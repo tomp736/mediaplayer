@@ -2,7 +2,7 @@
 version: "3.3"
 services:
   app:
-    image: ghcr.io/tomp736/images/python_app
+    image: ghcr.io/tomp736/mediaplayer/mediaplayer
     ports:
       - "8080:80"
     environment:
