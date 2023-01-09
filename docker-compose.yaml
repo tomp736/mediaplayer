@@ -1,0 +1,40 @@
+---
+version: "3.3"
+services:
+  app:
+    image: ghcr.io/tomp736/images/python_app
+    ports:
+      - "8080:80"
+    environment:
+      - PYTHONHASHSEED=383747829
+      - FLASK_RUN_PORT=80
+    volumes:
+      - /srv/media/videos:/app/videos
+    restart: unless-stopped
+  httpthumb:
+    image: ghcr.io/tomp736/images/python_httpthumb
+    environment:
+      - PYTHONHASHSEED=383747829
+      - FLASK_RUN_PORT=80
+    volumes:
+      - /srv/media/videos:/app/videos
+      - /srv/media/thumbs:/app/thumbs
+    restart: always
+  httpvideo:
+    image: ghcr.io/tomp736/images/python_httpvideo
+    environment:
+      - PYTHONHASHSEED=383747829
+      - FLASK_RUN_PORT=80
+    volumes:
+      - /srv/media/videos:/app/videos
+    restart: always
+  httpfile:
+    image: ghcr.io/tomp736/images/python_httpfile
+    ports:
+      - "8081:80"
+    environment:
+      - PYTHONHASHSEED=383747829
+      - FLASK_RUN_PORT=80
+    volumes:
+      - /srv/media/videos:/files
+    restart: unless-stopped

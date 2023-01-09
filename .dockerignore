@@ -1,0 +1,4 @@
+dockerfile
+build/**
+test/**
+debug/**
