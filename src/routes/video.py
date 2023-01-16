@@ -1,5 +1,5 @@
 from flask import Response, request, Blueprint
-from utils.net_services import get_video_url
+from utils.media_services import get_video_url
 from utils.prom_services import count_video
 import requests
 import logging
@@ -23,3 +23,9 @@ def video(id):
     response = Response(req.iter_content(CHUNK_SIZE), 206, mimetype='video/webm', content_type='video/webm', direct_passthrough=True )
     response.headers.add('Content-Range', req.headers['Content-Range'])
     return response
+
+@app_video.after_request
+def after_request(response):
+    response.headers.add('Accept-Ranges', 'bytes')
+    return response
+

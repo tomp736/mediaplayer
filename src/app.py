@@ -1,15 +1,15 @@
 
 from flask import Flask
+from prometheus_client import start_http_server
+from routes import video, thumb, meta, base
+
 import os
 import logging
 
-from routes import base, video, thumb, extensions
-from prometheus_client import start_http_server, Summary
-
 app = Flask(__name__)
-app.register_blueprint(extensions.app_def)
 app.register_blueprint(video.app_video)
 app.register_blueprint(thumb.app_thumb)
+app.register_blueprint(meta.app_meta)
 app.register_blueprint(base.app_base)
 
 if __name__ == '__main__':

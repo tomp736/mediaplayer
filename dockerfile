@@ -17,7 +17,7 @@ COPY ./src .
 
 # Set environment variables for the Flask application
 # ENV PYTHONHASHSEED= set to have consistant hashes
-ENV FLASK_APP=httpvideo.py
+ENV FLASK_APP=app.py
 ENV FLASK_DEBUG=False
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=80

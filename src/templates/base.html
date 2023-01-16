@@ -60,6 +60,16 @@
 		source.setAttribute('type', 'video/webm');
 		video.load();
 		video.play();
+		meta(id);
+	}
+	function meta(id)
+	{
+		fetch('/meta/' + id)
+			.then(res => res.json())
+			.then((out) => {
+				console.log('Output: ', out);
+			})
+			.catch(err => console.error(err));
 	}
 </script>
 </html> 

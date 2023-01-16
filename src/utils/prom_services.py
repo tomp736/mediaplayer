@@ -1,14 +1,18 @@
 from prometheus_client import Counter
 
-cv = Counter(f"request_video_total", "The total number of requests to video id.")
-cvl = Counter(f"request_video_list_total", "The total number of requests to video list.")
-ct = Counter(f"request_thumb_total", "The total number of requests to thumb id.")
+request_video_total = Counter(f"request_video_total", "request_video_total")
+request_video_list_total = Counter(f"request_video_list_total", "request_video_list_total")
+request_thumb_total = Counter(f"request_thumb_total", "request_thumb_total")
+request_meta_total = Counter(f"request_meta_total", "request_meta_total")
 
 def count_video():
-    cv.inc()
+    request_video_total.inc()
     
 def count_video_list():
-    cvl.inc()
+    request_video_total.inc()
     
 def count_thumb():
-    ct.inc()
+    request_thumb_total.inc()
+    
+def count_meta():
+    request_meta_total.inc()

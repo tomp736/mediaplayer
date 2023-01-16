@@ -1,27 +1,27 @@
 from flask import Blueprint, Response
-from utils.media_services import get_thumb_url
-from utils.prom_services import count_thumb
+from utils.media_services import get_meta_url
+from utils.prom_services import count_meta
 import requests
 import logging
 
-app_thumb = Blueprint('app_thumb',__name__)
+app_meta = Blueprint('app_meta',__name__)
 
 CHUNK_SIZE = 2 ** 25
 
-@app_thumb.route('/thumb/<string:id>')
-def thumb(id):
-    logging.info(f"Handling thumb/{id}")
-    count_thumb()
-    thumbUrl=get_thumb_url(id)
+@app_meta.route('/meta/<string:id>')
+def meta(id):
+    logging.info(f"Handling meta/{id}")
+    count_meta()
+    metaUrl=get_meta_url(id)
     
     req = requests.get(
-        thumbUrl
+        metaUrl
         )
     
     response = Response(req.iter_content(CHUNK_SIZE), content_type=req.headers['Content-Type'])
     return response
 
-@app_thumb.after_request
+@app_meta.after_request
 def after_request(response):
     response.headers.add('Accept-Ranges', 'bytes')
     return response
