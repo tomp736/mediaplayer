@@ -1,40 +1,64 @@
 ---
-version: "3.3"
+version: "3.9"
 services:
-  app:
+  mediaplayer:
     image: ghcr.io/tomp736/mediaplayer/mediaplayer
     ports:
       - "8080:80"
-    environment:
-      - PYTHONHASHSEED=383747829
-      - FLASK_RUN_PORT=80
-    volumes:
-      - /srv/media/videos:/app/videos
+    env_file:
+      - 'common.env'
+    networks:
+      - fe_public
+      - be_public
     restart: unless-stopped
+
   httpthumb:
     image: ghcr.io/tomp736/images/python_httpthumb
-    environment:
-      - PYTHONHASHSEED=383747829
-      - FLASK_RUN_PORT=80
+    env_file:
+      - 'common.env'
+    networks:
+      - be_public
     volumes:
-      - /srv/media/videos:/app/videos
-      - /srv/media/thumbs:/app/thumbs
+      - /srv/media/videos:/app/videos:ro
+      - /srv/media/thumbs:/app/thumbs:rw
     restart: always
+
+  httpmeta:
+    image: ghcr.io/tomp736/images/python_httpmeta
+    env_file:
+      - 'common.env'
+    networks:
+      - be_public
+    ports:
+      - "8082:80"
+    volumes:
+      - /srv/media/videos:/app/videos:ro
+      - /srv/media/meta:/app/meta:rw
+    restart: always
+
   httpvideo:
     image: ghcr.io/tomp736/images/python_httpvideo
-    environment:
-      - PYTHONHASHSEED=383747829
-      - FLASK_RUN_PORT=80
+    env_file:
+      - 'common.env'
+    networks:
+      - be_public
     volumes:
-      - /srv/media/videos:/app/videos
+      - /srv/media/videos:/app/videos:ro
     restart: always
+
   httpfile:
     image: ghcr.io/tomp736/images/python_httpfile
+    env_file:
+      - 'common.env'
+    networks:
+      - fe_admin
     ports:
       - "8081:80"
-    environment:
-      - PYTHONHASHSEED=383747829
-      - FLASK_RUN_PORT=80
     volumes:
-      - /srv/media/videos:/files
+      - /srv/media/videos:/files:rw
     restart: unless-stopped
+
+networks:
+  fe_public:
+  be_public:
+  fe_admin:
