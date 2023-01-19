@@ -70,8 +70,16 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.patch_version.outputs.new_version }}
-      
-      # Commit the changes to the repository without pushing
+
+  publish-tag:
+    needs: build-and-push-image
+    runs-on: ubuntu-latest   
+    
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
