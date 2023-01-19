@@ -1,7 +1,4 @@
-FROM python:3.8-slim
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends build-essential gcc ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+FROM ghcr.io/labrats-work/ops-images/python:latest
 
 COPY ./src/pymp_common/ ./pymp_common
 COPY ./src/pymp_frontend_api/ ./pymp_frontend_api
