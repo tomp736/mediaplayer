@@ -80,6 +80,11 @@ jobs:
       packages: write
 
     steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          
       - run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
