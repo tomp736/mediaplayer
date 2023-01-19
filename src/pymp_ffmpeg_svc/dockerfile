@@ -1,7 +1,7 @@
 FROM ghcr.io/labrats-work/ops-images/python:latest
 
 RUN apt-get update \
-    && ffmpeg \
+    && apt-get install ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./src/pymp_common/ ./pymp_common
