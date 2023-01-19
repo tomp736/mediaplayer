@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ${{ matrix.image }}/dockerfile
+          file: src/${{ matrix.image }}/dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
