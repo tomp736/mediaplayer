@@ -1,11 +1,11 @@
-# MediaPlayer
+# PYMP - Python Media Player
 
-Basic media library and player.
+Featureless media player I created when learning Python & Prometheus.
 
 Usage:
 ``` sh
-sudo mkdir -p /srv/media/files
-sudo mkdir -p /srv/media/thumbs
+sudo mkdir -p /srv/media/videos
 sudo chown -R $USER:docker /srv/media
-docker-compose up
+./build-all.sh
+docker-compose up -d
 ```

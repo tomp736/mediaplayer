@@ -1,0 +1,11 @@
+{% for id in ids %}
+<div class="card">
+    <a onclick="play('{{id}}')" href="javascript:void(0);">
+        <div class="card-image">
+            <figure class="image is-fullwidth is-16by9">
+                <img id="thumb_{{id}}" src="" >
+            </figure>
+        </div>
+    </a>
+</div>
+{% endfor %}

@@ -1,0 +1,99 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head> 
+<body> 
+	<section class="hero is-info is-fullheight">
+		<div class="hero-head">
+		  <nav class="navbar">
+			<div class="container">
+			  <div class="navbar-brand">
+				<a class="navbar-item">
+				  <h1>PYMP - Python Media Player</h1>
+				</a>
+				<span class="navbar-burger" data-target="navbarMenuHeroA">
+				  <span></span>
+				  <span></span>
+				  <span></span>
+				</span>
+			  </div>
+			  <div id="navbarMenuHeroA" class="navbar-menu">
+				<div class="navbar-end">
+				  <a class="navbar-item is-active">
+					Home
+				  </a>
+				  <a class="navbar-item" href="https://github.com/tomp736/images">
+					Documentation
+				  </a>
+				</div>
+			  </div>
+			</div>
+		  </nav>
+		</div>
+		<div class="hero-body">
+			<div class="container is-fullhd">
+				<div class="columns is-10 is-variable">
+					<div class="column is-four-fifths has-text-left">
+						{% block video %} 
+					
+						{% endblock %} 
+					</div>
+					<div class="column is-one-fifth has-text-left" style="overflow-anchor: none; overflow: overlay; height: 70vh;">
+						{% block library %} 
+					
+						{% endblock %} 
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="hero-foot"></div>
+	  </section>
+</body> 
+<script>
+	var video = document.getElementById('player');
+	var source = document.getElementById('player_source');
+	loadthumbs()
+	function loadthumbs()
+	{
+		var images = document.getElementsByTagName('img'); 
+		for(var i = 0; i < images.length; i++) {
+			image_id = images[i].id;
+			if(image_id.startsWith("thumb_"))
+			{
+				media_id = image_id.substring(6)
+				thumb(media_id)
+			}			
+		}		
+	}
+	function play(id)
+	{
+		video.pause();
+		source.setAttribute('src', '/media/' + id);
+		source.setAttribute('type', 'video/webm');
+		video.load();
+		video.play();
+		meta(id);
+	}
+	function meta(id)
+	{
+		fetch('/meta/' + id)
+			.then(res => res.json())
+			.then((out) => {
+				console.log('Output: ', out);
+			})
+			.catch(err => console.error(err));
+	}
+	function thumb(id)
+	{		
+		var thumb = document.getElementById('thumb_' + id);
+		fetch('/thumb/' + id)
+			.then(res => res.text())
+			.then((out) => {
+				// console.log('Output: ', out);
+				thumb.setAttribute('src','data:image/png;base64, ' + out)
+			})
+			.catch(err => console.error(err));
+	}
+</script>
+</html> 

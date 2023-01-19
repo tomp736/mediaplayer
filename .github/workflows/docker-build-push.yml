@@ -11,6 +11,14 @@ env:
 jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        image:
+          - pymp_frontend 
+          - pymp_frontend_api 
+          - pymp_ffmpeg_svc 
+          - pymp_file_svc 
+          - pymp_media_svc 
 
     permissions:
       contents: read
@@ -55,10 +63,12 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
+          context: .
+          file: ${{ matrix.image }}/dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}/mediaplayer:latest
-            ghcr.io/${{ github.repository }}/mediaplayer:${{ steps.patch_version.outputs.new_version }}
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.patch_version.outputs.new_version }}
       
       # Commit the changes to the repository without pushing
       - run: |
