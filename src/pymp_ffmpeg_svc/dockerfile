@@ -1,4 +1,4 @@
-FROM ghcr.io/labrats-work/ops-images/python:latest
+FROM ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg \
