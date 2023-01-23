@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: 
+        - 'prometheus:9090'
+
+  - job_name: 'pymp'
+    static_configs:
+    - targets:
+      - 'pymp_frontend:8000'
+      - 'pymp_frontend_media_api:8000'
+      - 'pymp_frontend_thumb_api:8000'
+      - 'pymp_frontend_meta_api:8000'
+      - 'pymp_media_svc:8000'
+      - 'pymp_ffmpeg_svc:8000'

@@ -4,18 +4,20 @@ from prometheus_client import start_http_server
 import os
 import logging
 
-from .routes import thumb
-from pymp_common.services.ConfigService import ConfigService
+from .routes import thumb, meta, media
+from pymp_common.app.PympConfig import pymp_env
 
 app = Flask(__name__)
 app.register_blueprint(thumb.app_thumb)
+app.register_blueprint(meta.app_meta)
+app.register_blueprint(media.app_media)
     
 def main():
     logging.getLogger().setLevel(logging.INFO)
     start_http_server(8000)
     app.run(
-        host=ConfigService.flask_host, 
-        port=ConfigService.flask_port, 
+        host=pymp_env.get("FLASK_RUN_HOST"), 
+        port=int(pymp_env.get("FLASK_RUN_PORT")), 
         debug=False
     )
 

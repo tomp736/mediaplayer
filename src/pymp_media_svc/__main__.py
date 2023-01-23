@@ -2,7 +2,7 @@
 from flask import Flask
 from prometheus_client import start_http_server
 import os, logging
-from pymp_common.services.ConfigService import ConfigService
+from pymp_common.app.PympConfig import pymp_env
 
 from .routes.media import app_media
 
@@ -13,8 +13,8 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     start_http_server(8000)
     app.run(
-        host=ConfigService.flask_host, 
-        port=ConfigService.flask_port, 
+        host=pymp_env.get("FLASK_RUN_HOST"), 
+        port=int(pymp_env.get("FLASK_RUN_PORT")), 
         debug=False
     )
 

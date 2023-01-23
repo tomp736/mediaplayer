@@ -1,15 +1,19 @@
 from flask import Blueprint, Response
-from ..services.ThumbService import ThumbService
 
-app_thumb = Blueprint('app_thumb',__name__)
+from pymp_common.dataaccess.redis import media_path_da
+from pymp_common.dataaccess.redis import media_thumb_da
 
-@app_thumb.route('/thumb/<string:id>')
-def video_thumb(id):  
-    thumb = ThumbService.get_thumb(id)
-    response=Response(thumb, 200, mimetype="text")
-    return response
+from ..services.FfmpegService import ffmpeg_service
 
-@app_thumb.after_request
-def after_request(response):
-    response.headers.add('Accept-Ranges', 'bytes')
-    return response
+app_thumb = Blueprint('app_thumb', __name__)
+
+
+@app_thumb.route('/thumb/<string:id>', methods=['GET'])
+def get_thumb(id):
+    if media_path_da.hhas(id):
+        media_path = str(media_path_da.hget(id))
+        media_thumb = ffmpeg_service.generate_thumb(media_path)
+        media_thumb_da.set(id, media_thumb.getvalue())
+    else:
+        return Response(status=404)
+    return Response(status=200)

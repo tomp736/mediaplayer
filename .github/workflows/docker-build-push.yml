@@ -20,6 +20,7 @@ jobs:
           - pymp_ffmpeg_svc 
           - pymp_file_svc 
           - pymp_media_svc 
+          - pymp_locust
 
     permissions:
       contents: read

@@ -1,0 +1,6 @@
+FROM pymp_common
+
+COPY ./src/pymp_file_svc/ ./pymp_file_svc
+RUN pip3 install ./pymp_file_svc
+
+CMD ["python", "-u", "-m" , "pymp_file_svc"]

@@ -1,0 +1,222 @@
+---
+version: "3.9"
+services:
+
+  # PYMP Services
+  pymp_frontend:
+    image: pymp_frontend
+    ports:
+      - "8080:80"
+    env_file:
+      - 'common.env'
+      - 'frontend.env'
+    networks:
+      - fe_api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: unless-stopped
+
+  pymp_frontend_media_api:
+    image: pymp_frontend_api
+    ports:
+      - "8081:80"
+    env_file:
+      - 'common.env'
+      - 'frontend_api.env'
+    networks:
+      - fe_api
+      - fe_api_svc
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: unless-stopped
+
+  pymp_frontend_thumb_api:
+    image: pymp_frontend_api
+    ports:
+      - "8082:80"
+    env_file:
+      - 'common.env'
+      - 'frontend_api.env'
+    networks:
+      - fe_api
+      - fe_api_svc
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: unless-stopped
+
+  pymp_frontend_meta_api:
+    image: pymp_frontend_api
+    ports:
+      - "8083:80"
+    env_file:
+      - 'common.env'
+      - 'frontend_api.env'
+    networks:
+      - fe_api
+      - fe_api_svc
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: unless-stopped
+
+  pymp_media_svc:
+    image: pymp_media_svc
+    env_file:
+      - 'common.env'
+      - 'backend.env'
+      - 'backend_api.env'
+    networks:
+      - fe_api_svc
+      - be_api_svc
+    ports:
+      - "8084:80"
+    volumes:
+      - /srv/media/videos:/app/videos:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 250M
+    restart: always
+
+  pymp_ffmpeg_svc:
+    image: pymp_ffmpeg_svc
+    env_file:
+      - 'common.env'
+      - 'backend.env'
+      - 'backend_api.env'
+    networks:
+      - be_api_svc
+    volumes:
+      - /srv/media/videos:/app/videos:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 50M
+    restart: always
+
+  pymp_file_svc:
+    image: pymp_file_svc
+    networks:
+      - be_api_svc
+    env_file:
+      - 'common.env'
+      - 'backend.env'
+      - 'backend_api.env'
+    ports:
+      - "8087:80"
+    volumes:
+      - /srv/media/videos:/files:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 50M
+        reservations:
+          cpus: '0.5'
+          memory: 20M
+    restart: unless-stopped
+
+  # Redis Services
+  redis-slave:
+    image: redis:latest
+    command: redis-server --slaveof redis-master 6379
+    networks:
+      - fe_api_svc
+      - be_redis
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: always
+   
+  redis-master:
+    image: redis:latest
+    command: redis-server --port 6379   
+    networks:
+      - be_api_svc
+      - be_redis
+    volumes: 
+      - /srv/media/redis:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: always
+
+  # Monitoring and Load Testing Services
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - fe_api
+      - fe_api_svc
+      - be_api_svc
+    ports:
+      - 9090:9090
+    volumes: 
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 100M
+    restart: always
+
+  pymp_locust:
+    image: pymp_locust
+    networks:
+      - fe_api
+      - fe_api_svc
+      - be_api_svc
+    ports:
+    - "8089:8089"
+    env_file:
+      - 'frontend.env'
+    command: -f /mnt/locust/locustfiles  
+
+networks:
+  fe_api:
+  fe_api_svc:
+  be_api_svc:
+  be_redis:

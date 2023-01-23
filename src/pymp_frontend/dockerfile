@@ -1,9 +1,13 @@
-FROM ghcr.io/labrats-work/ops-images/python:latest
+FROM ghcr.io/labrats-work/ops-images/python:latest as common
 
 COPY ./src/pymp_common/ ./pymp_common
-COPY ./src/pymp_frontend/ ./pymp_frontend
-
 RUN pip3 install ./pymp_common
+
+# FROM ghcr.io/labrats-work/ops-images/python:latest as app
+
+# COPY --from=common /usr/local/lib /usr/local/lib
+
+COPY ./src/pymp_frontend/ ./pymp_frontend
 RUN pip3 install ./pymp_frontend
 
 CMD ["python", "-u", "-m" , "pymp_frontend"]

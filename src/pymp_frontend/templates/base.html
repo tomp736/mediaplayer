@@ -69,7 +69,7 @@
 	function play(id)
 	{
 		video.pause();
-		source.setAttribute('src', '/media/' + id);
+		source.setAttribute('src', '{{ media_host }}/media/' + id);
 		source.setAttribute('type', 'video/webm');
 		video.load();
 		video.play();
@@ -77,7 +77,7 @@
 	}
 	function meta(id)
 	{
-		fetch('/meta/' + id)
+		fetch('{{ meta_host }}/meta/' + id)
 			.then(res => res.json())
 			.then((out) => {
 				console.log('Output: ', out);
@@ -87,13 +87,7 @@
 	function thumb(id)
 	{		
 		var thumb = document.getElementById('thumb_' + id);
-		fetch('/thumb/' + id)
-			.then(res => res.text())
-			.then((out) => {
-				// console.log('Output: ', out);
-				thumb.setAttribute('src','data:image/png;base64, ' + out)
-			})
-			.catch(err => console.error(err));
+		thumb.src = '{{ thumb_host }}/thumb/' + id;
 	}
 </script>
 </html> 
