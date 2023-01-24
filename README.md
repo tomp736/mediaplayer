@@ -25,7 +25,7 @@ sudo chown -R $USER:docker /srv/media
 cd examples/basic
 docker-compose up -d
 ```
-Running the docker-compose file in the basic example:
+Running the docker-compose file in 'example/basic':
 - frontend: localhost:8080
 - server: localhost:8081
 
@@ -35,7 +35,7 @@ Running the docker-compose file in the basic example:
 cd examples/multiple_frontend
 docker-compose up -d
 ```
-Running the docker-compose file included in the multiple_frontend example:
+Running the docker-compose file included in 'example/multiple_frontend':
 - frontend: localhost:8080
 - media-api: localhost:8081
 - meta-api: localhost:8082
@@ -43,7 +43,7 @@ Running the docker-compose file included in the multiple_frontend example:
 - media-svc: internal
 - ffmpeg-svc: internal
 
-Prometheus and locust services are only included in '_metrics' example.
+Prometheus and locust services are only included in 'example/multiple_frontend_metrics' example.
 
 - prometheus: localhost:9090
 - locust: localhost:8089
