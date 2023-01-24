@@ -1,4 +1,5 @@
 Flask==2.1.0
 flask_dropzone
 prometheus_client
-pymp_common
+app_common
+typing_extensions

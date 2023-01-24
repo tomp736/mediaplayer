@@ -8,10 +8,7 @@ services:
     ports:
       - "8080:80"
     env_file:
-      - 'common.env'
-      - 'frontend_api.env'
-    networks:
-      - fe_api
+      - 'frontend.env'
     deploy:
       resources:
         limits:
@@ -28,9 +25,8 @@ services:
       - "8081:80"
     env_file:
       - 'common.env'
-      - 'backend.env'
+      - 'frontend_api.env'
     networks:
-      - fe_api
       - fe_api_svc
     deploy:
       resources:
@@ -47,6 +43,7 @@ services:
     env_file:
       - 'common.env'
       - 'backend.env'
+      - 'backend_api.env'
     networks:
       - fe_api_svc
       - be_api_svc
@@ -67,6 +64,7 @@ services:
     env_file:
       - 'common.env'
       - 'backend.env'
+      - 'backend_api.env'
     networks:
       - be_api_svc
     volumes:
@@ -84,7 +82,7 @@ services:
   # Redis Services
    
   redis:
-    image: redis:latest
+    image: redis
     command: redis-server --port 6379   
     networks:
       - fe_api_svc
@@ -108,6 +106,7 @@ services:
     env_file:
       - 'common.env'
       - 'backend.env'
+      - 'backend_api.env'
     ports:
       - "8087:80"
     volumes:
@@ -123,6 +122,5 @@ services:
     restart: unless-stopped
 
 networks:
-  fe_api:
   fe_api_svc:
   be_api_svc:

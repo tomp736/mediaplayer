@@ -1,0 +1,6 @@
+FROM pymp_common
+
+COPY ./src/pymp_server/ ./pymp_server
+RUN pip3 install ./pymp_server
+
+CMD ["python", "-u", "-m" , "pymp_server"]

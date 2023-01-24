@@ -1,4 +1,0 @@
-FROM ghcr.io/labrats-work/ops-images/python:latest
-
-COPY ./src/pymp_common/ ./pymp_common
-RUN pip3 install ./pymp_common

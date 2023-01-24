@@ -7,11 +7,10 @@ SCRIPTPATH=`dirname $SCRIPT`
 
 cd $SCRIPTPATH
 
-docker build .. -f dockerfile.common -t pymp_common
+docker build .. -f dockerfile.pymp_common -t pymp_common
 
-docker build .. -f dockerfile.frontend -t pymp_frontend
-docker build .. -f dockerfile.frontend_api -t pymp_frontend_api
-docker build .. -f dockerfile.ffmpeg_svc -t pymp_ffmpeg_svc
-docker build .. -f dockerfile.media_svc -t pymp_media_svc
+docker build .. -f dockerfile.pymp_frontend -t pymp_frontend
+docker build .. -f dockerfile.pymp_server -t pymp_server
 docker build .. -f dockerfile.file_svc -t pymp_file_svc
-docker build .. -f dockerfile.locust -t pymp_locust
+
+docker build .. -f dockerfile.pymp_locust -t pymp_locust

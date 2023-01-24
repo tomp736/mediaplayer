@@ -2,6 +2,4 @@ Flask==2.1.0
 requests
 prometheus_client
 redis
-ffmpeg-python
-ffprobe-python
-typing_extensions
+app_common

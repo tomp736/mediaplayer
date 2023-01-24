@@ -1,9 +1,0 @@
-FROM ghcr.io/labrats-work/ops-images/python:latest
-
-COPY ./src/pymp_common/ ./pymp_common
-COPY ./src/pymp_frontend_api/ ./pymp_frontend_api
-
-RUN pip3 install ./pymp_common
-RUN pip3 install ./pymp_frontend_api
-
-CMD ["python", "-u", "-m" , "pymp_frontend_api"]

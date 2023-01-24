@@ -1,9 +1,0 @@
-FROM ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
-
-COPY ./src/pymp_common/ ./pymp_common
-COPY ./src/pymp_ffmpeg_svc/ ./pymp_ffmpeg_svc
-
-RUN pip3 install ./pymp_common
-RUN pip3 install ./pymp_ffmpeg_svc
-
-CMD ["python", "-u", "-m" , "pymp_ffmpeg_svc"]

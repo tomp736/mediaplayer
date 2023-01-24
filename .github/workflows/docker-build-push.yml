@@ -16,10 +16,7 @@ jobs:
       matrix: 
         image:
           - pymp_frontend 
-          - pymp_frontend_api 
-          - pymp_ffmpeg_svc 
-          - pymp_file_svc 
-          - pymp_media_svc 
+          - pymp_server
           - pymp_locust
 
     permissions:

@@ -2,9 +2,9 @@ from locust import HttpUser, TaskSet, between, task
 from locust.clients import HttpSession
 import json, random, os
 
-media_host=os.environ.get("MEDIA_HOST")
-meta_host=os.environ.get("META_HOST")
-thumb_host=os.environ.get("THUMB_HOST")
+media_url=os.environ.get("MEDIA_URL")
+meta_url=os.environ.get("META_URL")
+thumb_url=os.environ.get("THUMB_URL")
 
 class ApiTasks(TaskSet):              
     def on_start(self):
@@ -12,14 +12,14 @@ class ApiTasks(TaskSet):
         self.get_media_ids()
         
     def get_media_ids(self):
-        response = self.client.get(f"http://{media_host}/media/list")
+        response = self.client.get(f"{media_url}/api/media/list")
         self.media_ids = json.loads(response.content)
            
     @task
     def get_media(self):     
         range = 1048576 * random.randint(1,50)     
         id = random.choice(self.media_ids)
-        self.client.get(f"http://{media_host}/media/{id}",            
+        self.client.get(f"{media_url}/api/media/{id}",            
             headers={
                 "Range": f"{range}"
             }
@@ -28,19 +28,19 @@ class ApiTasks(TaskSet):
 
     @task
     def get_media_list(self):
-        self.client.get(f"http://{media_host}/media/list")
+        self.client.get(f"{media_url}/api/media/list")
         pass
         
     @task
     def get_thumb(self):
         id = random.choice(self.media_ids)
-        self.client.get(f"http://{thumb_host}/thumb/{id}")
+        self.client.get(f"{thumb_url}/api/thumb/{id}")
         pass
     
     @task
     def get_meta(self):
         id = random.choice(self.media_ids)
-        self.client.get(f"http://{meta_host}/meta/{id}")
+        self.client.get(f"{meta_url}/api/meta/{id}")
         pass
 
 class UserBehaviour(TaskSet):

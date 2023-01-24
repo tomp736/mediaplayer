@@ -1,6 +1,0 @@
-FROM pymp_common
-
-COPY ./src/pymp_frontend/ ./pymp_frontend
-RUN pip3 install ./pymp_frontend
-
-CMD ["python", "-u", "-m" , "pymp_frontend"]

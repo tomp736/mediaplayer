@@ -1,39 +1,46 @@
-from typing import Dict
 import os
+from enum import IntFlag
 
-
+class PympServer(IntFlag):
+    MEDIA_API = 1
+    META_API = 2
+    THUMB_API = 4
+    MEDIA_SVC = 8
+    FFMPEG_SVC = 16
+    
 class PympEnv:
 
     def __init__(self):
         self.getkeys = {
+            'FLASK_RUN_HOST': "0.0.0.0",
+            'FLASK_RUN_PORT': "80",
+            
             'REDIS_HOST': "",
             'REDIS_PORT': "80",
 
-            'MEDIA_SCHEME': "http",
-            'MEDIA_HOST': "",
-            'MEDIA_PORT': "80",
-            'MEDIA_HOST_PUBLIC': "",
-            'MEDIA_PORT_PUBLIC': "",
+            'MEDIA_API_SCHEME': "http",
+            'MEDIA_API_HOST': "",
+            'MEDIA_API_PORT': "80",
 
-            'THUMB_SCHEME': "http",
-            'THUMB_HOST': "",
-            'THUMB_PORT': "80",
-            'THUMB_HOST_PUBLIC': "",
-            'THUMB_PORT_PUBLIC': "",
+            'THUMB_API_SCHEME': "http",
+            'THUMB_API_HOST': "",
+            'THUMB_API_PORT': "80",
 
-            'META_SCHEME': "http",
-            'META_HOST': "",
-            'META_PORT': "80",
-            'META_HOST_PUBLIC': "",
-            'META_PORT_PUBLIC': "",
+            'META_API_SCHEME': "http",
+            'META_API_HOST': "",
+            'META_API_PORT': "80",
 
-            'FFMPEG_SCHEME': "http",
-            'FFMPEG_HOST': "",
-            'FFMPEG_PORT': "80",
+            'MEDIA_SVC_SCHEME': "http",
+            'MEDIA_SVC_HOST': "",
+            'MEDIA_SVC_PORT': "80",
 
-            'FEAPI_CORS_HEADER': "",
-            'FLASK_RUN_HOST': "0.0.0.0",
-            'FLASK_RUN_PORT': "80",
+            'FFMPEG_SVC_SCHEME': "http",
+            'FFMPEG_SVC_HOST': "",
+            'FFMPEG_SVC_PORT': "80",
+            
+            'SERVER_TYPE' : "31",
+            
+            'CORS_HEADER': "",
             'MEDIA_CHUNK_SIZE': 2 ** 20,
             'THUMB_CHUNK_SIZE': 2 ** 10
         }
@@ -46,47 +53,46 @@ class PympEnv:
             return value
 
         raise ValueError(f"{key} is not valid.")
+    
+    def getServerType(self):
+        serverType = int(self.get("SERVER_TYPE"))
+        return PympServer(serverType)
+    
 
-    def media_fqdn(self) -> str:
-        scheme = self.get("MEDIA_SCHEME")
-        host = self.get("MEDIA_HOST")
-        port = self.get("MEDIA_PORT")
+    def getRole(self) -> str:
+        scheme = self.get("MEDIA_API_SCHEME")
+        host = self.get("MEDIA_API_HOST")
+        port = self.get("MEDIA_API_PORT")
         return f"{scheme}://{host}:{port}"
 
-    def thumb_fqdn(self) -> str:
-        scheme = self.get("THUMB_SCHEME")
-        host = self.get("THUMB_HOST")
-        port = self.get("THUMB_PORT")
+    def media_api_base_url(self) -> str:
+        scheme = self.get("MEDIA_API_SCHEME")
+        host = self.get("MEDIA_API_HOST")
+        port = self.get("MEDIA_API_PORT")
         return f"{scheme}://{host}:{port}"
 
-    def meta_fqdn(self) -> str:
-        scheme = self.get("META_SCHEME")
-        host = self.get("META_HOST")
-        port = self.get("META_PORT")
+    def thumb_api_base_url(self) -> str:
+        scheme = self.get("THUMB_API_SCHEME")
+        host = self.get("THUMB_API_HOST")
+        port = self.get("THUMB_API_PORT")
         return f"{scheme}://{host}:{port}"
 
-    def ffmpeg_fqdn(self) -> str:
-        scheme = self.get("FFMPEG_SCHEME")
-        host = self.get("FFMPEG_HOST")
-        port = self.get("FFMPEG_PORT")
+    def meta_api_base_url(self) -> str:
+        scheme = self.get("META_API_SCHEME")
+        host = self.get("META_API_HOST")
+        port = self.get("META_API_PORT")
         return f"{scheme}://{host}:{port}"
 
-    def media_public_fqdn(self) -> str:
-        scheme = self.get("MEDIA_SCHEME")
-        host = self.get("MEDIA_HOST_PUBLIC")
-        port = self.get("MEDIA_PORT_PUBLIC")
+    def media_svc_base_url(self) -> str:
+        scheme = self.get("MEDIA_SVC_SCHEME")
+        host = self.get("MEDIA_SVC_HOST")
+        port = self.get("MEDIA_SVC_PORT")
         return f"{scheme}://{host}:{port}"
 
-    def thumb_public_fqdn(self) -> str:
-        scheme = self.get("THUMB_SCHEME")
-        host = self.get("THUMB_HOST_PUBLIC")
-        port = self.get("THUMB_PORT_PUBLIC")
-        return f"{scheme}://{host}:{port}"
-
-    def meta_public_fqdn(self) -> str:
-        scheme = self.get("META_SCHEME")
-        host = self.get("META_HOST_PUBLIC")
-        port = self.get("META_PORT_PUBLIC")
+    def ffmpeg_svc_base_url(self) -> str:
+        scheme = self.get("FFMPEG_SVC_SCHEME")
+        host = self.get("FFMPEG_SVC_HOST")
+        port = self.get("FFMPEG_SVC_PORT")
         return f"{scheme}://{host}:{port}"
 
 

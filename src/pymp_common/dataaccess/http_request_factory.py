@@ -1,34 +1,28 @@
 from abc import ABCMeta
 from typing import Mapping
 from typing_extensions import TypeAlias
-from enum import Enum
 from requests import Request
 
-from ..app.PympConfig import pymp_env
+from ..app.PympConfig import pymp_env, PympServer
 
 _HeadersMapping: TypeAlias = Mapping[str, str or bytes]
 
 
-class PympApi(Enum):
-    MEDIA = 1
-    THUMB = 2
-    META = 3
-    FFMPEG = 4
-
-
 class HttpRequestFactory(metaclass=ABCMeta):
-    def base_url(self, api: PympApi) -> str:
-        if api.value == PympApi.MEDIA.value:
-            return pymp_env.media_fqdn()
-        elif api.value == PympApi.THUMB.value:
-            return pymp_env.thumb_fqdn()
-        elif api.value == PympApi.META.value:
-            return pymp_env.meta_fqdn()
-        elif api.value == PympApi.FFMPEG.value:
-            return pymp_env.ffmpeg_fqdn()
+    def base_url(self, api: PympServer) -> str:
+        if api.value == PympServer.MEDIA_API.value:
+            return pymp_env.media_api_base_url()
+        elif api.value == PympServer.META_API.value:
+            return pymp_env.meta_api_base_url()
+        elif api.value == PympServer.THUMB_API.value:
+            return pymp_env.thumb_api_base_url()
+        elif api.value == PympServer.MEDIA_SVC.value:
+            return pymp_env.media_svc_base_url()
+        elif api.value == PympServer.FFMPEG_SVC.value:
+            return pymp_env.ffmpeg_svc_base_url()
         return ""
 
-    def get(self, api: PympApi, path: str, headers: _HeadersMapping = {}) -> Request:
+    def get(self, api: PympServer, path: str, headers: _HeadersMapping = {}) -> Request:
         base_url = self.base_url(api)
         return Request(
             method='GET',
@@ -36,7 +30,7 @@ class HttpRequestFactory(metaclass=ABCMeta):
             headers=headers
         )
 
-    def post(self, api: PympApi, path: str, data, headers: _HeadersMapping = {}) -> Request:
+    def post(self, api: PympServer, path: str, data, headers: _HeadersMapping = {}) -> Request:
         base_url = self.base_url(api)
         return Request(
             method='POST',
@@ -49,48 +43,49 @@ class HttpRequestFactory(metaclass=ABCMeta):
 http_request_factory = HttpRequestFactory()
 
 
+class ApiRequestFactory():
+    def get_media(self, id: str, rangeStart: int, rangeEnd) -> Request:
+        mediaHeaders = {
+            'Range': f'bytes {rangeStart}-{rangeEnd}'
+        }
+        return http_request_factory.get(PympServer.MEDIA_API, f"/api/media/{id}", mediaHeaders)
+
+    def get_media_list(self) -> Request:
+        return http_request_factory.get(PympServer.MEDIA_API, f"/api/media/list")
+
+    def get_thumb(self, id: str) -> Request:
+        return http_request_factory.get(PympServer.THUMB_API, f"/api/thumb/{id}")
+
+    def get_meta(self, id: str) -> Request:
+        return http_request_factory.get(PympServer.META_API, f"/api/meta/{id}")
+
+
+api_request_factory = ApiRequestFactory()
+
+
 class MediaRequestFactory():
     def get_media(self, id: str, rangeStart: int, rangeEnd) -> Request:
         mediaHeaders = {
             'Range': f'bytes {rangeStart}-{rangeEnd}'
         }
-        return http_request_factory.get(PympApi.MEDIA, f"/media/{id}", mediaHeaders)
-
-    def get_media_list(self) -> Request:
-        return http_request_factory.get(PympApi.MEDIA, f"/media/list")
+        return http_request_factory.get(PympServer.MEDIA_SVC, f"/media/{id}", mediaHeaders)
 
     def get_media_index(self) -> Request:
-        return http_request_factory.get(PympApi.MEDIA, f"/media/index")
+        return http_request_factory.get(PympServer.MEDIA_SVC, f"/media/index")
 
 
 media_request_factory = MediaRequestFactory()
 
 
-class ThumbRequestFactory():
-    def get_thumb(self, id: str) -> Request:
-        return http_request_factory.get(PympApi.THUMB, f"/thumb/{id}")
-
-
-thumb_request_factory = ThumbRequestFactory()
-
-
-class MetaRequestFactory():
-    def get_meta(self, id: str) -> Request:
-        return http_request_factory.get(PympApi.META, f"/meta/{id}")
-
-
-meta_request_factory = MetaRequestFactory()
-
-
 class FfmpegRequestFactory():
     def get_meta(self, id: str) -> Request:
-        return http_request_factory.get(PympApi.FFMPEG, f"/meta/{id}")
+        return http_request_factory.get(PympServer.FFMPEG_SVC, f"/ffmpeg/meta/{id}")
 
     def get_thumb(self, id: str) -> Request:
-        return http_request_factory.get(PympApi.FFMPEG, f"/thumb/{id}")
+        return http_request_factory.get(PympServer.FFMPEG_SVC, f"/ffmpeg/thumb/{id}")
 
     def get_static(self) -> Request:
-        return http_request_factory.get(PympApi.FFMPEG, f"/media/static")
+        return http_request_factory.get(PympServer.FFMPEG_SVC, f"/ffmpeg/media/static")
 
 
 ffmpeg_request_factory = FfmpegRequestFactory()

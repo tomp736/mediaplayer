@@ -1,6 +1,0 @@
-FROM pymp_common
-
-COPY ./src/pymp_media_svc/ ./pymp_media_svc
-RUN pip3 install ./pymp_media_svc
-
-CMD ["python", "-u", "-m" , "pymp_media_svc"]

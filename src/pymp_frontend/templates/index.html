@@ -1,9 +1,62 @@
-{% extends 'base.html' %}
-
-{% block video %}
-    {{ rendered_video|safe }}
-{% endblock %}
-
-{% block library %}
-    {{ rendered_library|safe }}
-{% endblock %}
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head> 
+<body> 
+	<section class="hero is-info is-fullheight">
+		<div class="hero-head">
+		  <nav class="navbar">
+			<div class="container">
+			  <div class="navbar-brand">
+				<a class="navbar-item">
+				  <h1>PYMP - Python Media Player</h1>
+				</a>
+				<span class="navbar-burger" data-target="navbarMenuHeroA">
+				  <span></span>
+				  <span></span>
+				  <span></span>
+				</span>
+			  </div>
+			  <div id="navbarMenuHeroA" class="navbar-menu">
+				<div class="navbar-end">
+				  <a class="navbar-item is-active">
+					Home
+				  </a>
+				  <a class="navbar-item" href="https://github.com/tomp736/pymp">
+					Documentation
+				  </a>
+				</div>
+			  </div>
+			</div>
+		  </nav>
+		</div>
+		<div class="hero-body">
+			<div class="container is-fullhd">
+				<div class="columns is-10 is-variable">
+					<div id="video" class="column is-four-fifths has-text-left">
+                        <video id="player" controls style="width:100%;" >
+                            <source id="player_source" src="" >
+                        </video>
+					</div>
+					<div id="library" class="column is-one-fifth has-text-left" style="overflow-anchor: none; overflow: overlay; height: 70vh;">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="hero-foot"></div>
+	  </section>
+</body> 
+<template id="libraryitem">
+    <div class="card">
+        <a href="javascript:void(0);">
+            <div class="card-image">
+                <figure class="image is-fullwidth is-16by9">
+                    <img src="" >
+                </figure>
+            </div>
+        </a>
+    </div>
+</template>
+<script src="app.js" type="text/javascript"></script>
+</html> 

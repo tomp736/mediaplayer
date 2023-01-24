@@ -8,10 +8,7 @@ services:
     ports:
       - "8080:80"
     env_file:
-      - 'common.env'
       - 'frontend.env'
-    networks:
-      - fe_api
     deploy:
       resources:
         limits:
@@ -23,15 +20,16 @@ services:
     restart: unless-stopped
 
   pymp_frontend_media_api:
-    image: pymp_frontend_api
+    image: pymp_server
     ports:
       - "8081:80"
     env_file:
-      - 'common.env'
-      - 'frontend_api.env'
+      - 'server_api.env'
+    environment:
+      - SERVER_TYPE=1
     networks:
-      - fe_api
       - fe_api_svc
+      - be_api_svc
     deploy:
       resources:
         limits:
@@ -43,15 +41,16 @@ services:
     restart: unless-stopped
 
   pymp_frontend_thumb_api:
-    image: pymp_frontend_api
+    image: pymp_server
     ports:
       - "8082:80"
     env_file:
-      - 'common.env'
-      - 'frontend_api.env'
+      - 'server_api.env'
+    environment:
+      - SERVER_TYPE=4
     networks:
-      - fe_api
       - fe_api_svc
+      - be_api_svc
     deploy:
       resources:
         limits:
@@ -63,15 +62,16 @@ services:
     restart: unless-stopped
 
   pymp_frontend_meta_api:
-    image: pymp_frontend_api
+    image: pymp_server
     ports:
       - "8083:80"
     env_file:
-      - 'common.env'
-      - 'frontend_api.env'
+      - 'server_api.env'
+    environment:
+      - SERVER_TYPE=2
     networks:
-      - fe_api
       - fe_api_svc
+      - be_api_svc
     deploy:
       resources:
         limits:
@@ -83,11 +83,11 @@ services:
     restart: unless-stopped
 
   pymp_media_svc:
-    image: pymp_media_svc
+    image: pymp_server
     env_file:
-      - 'common.env'
-      - 'backend.env'
-      - 'backend_api.env'
+      - 'server_svc.env'
+    environment:
+      - SERVER_TYPE=8
     networks:
       - fe_api_svc
       - be_api_svc
@@ -106,11 +106,11 @@ services:
     restart: always
 
   pymp_ffmpeg_svc:
-    image: pymp_ffmpeg_svc
+    image: pymp_server
     env_file:
-      - 'common.env'
-      - 'backend.env'
-      - 'backend_api.env'
+      - 'server_svc.env'
+    environment:
+      - SERVER_TYPE=16
     networks:
       - be_api_svc
     volumes:
@@ -124,6 +124,26 @@ services:
           cpus: '0.5'
           memory: 50M
     restart: always
+
+  pymp_file_svc:
+    image: pymp_file_svc
+    networks:
+      - be_api_svc
+    env_file:
+      - 'server_api.env'
+    ports:
+      - "8087:80"
+    volumes:
+      - /srv/media/videos:/files:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 50M
+        reservations:
+          cpus: '0.5'
+          memory: 20M
+    restart: unless-stopped
 
   # Redis Services
   redis-slave:
@@ -160,30 +180,7 @@ services:
           memory: 25M
     restart: always
 
-  pymp_file_svc:
-    image: pymp_file_svc
-    networks:
-      - be_api_svc
-    env_file:
-      - 'common.env'
-      - 'backend.env'
-      - 'backend_api.env'
-    ports:
-      - "8087:80"
-    volumes:
-      - /srv/media/videos:/files:rw
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 50M
-        reservations:
-          cpus: '0.5'
-          memory: 20M
-    restart: unless-stopped
-
 networks:
-  fe_api:
   fe_api_svc:
   be_api_svc:
   be_redis:
