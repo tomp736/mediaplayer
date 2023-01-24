@@ -1,5 +1,5 @@
 ---
-version: "3.9"
+version: "3.3"
 services:
 
   # PYMP Services
@@ -42,7 +42,7 @@ services:
   pymp_file_svc:
     image: pymp_file_svc
     networks:
-      - be_api_svc
+      - fe_api_svc
     env_file:
       - 'server.env'
     ports:

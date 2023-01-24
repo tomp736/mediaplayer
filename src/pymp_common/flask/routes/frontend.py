@@ -1,6 +1,7 @@
 from flask import Response, request, Blueprint
 import requests, json
 
+from pymp_common.app.PympConfig import PympServer
 from pymp_common.flask.routes.media import index, get_media
 from pymp_common.flask.routes.ffmpeg import ffmpeg_meta, ffmpeg_thumb
 
@@ -17,7 +18,7 @@ app_frontend_thumb = Blueprint('app_frontend_thumb', __name__)
 def media(id):
     reqByte1, reqByte2 = get_request_range(request)
     
-    if(pymp_env.media_api_base_url() == pymp_env.media_svc_base_url()):
+    if(pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.MEDIA_SVC)):
         return get_media(id)   
     else:   
         apiRequest = media_request_factory.get_media(id, reqByte1, request)        
@@ -36,7 +37,7 @@ def media(id):
 @app_frontend_media.route('/api/media/list')
 def list():        
     if not media_path_da.has():      
-        if(pymp_env.media_api_base_url() == pymp_env.media_svc_base_url()):
+        if(pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.MEDIA_SVC)):
             index()
         else: 
             apiRequest = media_request_factory.get_media_index()     
@@ -54,7 +55,7 @@ def list():
 @app_frontend_meta.route('/api/meta/<string:id>')
 def meta(id):     
     if not media_meta_da.has(id):
-        if(pymp_env.media_api_base_url() == pymp_env.ffmpeg_svc_base_url()):
+        if(pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.FFMPEG_SVC)):
             ffmpeg_meta(id)  
         else:
             apiRequest = ffmpeg_request_factory.get_meta(id)    
@@ -68,7 +69,7 @@ def meta(id):
 @app_frontend_thumb.route('/api/thumb/<string:id>')
 def thumb(id):
     if not media_thumb_da.has(id):
-        if(pymp_env.media_api_base_url() == pymp_env.ffmpeg_svc_base_url()):
+        if(pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.FFMPEG_SVC)):
             ffmpeg_thumb(id)  
         else:
             apiRequest = ffmpeg_request_factory.get_thumb(id)

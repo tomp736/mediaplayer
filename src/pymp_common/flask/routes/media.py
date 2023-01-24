@@ -4,7 +4,7 @@ import requests
 
 from pymp_common.flask.routes.ffmpeg import ffmpeg_media, ffmpeg_meta, ffmpeg_thumb
 
-from ...app.PympConfig import pymp_env
+from ...app.PympConfig import PympServer, pymp_env
 from ...dataaccess.redis import media_da, media_length_da, media_path_da
 from ...dataaccess.http_request_factory import ffmpeg_request_factory
 from ...app.MediaFileService import MediaFileService
@@ -35,7 +35,7 @@ def get_media(id):
 
     # catch all
     if not media_da.has("static"):
-        if (pymp_env.media_api_base_url() == pymp_env.ffmpeg_svc_base_url()):
+        if (pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.FFMPEG_SVC)):
             ffmpeg_media("static")
         else:
             apiRequest = ffmpeg_request_factory.get_static()
@@ -52,7 +52,7 @@ def get_media(id):
 def index():
     media_path_dictionary, media_length_dictionary = MediaFileService.get_media_indexes()
 
-    if (pymp_env.media_api_base_url() == pymp_env.ffmpeg_svc_base_url()):
+    if (pymp_env.getBaseUrl(PympServer.MEDIA_API) == pymp_env.getBaseUrl(PympServer.FFMPEG_SVC)):
         for item in media_path_dictionary.items():
             ffmpeg_thumb(item[0])
             ffmpeg_meta(item[0])
