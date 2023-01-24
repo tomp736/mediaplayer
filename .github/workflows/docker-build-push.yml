@@ -15,9 +15,10 @@ jobs:
       fail-fast: false
       matrix: 
         image:
+          - pymp_file_svc
           - pymp_frontend 
-          - pymp_server
           - pymp_locust
+          - pymp_server
 
     permissions:
       contents: read
