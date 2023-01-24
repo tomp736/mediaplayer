@@ -79,26 +79,6 @@ services:
           memory: 50M
     restart: always
 
-  # Redis Services
-   
-  redis:
-    image: redis
-    command: redis-server --port 6379   
-    networks:
-      - fe_api_svc
-      - be_api_svc
-    volumes: 
-      - /srv/media/redis:/data
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 25M
-    restart: always
-
   pymp_file_svc:
     image: ghcr.io/tomp736/pymp/pymp_file_svc:latest
     networks:
@@ -120,6 +100,26 @@ services:
           cpus: '0.5'
           memory: 20M
     restart: unless-stopped
+
+  # Redis Services
+   
+  redis:
+    image: redis
+    command: redis-server --port 6379   
+    networks:
+      - fe_api_svc
+      - be_api_svc
+    volumes: 
+      - /srv/media/redis:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 25M
+    restart: always
 
 networks:
   fe_api_svc:
