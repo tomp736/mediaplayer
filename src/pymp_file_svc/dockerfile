@@ -1,9 +1,9 @@
 FROM ghcr.io/labrats-work/ops-images/python:latest
 
-COPY ./src/app_common/ ./app_common
+COPY ./src/pymp_common/ ./pymp_common
 COPY ./src/pymp_file_svc/ ./pymp_file_svc
 
-RUN pip3 install ./app_common
+RUN pip3 install ./pymp_common
 RUN pip3 install ./pymp_file_svc
 
 CMD ["python", "-u", "-m" , "pymp_file_svc"]
