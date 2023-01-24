@@ -25,7 +25,7 @@ sudo chown -R $USER:docker /srv/media
 cd examples/basic
 docker-compose up -d
 ```
-Running docker-compose files included in the basic example:
+Running the docker-compose file in the basic example:
 - frontend: localhost:8080
 - server: localhost:8081
 
@@ -35,7 +35,7 @@ Running docker-compose files included in the basic example:
 cd examples/multiple_frontend
 docker-compose up -d
 ```
-Running docker-compose files included in the multiple_frontend example:
+Running the docker-compose file included in the multiple_frontend example:
 - frontend: localhost:8080
 - media-api: localhost:8081
 - meta-api: localhost:8082
