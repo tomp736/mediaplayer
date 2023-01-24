@@ -19,23 +19,35 @@ sudo chown -R $USER:docker /srv/media
 ```
 
 
-## Run:
+## Basic Example:
 
 ``` sh
 cd examples/basic
 docker-compose up -d
 ```
-Running docker-compose files included - you can expect the services to be bound to ports as follows.
+Running docker-compose files included in the basic example:
 - frontend: localhost:8080
-- frontend-api: localhost:8081, *localhost:8082*, *localhost:8083*
-- fileupload: localhost:8087
-- prometheus: *localhost:9090*
-- locust: *localhost:8089*
+- server: localhost:8081
+
+## Microservice Example:
+
+``` sh
+cd examples/multiple_frontend
+docker-compose up -d
+```
+Running docker-compose files included in the multiple_frontend example:
+- frontend: localhost:8080
+- media-api: localhost:8081
+- meta-api: localhost:8082
+- thumb-api: localhost:8083
+- media-svc: internal
+- ffmpeg-svc: internal
 
 Prometheus and locust services are only included in '_metrics' example.
- 
-Frontend-api is only created on 8081 for basic.
 
+- prometheus: localhost:9090
+- locust: localhost:8089
+ 
 ## Upload:
 
 ``` sh
