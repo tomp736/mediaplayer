@@ -2,12 +2,11 @@
 from flask import Flask
 from prometheus_client import start_http_server
 import logging
-from pymp_common.dataaccess.http_request_factory import PympServer
 
 from pymp_common.flask.routes.media import app_media
 from pymp_common.flask.routes.ffmpeg import app_ffmpeg_media, app_ffmpeg_meta, app_ffmpeg_thumb
 from pymp_common.flask.routes.frontend import app_frontend_media, app_frontend_thumb, app_frontend_meta
-from pymp_common.app.PympConfig import pymp_env
+from pymp_common.app.PympConfig import pymp_env, PympServer
 
 app = Flask(__name__)
 
@@ -17,6 +16,7 @@ def main():
     start_http_server(8000)
 
     server_type = pymp_env.getServerType()
+
     logging.info(server_type)
 
     if (server_type & PympServer.MEDIA_API):
