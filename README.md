@@ -55,7 +55,7 @@ Monitoring Services
 - prometheus: localhost:9090
 - locust: localhost:8089
 
-![micro](docs/pymp_microservice_flat_v2.png)
+![micro](docs/pymp_microservice_flat2.png)
  
 ## Upload:
 
