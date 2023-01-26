@@ -38,22 +38,24 @@ cd examples/multiple_frontend
 docker-compose up -d
 ```
 Running the docker-compose file included in 'example/multiple_frontend':
+
+App Services
 - frontend: localhost:8080
 - media-api: localhost:8081
 - meta-api: localhost:8082
 - thumb-api: localhost:8083
-- file_svc: localhost:8087
-- media-svc: internal
-- ffmpeg-svc: internal
+- file: localhost:8087
+- media-remote: localhost:8880
+- media-local: internal
+- ffmpeg: internal
 - redis-master: internal (rw)
 - redis-slave: internal (ro)
 
-![micro](pymp_microservice.png)
-
-Prometheus and locust services are only included in 'example/multiple_frontend_metrics' example.
-
+Monitoring Services
 - prometheus: localhost:9090
 - locust: localhost:8089
+
+![micro](docs/pymp_microservice_flat_v2.png)
  
 ## Upload:
 
