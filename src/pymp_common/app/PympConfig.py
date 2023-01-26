@@ -7,7 +7,7 @@ class PympServer(IntFlag):
     THUMB_API = 4
     MEDIA_SVC = 8
     FFMPEG_SVC = 16
-    MEDIA_REGISTRY_SVC = 32
+    MEDIAREGISTRY_SVC = 32
     
 class PympEnv:
 
@@ -20,6 +20,7 @@ class PympEnv:
             'REDIS_PORT': "80",
             
             'SERVER_TYPE' : "63",
+            'SERVER_ID' : "",
             
             'CORS_HEADER': "",
             'MEDIA_CHUNK_SIZE': 2 ** 20,

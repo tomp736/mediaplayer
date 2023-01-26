@@ -88,13 +88,15 @@ services:
       - 'server_svc.env'
     environment:
       - SERVER_TYPE=8
+      - SERVER_ID=default
+      - MEDIA_SVC_HOST=pymp_media_svc
     networks:
       - fe_api_svc
       - be_api_svc
     ports:
-      - "8084:80"
+      - "8880:80"
     volumes:
-      - /srv/media/videos:/app/videos:ro
+      - /srv/media/videos:/app/media:ro
     deploy:
       resources:
         limits:
@@ -105,6 +107,27 @@ services:
           memory: 250M
     restart: always
 
+  pymp_mediaregistry_svc:
+    image: pymp_server
+    env_file:
+      - 'server_svc.env'
+    environment:
+      - SERVER_TYPE=32
+    networks:
+      - fe_api_svc
+      - be_api_svc
+    ports:
+      - "8085:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 50M
+    restart: always
+
   pymp_ffmpeg_svc:
     image: pymp_server
     env_file:
@@ -113,8 +136,6 @@ services:
       - SERVER_TYPE=16
     networks:
       - be_api_svc
-    volumes:
-      - /srv/media/videos:/app/videos:ro
     deploy:
       resources:
         limits:
@@ -133,8 +154,6 @@ services:
       - 'server_api.env'
     ports:
       - "8087:80"
-    volumes:
-      - /srv/media/videos:/files:rw
     deploy:
       resources:
         limits:

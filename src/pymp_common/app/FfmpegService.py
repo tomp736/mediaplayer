@@ -1,12 +1,69 @@
 import io
 import logging
+from typing import Union
 import ffmpeg
 import json
 
 from ..app.PympMetrics import prometheus
 
+from ..dataaccess.redis import media_service_da
+from ..dataaccess.redis import media_source_da
+from ..dataaccess.redis import media_meta_da
+from ..dataaccess.redis import media_thumb_da
+
+from pymp_common.dataaccess.http_request_factory import media_request_factory
 
 class FfmpegService:
+    
+    def get_media_url(self, id:str) -> Union[str ,None]:
+        # check if media_source exists in redis
+        if media_source_da.has():
+            # get sourceid by mediaid
+            sourceid = media_source_da.hget(id)
+            if sourceid and media_service_da.has():
+                # get service info by sourceid
+                serviceinfo = media_service_da.hget(sourceid)
+                if serviceinfo:
+                    media_svc_scheme = serviceinfo["scheme"]
+                    media_svc_host = serviceinfo["host"]
+                    media_svc_port = serviceinfo["port"]
+                    return f"{media_svc_scheme}://{media_svc_host}:{media_svc_port}"         
+        return None                    
+    
+    def process_media(self, id, force: bool = False) -> bool:
+        self.process_thumb(id, force)
+        self.process_meta(id, force)
+        return True
+    
+    def process_thumb(self, id, force: bool = False) -> bool:
+        if force or not media_thumb_da.has(id):
+            try:
+                media_svc_url = self.get_media_url(id)
+                if media_svc_url is None:
+                    return False
+                            
+                apiRequest = media_request_factory._get_media_(media_svc_url, id, 0, None)
+                media_thumb = self.generate_thumb(apiRequest.url)
+                media_thumb_da.set(id, media_thumb.getvalue())
+            except Exception as err:
+                logging.exception(err)
+                return False
+        return True
+    
+    def process_meta(self, id, force: bool = False) -> bool:
+        if force or not media_meta_da.has(id):
+            try:
+                media_svc_url = self.get_media_url(id)
+                if media_svc_url is None:
+                    return False
+                            
+                apiRequest = media_request_factory._get_media_(media_svc_url, id, 0, None)
+                media_meta = self.generate_meta(apiRequest.url)
+                media_meta_da.set(id, media_meta)
+            except Exception as err:
+                logging.exception(err)
+                return False
+        return True
 
     def generate_static(self) -> io.BytesIO:
         prometheus.Count("ffmpeg_static_gen_total")
