@@ -1,0 +1,27 @@
+---
+version: "3.9"
+services:
+
+  media_svc_p99c2023:
+    image: pymp_server
+    environment:
+      - SERVER_TYPE=8
+      - SERVER_ID=p99c2023
+      - MEDIA_SVC_SCHEME=http
+      - MEDIA_SVC_HOST=s01
+      - MEDIA_SVC_PORT=8882
+      - MEDIAREGISTRY_SVC_HOST=s01
+      - MEDIAREGISTRY_SVC_PORT=8085
+    ports:
+      - "8882:80"
+    volumes:
+      - /nfs/p99c2023/:/app/media:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 50M
+    restart: always

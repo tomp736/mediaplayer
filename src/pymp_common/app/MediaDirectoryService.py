@@ -61,6 +61,7 @@ class MediaDirectoryService:
             os.symlink(f"../media/{media_basename}", f"{self.indexpath}/{index_basename}")
             index[index_basename] = media_basename
                 
+        logging.info(index)
         self.index = index  
 
     def read_mediafiles(self):

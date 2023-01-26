@@ -12,45 +12,29 @@ app_mediaregistry = Blueprint('app_mediaregistry', __name__)
 @app_mediaregistry.route('/registry/register', methods=['POST'])
 def post_registry_register():
     json_data = request.get_json()
-    logging.info(json_data)
     if not json_data is None:
         media_svc_id = json_data["id"]
         media_svc_scheme = json_data["scheme"]
         media_svc_host = json_data["host"]
         media_svc_port = json_data["port"]
-
         media_svc_url = f"{media_svc_scheme}://{media_svc_host}:{media_svc_port}"
-        logging.info(media_svc_url)
-        mediaListRequest = media_request_factory._get_media_list_(media_svc_url)
-        s = requests.Session()
-        mediaListResponse = s.send(mediaListRequest.prepare())
-        logging.info(mediaListResponse.status_code)
-        if mediaListResponse.status_code == 200:            
-            redis_dict = media_source_da.hgetall()
-            media_ids = []
-            for media_id in mediaListResponse.json():
-                media_ids.append(media_id)
-            
-            if not redis_dict is None:
-                for redis_id in redis_dict:
-                    if redis_dict[redis_id] == media_svc_id: 
-                        if not media_ids.__contains__(redis_id):
-                            logging.info(f"deleting: {redis_id}")
-                            media_source_da.hdel(redis_id)
-                    
-            # populate media_id -> media_svc_id
-            for media_id in media_ids:
-                media_source_da.hset(media_id, media_svc_id)      
-                          
-            # populate media_svc_id -> media_svc_info
-            media_service_da.hset(
-                media_svc_id, 
-                media_svc_scheme, 
-                media_svc_host, 
-                media_svc_port)
-            
+        mediaListRequest = media_request_factory._get_media_list_(media_svc_url)        
+        try:
+            s = requests.Session()
+            mediaListResponse = s.send(mediaListRequest.prepare())
+            if mediaListRequest and mediaListResponse.status_code == 200:                
+                media_service_da.hset(
+                    media_svc_id,
+                    media_svc_scheme,
+                    media_svc_host,
+                    media_svc_port
+                    )             
             return Response(status=200)
-
+        except Exception as ex:
+            logging.info(ex)
+            if media_service_da.hhas(media_svc_id):
+                media_service_da.hdel(media_svc_id) 
+        
     return Response(status=400)
 
 @app_mediaregistry.route('/registry/list')

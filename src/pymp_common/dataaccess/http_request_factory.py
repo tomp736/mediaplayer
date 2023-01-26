@@ -1,5 +1,4 @@
 from abc import ABCMeta
-import json
 from typing import Mapping
 from typing_extensions import TypeAlias
 from requests import Request
@@ -46,6 +45,14 @@ class HttpRequestFactory(metaclass=ABCMeta):
             url=f"{base_url}{path}",
             headers=headers,
             json=data
+        )
+    
+    def _post_media_(self, base_url: str, path: str, data, headers: _HeadersMapping = {}) -> Request:
+        return Request(
+            method='POST',
+            url=f"{base_url}{path}",
+            headers=headers,
+            data=data
         )
 
 
@@ -111,6 +118,9 @@ class MediaRequestFactory():
             'Range': f'bytes {rangeStart}-{rangeEnd}'
         }
         return http_request_factory._get_(baseurl, f"/media/{id}", mediaHeaders)
+    
+    def _post_media_(self, baseurl:str, data) -> Request:
+        return http_request_factory._post_media_(baseurl, f"/media", data)
 
     def get_media_list(self) -> Request:
         return http_request_factory.get(PympServer.MEDIA_SVC, f"/media/list")

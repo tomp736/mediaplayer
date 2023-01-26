@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   # PYMP Services
-  pymp_frontend:
+  frontend:
     image: pymp_frontend
     ports:
       - "8080:80"
@@ -19,7 +19,7 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  pymp_frontend_media_api:
+  media_api:
     image: pymp_server
     ports:
       - "8081:80"
@@ -28,8 +28,9 @@ services:
     environment:
       - SERVER_TYPE=1
     networks:
-      - fe_api_svc
-      - be_api_svc
+      - media_net
+      - redis_fe
+      - locust_net
     deploy:
       resources:
         limits:
@@ -40,7 +41,7 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  pymp_frontend_thumb_api:
+  thumb_api:
     image: pymp_server
     ports:
       - "8082:80"
@@ -49,8 +50,8 @@ services:
     environment:
       - SERVER_TYPE=4
     networks:
-      - fe_api_svc
-      - be_api_svc
+      - redis_fe
+      - locust_net
     deploy:
       resources:
         limits:
@@ -61,7 +62,7 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  pymp_frontend_meta_api:
+  meta_api:
     image: pymp_server
     ports:
       - "8083:80"
@@ -70,8 +71,8 @@ services:
     environment:
       - SERVER_TYPE=2
     networks:
-      - fe_api_svc
-      - be_api_svc
+      - redis_fe
+      - locust_net
     deploy:
       resources:
         limits:
@@ -82,74 +83,11 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  pymp_media_svc:
-    image: pymp_server
-    env_file:
-      - 'server_svc.env'
-    environment:
-      - SERVER_TYPE=8
-      - SERVER_ID=default
-      - MEDIA_SVC_HOST=pymp_media_svc
-    networks:
-      - fe_api_svc
-      - be_api_svc
-    ports:
-      - "8880:80"
-    volumes:
-      - /srv/media/videos:/app/media:ro
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 500M
-        reservations:
-          cpus: '0.5'
-          memory: 250M
-    restart: always
-
-  pymp_mediaregistry_svc:
-    image: pymp_server
-    env_file:
-      - 'server_svc.env'
-    environment:
-      - SERVER_TYPE=32
-    networks:
-      - fe_api_svc
-      - be_api_svc
-    ports:
-      - "8085:80"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 50M
-    restart: always
-
-  pymp_ffmpeg_svc:
-    image: pymp_server
-    env_file:
-      - 'server_svc.env'
-    environment:
-      - SERVER_TYPE=16
-    networks:
-      - be_api_svc
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: 500M
-        reservations:
-          cpus: '0.5'
-          memory: 50M
-    restart: always
-
-  pymp_file_svc:
+  file_svc:
     image: pymp_file_svc
     networks:
-      - be_api_svc
+      - media_net
+      - redis_fe
     env_file:
       - 'server_api.env'
     ports:
@@ -164,15 +102,102 @@ services:
           memory: 20M
     restart: unless-stopped
 
+  media_svc_internal:
+    image: pymp_server
+    environment:
+      - SERVER_TYPE=8
+      - SERVER_ID=internal
+      - MEDIA_SVC_HOST=media_svc_internal
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
+    volumes:
+      - /srv/media/videos:/app/media:rw
+      - /srv/media/index:/app/index:rw
+    networks:
+      - media_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 250M
+    restart: always
+
+  media_svc_external:
+    image: pymp_server
+    environment:
+      - SERVER_TYPE=8
+      - SERVER_ID=external
+      - MEDIA_SVC_SCHEME=http
+      - MEDIA_SVC_HOST=s01
+      - MEDIA_SVC_PORT=8880
+      - MEDIAREGISTRY_SVC_HOST=s01
+      - MEDIAREGISTRY_SVC_PORT=8085
+    ports:
+      - "8880:80"
+    volumes:
+      - /srv/media2/videos:/app/media:rw
+      - /srv/media2/index:/app/index:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 250M
+    restart: always
+
+  mediaregistry_svc:
+    image: pymp_server
+    env_file:
+      - 'server_svc.env'
+    environment:
+      - SERVER_TYPE=32
+    networks:
+      - media_net
+      - redis_be
+    ports:
+      - "8085:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 50M
+    restart: always
+
+  ffmpeg_svc:
+    image: pymp_server
+    env_file:
+      - 'server_svc.env'
+    environment:
+      - SERVER_TYPE=16
+      - MEDIA_SVC_HOST=media_svc_internal
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
+    networks:
+      - media_net
+      - redis_be
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 50M
+    restart: always
+
   # Redis Services
   redis-slave:
-    depends_on:
-      - redis-master
     image: redis:latest
     command: redis-server --slaveof redis-master 6379
     networks:
-      - fe_api_svc
-      - be_redis
+      - redis_fe
+      - redis_be
     deploy:
       resources:
         limits:
@@ -187,8 +212,7 @@ services:
     image: redis:latest
     command: redis-server --port 6379   
     networks:
-      - be_api_svc
-      - be_redis
+      - redis_be
     volumes: 
       - /srv/media/redis:/data
     deploy:
@@ -205,8 +229,7 @@ services:
   prometheus:
     image: prom/prometheus
     networks:
-      - fe_api_svc
-      - be_api_svc
+      - prom_net
     ports:
       - 9090:9090
     volumes: 
@@ -224,7 +247,7 @@ services:
   pymp_locust:
     image: pymp_locust
     networks:
-      - fe_api_svc
+      - locust_net
     ports:
     - "8089:8089"
     env_file:
@@ -232,6 +255,8 @@ services:
     command: -f /mnt/locust/locustfiles  
 
 networks:
-  fe_api_svc:
-  be_api_svc:
-  be_redis:
+  prom_net:
+  locust_net:
+  redis_be:
+  redis_fe:
+  media_net:

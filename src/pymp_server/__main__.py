@@ -8,7 +8,7 @@ from pymp_common.flask.routes.media import app_media
 from pymp_common.flask.routes.ffmpeg import app_ffmpeg_meta, app_ffmpeg_thumb
 from pymp_common.flask.routes.frontend import app_frontend_media, app_frontend_thumb, app_frontend_meta
 from pymp_common.app.PympConfig import pymp_env, PympServer
-from pymp_common.utils.RepeatTimer import RepeatTimer, media_loop, ffmpeg_loop
+from pymp_common.utils.RepeatTimer import RepeatTimer, media_loop, ffmpeg_loop, mediaregistry_loop
 
 app = Flask(__name__)
 server_type = pymp_env.getServerType()
@@ -41,6 +41,8 @@ def main():
         app.register_blueprint(app_media)
 
     if (server_type & PympServer.MEDIAREGISTRY_SVC):
+        timer = RepeatTimer(60, mediaregistry_loop)
+        timer.start()
         app.register_blueprint(app_mediaregistry)
 
     app.run(

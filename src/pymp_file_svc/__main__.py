@@ -1,11 +1,13 @@
+import json
+import random
 from flask import Flask, render_template, request
 from flask_dropzone import Dropzone
 from prometheus_client import start_http_server
 import requests
 from pymp_common.app.PympConfig import pymp_env
+from pymp_common.dataaccess.redis import media_source_da, media_service_da
 from pymp_common.dataaccess.http_request_factory import media_request_factory
 import logging
-import uuid
 import os
 
 app = Flask(__name__)
@@ -16,38 +18,31 @@ app.config['DROPZONE_MAX_FILE_SIZE'] = 3000
 app.config['DROPZONE_MAX_FILES'] = 30
 dropzone = Dropzone(app)
     
-def get_folder(filename):
-    hash_value = hash(filename)
-    hash_hex = hex(hash_value)
-    filefolder = hash_hex[2:26]
-    return filefolder
-    
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
         file = request.files.get('file')
         
-        folder = "/files"
-        filefolder = get_folder(file.filename)
-        fileuuid = str(uuid.uuid4())   
-        fullpath = os.path.join(folder, filefolder, fileuuid)
-        fullslpath = os.path.join(folder, file.filename)     
+        media_svc_url = None
+        # check if media_source exists in redis
+        if media_source_da.has():
+            # get sourceid by mediaid
+            media_svcs = media_service_da.hgetall()
+            if media_svcs:
+                media_svc = random.choice(list(media_svcs.items()))                 
+                if media_svc:
+                    serviceinfo = json.loads(media_svc[1])
+                    media_svc_scheme = serviceinfo["scheme"]
+                    media_svc_host = serviceinfo["host"]
+                    media_svc_port = serviceinfo["port"]
+                    media_svc_url = f"{media_svc_scheme}://{media_svc_host}:{media_svc_port}"  
+                
+        if media_svc_url and file and file.filename:                  
+            apiRequest = media_request_factory._post_media_(media_svc_url, file.stream)
+            s = requests.Session()
+            s.send(apiRequest.prepare())
+            return 'file uploaded successfully'
         
-        fullfilefolder = os.path.join(folder, filefolder)
-        if not os.path.exists(fullfilefolder):
-            os.makedirs(fullfilefolder)
-            
-        file.save(fullpath)
-        
-        os.symlink(f"./{filefolder}/{fileuuid}", f"{fullslpath}.tmp")
-        os.rename(f"{fullslpath}.tmp", fullslpath)
-        
-        
-        apiRequest = media_request_factory.get_media_index()
-        s = requests.Session()
-        s.send(apiRequest.prepare())
-        
-        return 'file uploaded successfully'
     return render_template('upload.html')
 
     
