@@ -2,7 +2,7 @@ import os
 from setuptools import find_packages, setup
 
 setup(
-    name="app_common",
+    name="pymp_common",
     description="",
     long_description=open("README.md").read(),
     url="",
