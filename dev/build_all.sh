@@ -7,10 +7,10 @@ SCRIPTPATH=`dirname $SCRIPT`
 
 cd $SCRIPTPATH
 
-docker build .. -f dockerfile.pymp_common -t pymp_common
+docker build .. -f dockerfile.pymp_common -t ghcr.io/tomp736/pymp/pymp_common:latest-dev
 
-docker build .. -f dockerfile.pymp_frontend -t pymp_frontend
-docker build .. -f dockerfile.pymp_server -t pymp_server
-docker build .. -f dockerfile.file_svc -t pymp_file_svc
+docker build .. -f dockerfile.pymp_frontend -t ghcr.io/tomp736/pymp/pymp_frontend:latest-dev
+docker build .. -f dockerfile.pymp_server -t ghcr.io/tomp736/pymp/pymp_server:latest-dev
+docker build .. -f dockerfile.file_svc -t ghcr.io/tomp736/pymp/pymp_file_svc:latest-dev
 
-docker build .. -f dockerfile.pymp_locust -t pymp_locust
+docker build .. -f dockerfile.pymp_locust -t ghcr.io/tomp736/pymp/pymp_locust:latest-dev

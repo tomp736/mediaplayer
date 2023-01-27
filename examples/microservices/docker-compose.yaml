@@ -4,7 +4,7 @@ services:
 
   # PYMP Services
   frontend:
-    image: pymp_frontend
+    image: ghcr.io/tomp736/pymp/pymp_frontend:latest-dev
     ports:
       - "8080:80"
     env_file:
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   media_api:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     ports:
       - "8081:80"
     env_file:
@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
 
   thumb_api:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     ports:
       - "8082:80"
     env_file:
@@ -63,7 +63,7 @@ services:
     restart: unless-stopped
 
   meta_api:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     ports:
       - "8083:80"
     env_file:
@@ -84,7 +84,7 @@ services:
     restart: unless-stopped
 
   file_svc:
-    image: pymp_file_svc
+    image: ghcr.io/tomp736/pymp/pymp_file_svc:latest-dev
     networks:
       - media_net
       - redis_fe
@@ -103,7 +103,7 @@ services:
     restart: unless-stopped
 
   media_svc_internal:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
       - SERVER_TYPE=8
       - SERVER_ID=internal
@@ -125,7 +125,7 @@ services:
     restart: always
 
   media_svc_external:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
       - SERVER_TYPE=8
       - SERVER_ID=external
@@ -150,7 +150,7 @@ services:
     restart: always
 
   mediaregistry_svc:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     env_file:
       - 'server_svc.env'
     environment:
@@ -171,7 +171,7 @@ services:
     restart: always
 
   ffmpeg_svc:
-    image: pymp_server
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     env_file:
       - 'server_svc.env'
     environment:
