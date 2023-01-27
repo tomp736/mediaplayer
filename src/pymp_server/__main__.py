@@ -12,7 +12,6 @@ from pymp_common.utils.RepeatTimer import RepeatTimer, media_loop, ffmpeg_loop, 
 
 app = Flask(__name__)
 server_type = pymp_env.getServerType()
-timer = None         
 
 def main():
     logging.getLogger().setLevel(logging.INFO)
@@ -30,19 +29,19 @@ def main():
         app.register_blueprint(app_frontend_meta)
 
     if (server_type & PympServer.FFMPEG_SVC):
-        timer = RepeatTimer(60, ffmpeg_loop)
-        timer.start()
+        ff_timer = RepeatTimer(60, ffmpeg_loop)
+        ff_timer.start()
         app.register_blueprint(app_ffmpeg_meta)
         app.register_blueprint(app_ffmpeg_thumb)
 
     if (server_type & PympServer.MEDIA_SVC):
-        timer = RepeatTimer(60, media_loop)
-        timer.start()
+        media_timer = RepeatTimer(60, media_loop)
+        media_timer.start()
         app.register_blueprint(app_media)
 
     if (server_type & PympServer.MEDIAREGISTRY_SVC):
-        timer = RepeatTimer(60, mediaregistry_loop)
-        timer.start()
+        media_reg_timer = RepeatTimer(60, mediaregistry_loop)
+        media_reg_timer.start()
         app.register_blueprint(app_mediaregistry)
 
     app.run(

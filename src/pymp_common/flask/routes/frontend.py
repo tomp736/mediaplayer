@@ -10,6 +10,8 @@ from ...dataaccess.redis import media_source_da, media_service_da, media_meta_da
 from ...dataaccess.http_request_factory import media_request_factory
 from ...utils.Request import get_request_range
 
+from pymp_common.abstractions.providers import MediaServiceFactory, MediaServiceProvider
+
 app_frontend_media = Blueprint('app_frontend_media',__name__)
 app_frontend_meta = Blueprint('app_frontend_meta',__name__)
 app_frontend_thumb = Blueprint('app_frontend_thumb', __name__)
@@ -21,36 +23,19 @@ def media(id):
         return get_media(id)  
     
     # default to pymp_env media_svc
-    media_svc_url = None
-    
-    # check if media_source exists in redis
-    if media_source_da.has():
-        # get sourceid by mediaid
-        sourceid = media_source_da.hget(id)
-        
-        if sourceid and media_service_da.has():
-            # get service info by sourceid
-            serviceinfo = media_service_da.hget(sourceid)
-            if serviceinfo:
-                media_svc_scheme = serviceinfo["scheme"]
-                media_svc_host = serviceinfo["host"]
-                media_svc_port = serviceinfo["port"]
-                media_svc_url = f"{media_svc_scheme}://{media_svc_host}:{media_svc_port}"            
-
-    if media_svc_url is None:
+    media_source_id = media_source_da.hget(id)
+    if not media_source_id:
         return Response(status=404)
     
-    reqByte1, reqByte2 = get_request_range(request)    
-    apiRequest = media_request_factory._get_media_(media_svc_url, id, reqByte1, request)        
-    s = requests.Session()
-    apiResponse = s.send(apiRequest.prepare())
-    response = Response(apiResponse.content)
+    reqByte1, reqByte2 = get_request_range(request)  
+    mediaProvider = MediaServiceFactory.create_instance(media_source_id)
+    response = Response(mediaProvider.get_media_chunk(id, reqByte1, reqByte2))
     
-    response.status_code = apiResponse.status_code
-    if not apiResponse.headers.get("Content-Range") is None:
-        response.headers.set('Content-Range', apiResponse.headers['Content-Range'])
-    if not apiResponse.headers.get("Content-Type") is None:
-        response.headers.set('Content-Type', apiResponse.headers['Content-Type'])
+    response.status_code = 206
+    # if not apiResponse.headers.get("Content-Range") is None:
+    #     response.headers.set('Content-Range', apiResponse.headers['Content-Range'])
+    # if not apiResponse.headers.get("Content-Type") is None:
+    #     response.headers.set('Content-Type', apiResponse.headers['Content-Type'])
         
     return response
 

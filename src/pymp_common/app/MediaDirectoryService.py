@@ -5,7 +5,7 @@ import os
 import logging
 from typing import Dict
 
-class MediaDirectoryService:
+class LocalMedia:
     def __init__(self):
         self.mediapath = "/app/media"
         self.indexpath = "/app/index"
@@ -109,4 +109,4 @@ class MediaDirectoryService:
 
         return start, length
 
-media_directory_service = MediaDirectoryService()
+local_media = LocalMedia()
