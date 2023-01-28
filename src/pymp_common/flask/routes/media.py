@@ -3,52 +3,37 @@ import logging
 import os
 from flask import Response, request, Blueprint
 
-from ...app.MediaDirectoryService import media_directory_service
+from pymp_common.providers.MediaProviderFactory import MediaServiceFactory
 from ...utils.Request import get_request_range
 
 app_media = Blueprint('app_media', __name__)
 
+mediaProvider = MediaServiceFactory.create_instance()
 
 @app_media.route('/media/<string:id>', methods=['GET'])
 def get_media(id):
-    reqByte1, reqByte2 = get_request_range(request)
+    reqByte1, reqByte2 = get_request_range(request)  
+    mediaChunk = mediaProvider.get_media_chunk(id, reqByte1, reqByte2)
 
-    logging.info(media_directory_service.index)
-    
-    media_path = media_directory_service.index.get(id)
-    if media_path:        
-        chunk, start, length, file_size = media_directory_service.get_media_chunk(
-            id, 
-            reqByte1, 
-            reqByte2)
-        
+    if mediaChunk:
         response = Response(
-            chunk, 
+            mediaChunk.chunk, 
             206, 
             mimetype='video/webm', 
             content_type='video/webm')
         
         response.headers.set(
-            'Content-Range', 
-            'bytes {0}-{1}/{2}'.format(start, start + length - 1, file_size))
-        
+            'Content-Range', mediaChunk.toContentRangeHeader()
+            )
         return response
-    return Response(status=404)
+        
+    return Response(status=400)
 
 @app_media.route('/media', methods=['POST'])
 def post_media():
     if request.method == 'POST':
-        filefolder = media_directory_service.mediapath
-        fullpath = os.path.join(filefolder, "output_file") 
-        
-        with open(fullpath, "bw") as f:
-            chunk_size = 4096
-            while True:
-                chunk = request.stream.read(chunk_size)
-                if len(chunk) == 0:
-                    media_directory_service.update_index() 
-                    return Response(status=200)
-                f.write(chunk)
+        mediauri = mediaProvider.get_media_uri("output_file")
+        mediaProvider.postMedia(request.stream)        
         
     return Response(status=404)
 

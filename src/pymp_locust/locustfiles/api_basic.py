@@ -1,5 +1,6 @@
 from locust import HttpUser, TaskSet, between, task
 from locust.clients import HttpSession
+import logging
 import json, random, os
 
 media_url=os.environ.get("MEDIA_URL")
@@ -12,6 +13,7 @@ class ApiTasks(TaskSet):
         self.get_media_ids()
         
     def get_media_ids(self):
+        logging.info(f"{media_url}/api/media/list")
         response = self.client.get(f"{media_url}/api/media/list")
         self.media_ids = json.loads(response.content)
            

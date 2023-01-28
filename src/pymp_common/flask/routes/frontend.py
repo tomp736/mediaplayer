@@ -10,7 +10,7 @@ from ...dataaccess.redis import media_source_da, media_service_da, media_meta_da
 from ...dataaccess.http_request_factory import media_request_factory
 from ...utils.Request import get_request_range
 
-from pymp_common.abstractions.providers import MediaServiceFactory, MediaServiceProvider
+from pymp_common.providers.MediaProviderFactory import MediaServiceFactory
 
 app_frontend_media = Blueprint('app_frontend_media',__name__)
 app_frontend_meta = Blueprint('app_frontend_meta',__name__)
@@ -29,15 +29,21 @@ def media(id):
     
     reqByte1, reqByte2 = get_request_range(request)  
     mediaProvider = MediaServiceFactory.create_instance(media_source_id)
-    response = Response(mediaProvider.get_media_chunk(id, reqByte1, reqByte2))
-    
-    response.status_code = 206
-    # if not apiResponse.headers.get("Content-Range") is None:
-    #     response.headers.set('Content-Range', apiResponse.headers['Content-Range'])
-    # if not apiResponse.headers.get("Content-Type") is None:
-    #     response.headers.set('Content-Type', apiResponse.headers['Content-Type'])
+    mediaChunk = mediaProvider.get_media_chunk(id, reqByte1, reqByte2)
+
+    if mediaChunk:
+        response = Response(
+            mediaChunk.chunk, 
+            206, 
+            mimetype='video/webm', 
+            content_type='video/webm')
         
-    return response
+        response.headers.set(
+            'Content-Range', mediaChunk.toContentRangeHeader()
+            )
+        return response
+        
+    return Response(status=400)
 
 @app_frontend_media.route('/api/media/list')
 def list(): 

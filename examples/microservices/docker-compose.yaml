@@ -1,5 +1,5 @@
 ---
-version: "3.9"
+version: "3.3"
 services:
 
   # PYMP Services
@@ -245,17 +245,17 @@ services:
     restart: always
 
   pymp_locust:
-    image: pymp_locust
+    image: ghcr.io/tomp736/pymp/pymp_locust:latest-dev
     networks:
       - locust_net
     ports:
-    - "8089:8089"
+      - "8089:8089"
     env_file:
       - 'locust.env'
     command: -f /mnt/locust/locustfiles  
 
 networks:
-  prom_net:
+  prom_net: 
   locust_net:
   redis_be:
   redis_fe:
