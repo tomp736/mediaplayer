@@ -1,7 +1,8 @@
 import logging
 import os
+import traceback
 import uuid
-from typing import IO, Dict, Union
+from typing import IO, Dict, List, Union
 
 from pymp_common.app.PympConfig import pymp_env
 from pymp_common.abstractions.providers import MediaProvider, MediaChunk
@@ -9,21 +10,27 @@ from pymp_common.abstractions.providers import MediaProvider, MediaChunk
 
 class MediaProviderLocal(MediaProvider):
     def __init__(self):
-        self.index = {}
         self.mediapath = "/app/media"
         self.indexpath = "/app/index"
+        if not os.path.exists(self.mediapath):
+            os.mkdir(self.mediapath)
+        if not os.path.exists(self.indexpath):
+            os.mkdir(self.indexpath)
+
+    def get_status(self) -> bool:
+        return True
 
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         return os.path.join(self.indexpath, media_id)
 
-    def get_media_list(self):
+    def get_mediaIds(self) -> List[str]:
         ids = []
-        for id in self.index.keys():
-            ids.append(id)
+        for id in self.read_indexfiles():
+            ids.append(os.path.basename(id))
         return ids
 
-    def saveMedia(self, stream: IO[bytes]):
-        fullpath = os.path.join(self.mediapath, "output_file") 
+    def save_media(self, name:str, stream: IO[bytes]):
+        fullpath = os.path.join(self.mediapath, name) 
         
         with open(fullpath, "bw") as f:
             chunk_size = 4096
@@ -33,21 +40,25 @@ class MediaProviderLocal(MediaProvider):
                     return 
                 f.write(chunk)
 
-    def get_media_chunk(self, id, byte1: int, byte2=None) -> Union[MediaChunk, None]:
-        if self.index.__contains__(id):
-            mediafile = f"{self.indexpath}/{id}"
-            if not mediafile or not os.path.isfile(mediafile):
-                raise OSError(f"no such file: {mediafile}")
+    def get_media_chunk(self, mediaId, sByte: int=0, eByte:int=0, fileSize:int=0) -> Union[MediaChunk, None]:
+        mediafile = self.get_media_uri(mediaId)
+        if not mediafile:
+            logging.info("mediafile None")
+            raise OSError(f"uri None")
+        
+        logging.info(mediafile)        
+        if not os.path.exists(mediafile):
+            raise OSError(f"no such file: {mediafile}")
 
-            file_size = os.stat(mediafile).st_size
+        if fileSize == 0:
+            fileSize = os.stat(mediafile).st_size
 
-            start, length = self.get_chunk_info(file_size, byte1, byte2)
-            with open(mediafile, 'rb') as f:
-                f.seek(start)
-                chunk = f.read(length)
-                
-            MediaChunk(chunk, start, start + length - 1, file_size)
-        return None
+        start, length = self.get_chunk_info(sByte, eByte, fileSize)
+        with open(mediafile, 'rb') as f:
+            f.seek(start)
+            chunk = f.read(length)
+            
+        return MediaChunk(chunk, start, start + length - 1, fileSize)
 
     def read_index(self) -> Dict[str, str]:
         fs_indexfiles = self.read_indexfiles()
@@ -64,7 +75,6 @@ class MediaProviderLocal(MediaProvider):
     def update_index(self):
         fs_indexfiles = self.read_indexfiles()
         fs_mediafiles = self.read_mediafiles()
-        index = {}
 
         logging.info(fs_indexfiles)
         logging.info(fs_mediafiles)
@@ -76,7 +86,6 @@ class MediaProviderLocal(MediaProvider):
                 realpath = os.path.realpath(fs_indexfile)
                 index_basename = os.path.basename(fs_indexfile)
                 media_basename = os.path.basename(realpath)
-                index[index_basename] = media_basename
 
                 logging.info(realpath)
                 if (fs_mediafiles.__contains__(realpath)):
@@ -89,12 +98,7 @@ class MediaProviderLocal(MediaProvider):
             index_basename = str(uuid.uuid4())
             media_basename = os.path.basename(fs_mediafile)
             logging.info(f" -- ADDING -- {index_basename} = {media_basename}")
-            os.symlink(f"../media/{media_basename}",
-                       f"{self.indexpath}/{index_basename}")
-            index[index_basename] = media_basename
-
-        logging.info(index)
-        self.index = index
+            os.symlink(f"../media/{media_basename}", f"{self.indexpath}/{index_basename}")
 
     def read_mediafiles(self):
         file_list = []
@@ -112,14 +116,14 @@ class MediaProviderLocal(MediaProvider):
                 file_list.append(filepath)
         return file_list
 
-    def get_chunk_info(self, file_size: int, byte1: int, byte2=None):
+    def get_chunk_info(self, sByte: int=0, eByte:int=0, file_size:int=0):
         start = 0
-        if byte1 < file_size:
-            start = byte1
+        if sByte < file_size:
+            start = sByte
 
-        length = file_size - start
-        if byte2:
-            length = byte2 + 1 - byte1
+        length = file_size - sByte
+        if eByte:
+            length = eByte + 1 - sByte
 
         if length > int(pymp_env.get("MEDIA_CHUNK_SIZE")):
             length = int(pymp_env.get("MEDIA_CHUNK_SIZE"))

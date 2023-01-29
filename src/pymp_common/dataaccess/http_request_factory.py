@@ -93,15 +93,15 @@ class MediaRegistryRequestFactory():
             }
         )
         
-    def media_list(self) -> Request:
+    def list_media(self) -> Request:
         return http_request_factory.get(PympServer.MEDIAREGISTRY_SVC, f"/registry/media/list")
         
-    def hello(self, id: str) -> Request:
-        return http_request_factory.post(PympServer.MEDIAREGISTRY_SVC, f"/registry/hello", 
+    def register_media(self, mediaServiceId, mediaId) -> Request:
+        return http_request_factory.post(PympServer.MEDIAREGISTRY_SVC, f"/registry/media/register",
             {
-                'id' : id             
-            }
-        )
+                'mediaServiceId' : mediaServiceId,
+                'mediaId' : mediaId
+            })
 
 media_registry_request_factory = MediaRegistryRequestFactory()
 

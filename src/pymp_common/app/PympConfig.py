@@ -20,10 +20,10 @@ class PympEnv:
             'REDIS_PORT': "80",
             
             'SERVER_TYPE' : "63",
-            'SERVER_ID' : "",
+            'SERVER_ID' : "DEFAULT",
             
             'CORS_HEADER': "",
-            'MEDIA_CHUNK_SIZE': 2 ** 20,
+            'MEDIA_CHUNK_SIZE': 2 ** 22,
             'THUMB_CHUNK_SIZE': 2 ** 10
         }
         for pympServer in PympServer:

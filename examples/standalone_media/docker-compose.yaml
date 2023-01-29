@@ -2,20 +2,21 @@
 version: "3.3"
 services:
 
-  media_svc_p99c2023:
+  media_svc_2:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
       - SERVER_TYPE=8
-      - SERVER_ID=p99c2023
+      - SERVER_ID=media2
       - MEDIA_SVC_SCHEME=http
       - MEDIA_SVC_HOST=s01
-      - MEDIA_SVC_PORT=8882
+      - MEDIA_SVC_PORT=8883
       - MEDIAREGISTRY_SVC_HOST=s01
-      - MEDIAREGISTRY_SVC_PORT=8085
+      - MEDIAREGISTRY_SVC_PORT=8081
     ports:
-      - "8882:80"
+      - "8883:80"
     volumes:
-      - /nfs/p99c2023/:/app/media:rw
+      - /srv/media2/videos:/app/media:rw
+      - /srv/media2/index:/app/index:rw
     deploy:
       resources:
         limits:

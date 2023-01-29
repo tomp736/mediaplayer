@@ -1,20 +1,16 @@
 import json
 import logging
-import os
 from flask import Response, request, Blueprint
 
-from pymp_common.providers.MediaProviderFactory import MediaServiceFactory
-from ...utils.Request import get_request_range
+from pymp_common.abstractions.providers import MediaChunk
+from pymp_common.app.Services import mediaService
 
 app_media = Blueprint('app_media', __name__)
 
-mediaProvider = MediaServiceFactory.create_instance()
-
-@app_media.route('/media/<string:id>', methods=['GET'])
-def get_media(id):
-    reqByte1, reqByte2 = get_request_range(request)  
-    mediaChunk = mediaProvider.get_media_chunk(id, reqByte1, reqByte2)
-
+@app_media.route('/media/<string:mediaId>', methods=['GET'])
+def get_media(mediaId):
+    reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(request.headers["Range"])    
+    mediaChunk = mediaService.get_media_chunk(mediaId, reqByte1, reqByte2)
     if mediaChunk:
         response = Response(
             mediaChunk.chunk, 
@@ -25,6 +21,8 @@ def get_media(id):
         response.headers.set(
             'Content-Range', mediaChunk.toContentRangeHeader()
             )
+        logging.info(response)
+        logging.info(response.headers)
         return response
         
     return Response(status=400)
@@ -32,26 +30,24 @@ def get_media(id):
 @app_media.route('/media', methods=['POST'])
 def post_media():
     if request.method == 'POST':
-        mediauri = mediaProvider.get_media_uri("output_file")
-        mediaProvider.postMedia(request.stream)        
-        
+        if not mediaService:
+            return Response(status=400)
+        mediaService.saveMedia("DEFAULT", "output_file", request.stream)
     return Response(status=404)
 
 @app_media.route('/media/index', methods=['GET'])
 def index():
-    media_directory_service.update_index()
+    if not mediaService:
+        return Response(status=400)
+    mediaService.updateIndex("DEFAULT")
     return Response(status=200)
 
 @app_media.route('/media/list', methods=['GET'])
 def list(): 
-    ids=[]
-    for id in media_directory_service.index.keys():
-        ids.append(id)
-    return Response(json.dumps(ids), mimetype='application/json')
-
-@app_media.route('/media/dictionary', methods=['GET'])
-def dictionary(): 
-    return Response(json.dumps(media_directory_service.index), mimetype='application/json')
+    if not mediaService:
+        return Response(status=400) 
+    mediaIds = mediaService.getMediaIds("DEFAULT")       
+    return Response(json.dumps(mediaIds), mimetype='application/json')
 
 @app_media.after_request
 def after_request(response):

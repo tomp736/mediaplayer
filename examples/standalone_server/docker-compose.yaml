@@ -26,7 +26,8 @@ services:
     env_file:
       - 'server.env'
     volumes:
-      - /srv/media/videos:/app/videos:ro
+      - /srv/media/videos:/app/media:rw
+      - /srv/media/index:/app/index:rw
     networks:
       - fe_api_svc
     deploy:
