@@ -50,7 +50,7 @@ class MediaProvider(ABC):
         pass
 
     @abstractmethod
-    def get_media_chunk(self, id, startByte=0, endByte=None) -> Union[MediaChunk, None]:
+    def get_media_chunk(self, mediaId, startByte=0, endByte=None) -> Union[MediaChunk, None]:
         pass
 
     @abstractmethod
@@ -72,11 +72,11 @@ class FfmpegProvider(ABC):
         pass
 
     @abstractmethod
-    def get_thumb(self, mediaId) -> bool:
+    def get_thumb(self, mediaId) -> Union[bytes, None]:
         pass
 
     @abstractmethod
-    def get_meta(self, mediaId) -> bool:
+    def get_meta(self, mediaId) -> Union[bytes, None]:
         pass
 
 

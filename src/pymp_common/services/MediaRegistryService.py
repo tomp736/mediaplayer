@@ -14,12 +14,19 @@ class MediaRegistryService():
         logging.info(f" --- MEDIAREGISTRYSERVICE --- {message}")
         
     def register(self, serviceInfo: Dict[str,str]):
+        self.loginfo("register")
         return self.mediaRegistryProvider.register_(serviceInfo)
         
     def getMediaServices(self) -> Dict[str, str]:
-        return self.mediaRegistryProvider.getMediaServices()   
+        self.loginfo("getMediaServices")
+        return self.mediaRegistryProvider.getMediaServices() 
+        
+    def getMediaService(self, mediaId) -> str:
+        self.loginfo("getMediaServices")
+        return self.mediaRegistryProvider.getMediaService(mediaId)   
         
     def getMediaIndex(self):
+        self.loginfo("getMediaIndex")
         return self.mediaRegistryProvider.getMediaIndex()     
         
     def watchServices(self):        

@@ -3,7 +3,7 @@ from typing import Dict, Union
 import requests
 from pymp_common.abstractions.providers import MediaRegistryProvider
 from pymp_common.dataaccess.http_request_factory import media_registry_request_factory
-
+from pymp_common.dataaccess.redis import media_source_da
 
 class MediaRegistryProviderRemote(MediaRegistryProvider):
     
@@ -14,34 +14,39 @@ class MediaRegistryProviderRemote(MediaRegistryProvider):
                       serviceinfo["port"])
     
     def register(self, id, scheme, host, port):
-        registerRequest = media_registry_request_factory.register(
+        registeryRequest = media_registry_request_factory.register(
             id,
             scheme,
             host,
             port
         )
         s = requests.Session()
-        return s.send(registerRequest.prepare()) 
+        return s.send(registeryRequest.prepare()) 
     
     def registerMedia(self, mediaId, serviceId):
-        registerRequest = media_registry_request_factory.register_media(
+        registeryRequest = media_registry_request_factory.register_media(
             mediaId,
             serviceId
         )
         s = requests.Session()
-        return s.send(registerRequest.prepare())   
-    
-    def remove(self, serviceId: str) -> Union[int, None]:
-        pass
-    
-    def removeMedia(self, mediaId: str) -> bool:
-        return False
+        return s.send(registeryRequest.prepare())   
     
     def getMediaIndex(self) -> Union[Dict[str, str], None]:
-        pass
+        registeryRequest = media_registry_request_factory.list_media()
+        s = requests.Session()
+        resistryResponse = s.send(registeryRequest.prepare())         
+        return resistryResponse.json()
     
+    def remove(self, serviceId: str) -> Union[int, None]:
+        raise Exception("NOT SUPPORTED")
+    
+    def removeMedia(self, mediaId: str) -> bool:
+        raise Exception("NOT SUPPORTED")
+    
+    # TODO - VALIDATE CLIENT ACCESS TO REDIS
     def getMediaServices(self) -> Union[Dict[str, str], None]:
-        pass
+        return media_source_da.hgetall()
     
+    # TODO - VALIDATE CLIENT ACCESS TO REDIS
     def getMediaService(self, mediaId: str) -> Union[str, None]:
-        pass
+        return media_source_da.hget(mediaId)

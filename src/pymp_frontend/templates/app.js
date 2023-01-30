@@ -4,6 +4,13 @@ var source = document.getElementById('player_source');
 const lib_item_template = document.getElementById("libraryitem");
 const lib = document.getElementById("library");
 
+player.onended = (event) => {
+    console.log(event)
+    elements = lib.querySelectorAll("img")
+    element = elements[Math.floor(Math.random()*elements.length)];
+    playId(element.id)
+};
+
 loadLibrary()
 function loadLibrary()
 {
@@ -24,6 +31,10 @@ function loadLibrary()
 function play(event)
 {
     id = event.target.id;
+    playId(id)
+}
+function playId(id)
+{
     video.pause();
     source.setAttribute('src', '{{ media_host }}/api/media/' + id);
     source.setAttribute('type', 'video/webm');

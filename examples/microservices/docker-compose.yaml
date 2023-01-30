@@ -27,6 +27,7 @@ services:
       - 'server_api.env'
     environment:
       - SERVER_TYPE=1
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
     networks:
       - media_net
       - redis_fe
@@ -49,6 +50,7 @@ services:
       - 'server_api.env'
     environment:
       - SERVER_TYPE=4
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
     networks:
       - redis_fe
       - locust_net
@@ -70,6 +72,7 @@ services:
       - 'server_api.env'
     environment:
       - SERVER_TYPE=2
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
     networks:
       - redis_fe
       - locust_net
@@ -123,32 +126,7 @@ services:
           cpus: '0.5'
           memory: 250M
     restart: always
-
-  media_svc_external:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    environment:
-      - SERVER_TYPE=8
-      - SERVER_ID=external
-      - MEDIA_SVC_SCHEME=http
-      - MEDIA_SVC_HOST=s01
-      - MEDIA_SVC_PORT=8880
-      - MEDIAREGISTRY_SVC_HOST=s01
-      - MEDIAREGISTRY_SVC_PORT=8085
-    ports:
-      - "8880:80"
-    volumes:
-      - /srv/media2/videos:/app/media:rw
-      - /srv/media2/index:/app/index:rw
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 500M
-        reservations:
-          cpus: '0.5'
-          memory: 250M
-    restart: always
-
+  
   mediaregistry_svc:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     env_file:

@@ -3,6 +3,7 @@ import logging
 from flask import Response, request, Blueprint
 
 from pymp_common.abstractions.providers import MediaChunk
+from pymp_common.app.PympConfig import pymp_env
 from pymp_common.app.Services import mediaService
 
 app_media = Blueprint('app_media', __name__)
@@ -10,7 +11,7 @@ app_media = Blueprint('app_media', __name__)
 @app_media.route('/media/<string:mediaId>', methods=['GET'])
 def get_media(mediaId):
     reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(request.headers["Range"])    
-    mediaChunk = mediaService.get_media_chunk(mediaId, reqByte1, reqByte2)
+    mediaChunk = mediaService.get_media_chunk(pymp_env.get("SERVER_ID"), mediaId, reqByte1, reqByte2)
     if mediaChunk:
         response = Response(
             mediaChunk.chunk, 
@@ -32,21 +33,21 @@ def post_media():
     if request.method == 'POST':
         if not mediaService:
             return Response(status=400)
-        mediaService.saveMedia("DEFAULT", "output_file", request.stream)
+        mediaService.saveMedia(pymp_env.get("SERVER_ID"),"output_file", request.stream)
     return Response(status=404)
 
 @app_media.route('/media/index', methods=['GET'])
 def index():
     if not mediaService:
         return Response(status=400)
-    mediaService.updateIndex("DEFAULT")
+    mediaService.updateIndex(pymp_env.get("SERVER_ID"))
     return Response(status=200)
 
 @app_media.route('/media/list', methods=['GET'])
 def list(): 
     if not mediaService:
         return Response(status=400) 
-    mediaIds = mediaService.getMediaIds("DEFAULT")       
+    mediaIds = mediaService.getMediaIds(pymp_env.get("SERVER_ID"))       
     return Response(json.dumps(mediaIds), mimetype='application/json')
 
 @app_media.after_request

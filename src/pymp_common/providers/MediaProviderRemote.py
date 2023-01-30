@@ -51,11 +51,14 @@ class MediaProviderRemote(MediaProvider):
             apiRequest = media_request_factory._get_media_(self.media_service_url, mediaId, sByte, eByte)
             
             session = requests.Session()
+
+            logging.info(apiRequest)
             apiResponse = session.send(apiRequest.prepare())
+            logging.info(apiResponse.headers)
+            logging.info(apiResponse.status_code)
             
             if not apiResponse.headers.__contains__("content-range"):
-                # TODO HANDLER
-                return None
+                raise Exception("MISSING CONTENT RANGE")
             if not apiResponse.status_code == 206:
                 # TODO HANDLER
                 return None

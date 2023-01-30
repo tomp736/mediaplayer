@@ -24,7 +24,7 @@ class FfmpegService:
         return self.process_thumb(mediaId) & self.process_meta(mediaId)
     
     def process_thumb(self, mediaId) -> bool:
-        return self.ffmpegProvider.gen_meta(mediaId)
+        return self.ffmpegProvider.gen_thumb(mediaId)
     
     def process_meta(self, mediaId) -> bool:
         return self.ffmpegProvider.gen_meta(mediaId)

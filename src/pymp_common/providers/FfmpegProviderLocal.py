@@ -18,6 +18,12 @@ class FfmpegProviderLocal(FfmpegProvider):
         self.mediaRegistryProvider = MediaRegistryProviderFactory.create_instance()
     
     def gen_thumb(self, mediaId) -> bool:
+        # TODO BETTER PLACE FOR THIS CHECK
+        logging.info("CHECK THUMB")
+        if media_thumb_da.has(mediaId):
+            return True
+        logging.info("GENERATING THUMB")
+        
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
         mediaProvider = MediaProviderFactory.create_instance(mediaServiceId)
         if mediaProvider:
@@ -29,6 +35,11 @@ class FfmpegProviderLocal(FfmpegProvider):
         return False
 
     def gen_meta(self, mediaId) -> bool:
+        # TODO BETTER PLACE FOR THIS CHECK
+        logging.info("CHECK META")
+        if media_meta_da.has(mediaId):
+            return True
+        logging.info("GENERATING META")
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
         mediaProvider = MediaProviderFactory.create_instance(mediaServiceId)
         if mediaProvider:
