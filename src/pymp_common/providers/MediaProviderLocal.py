@@ -10,8 +10,8 @@ from pymp_common.abstractions.providers import MediaProvider, MediaChunk
 
 class MediaProviderLocal(MediaProvider):
     def __init__(self):
-        self.mediapath = "/app/media"
-        self.indexpath = "/app/index"
+        self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
+        self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
         if not os.path.exists(self.mediapath):
             os.mkdir(self.mediapath)
         if not os.path.exists(self.indexpath):

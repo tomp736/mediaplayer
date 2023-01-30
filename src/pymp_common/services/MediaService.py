@@ -14,6 +14,8 @@ class MediaService:
         self.scheme = pymp_env.get("MEDIA_SVC_SCHEME")
         self.host = pymp_env.get("MEDIA_SVC_HOST")
         self.port = pymp_env.get("MEDIA_SVC_PORT")
+        self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
+        self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
             
     def printServiceInfo(self):
         logging.info("MediaService")

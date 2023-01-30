@@ -22,6 +22,9 @@ class PympEnv:
             'SERVER_TYPE' : "63",
             'SERVER_ID' : "DEFAULT",
             
+            'MEDIA_SVC_MEDIAPATH' : "/app/media",
+            'MEDIA_SVC_INDEXPATH' : "/app/index",
+            
             'CORS_HEADER': "",
             'MEDIA_CHUNK_SIZE': 2 ** 22,
             'THUMB_CHUNK_SIZE': 2 ** 10
