@@ -93,6 +93,11 @@ services:
       - redis_fe
     env_file:
       - 'server_api.env'
+    environment:
+      - SERVER_TYPE=64
+      - SERVER_ID=fileupload
+      - MEDIA_SVC_HOST=media_svc_internal
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
     ports:
       - "8087:80"
     deploy:
@@ -117,6 +122,32 @@ services:
       - /srv/media/index:/app/index:rw
     networks:
       - media_net
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 500M
+        reservations:
+          cpus: '0.5'
+          memory: 250M
+    restart: always
+
+  media_svc_external:
+    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
+    environment:
+      - SERVER_TYPE=8
+      - SERVER_ID=external
+      - MEDIA_SVC_HOST=s01
+      - MEDIA_SVC_PORT=12001
+      - MEDIAREGISTRY_SVC_HOST=s01
+      - MEDIAREGISTRY_SVC_PORT=8085
+    volumes:
+      - /srv/media2/videos:/app/media:rw
+      - /srv/media2/index:/app/index:rw
+    networks:
+      - media_net
+    ports:
+      - "12001:80"
     deploy:
       resources:
         limits:

@@ -10,7 +10,7 @@ app_mediaregistry = Blueprint('app_mediaregistry', __name__)
 def post_registry_register():
     serviceInfo = request.get_json()
     if not serviceInfo is None:
-        mediaRegistryService.register(serviceInfo)
+        mediaRegistryService.register_(serviceInfo)
         return Response(status=200)
         
     return Response(status=400)

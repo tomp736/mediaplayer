@@ -9,6 +9,11 @@ class FfmpegService:
         self.ffmpegProvider = FfmpegProviderFactory.create_instance()
         self.mediaRegistryProvider = MediaRegistryProviderFactory.create_instance()
         
+    def printServiceInfo(self):
+        logging.info("FfmpegService")
+        logging.info(type(self.ffmpegProvider).__name__)
+        logging.info(type(self.mediaRegistryProvider).__name__)
+    
     def watchMedia(self):        
         self.timer = RepeatTimer(60, self.process_media_services)
         self.timer.start()                   

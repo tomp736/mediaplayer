@@ -10,10 +10,18 @@ class MediaRegistryService():
     def __init__(self) -> None:
         self.mediaRegistryProvider = MediaRegistryProviderFactory.create_instance()
         
+    def printServiceInfo(self):
+        logging.info("MediaRegistryService")
+        logging.info(type(self.mediaRegistryProvider).__name__)
+        
     def loginfo(self, message:str):
         logging.info(f" --- MEDIAREGISTRYSERVICE --- {message}")
         
-    def register(self, serviceInfo: Dict[str,str]):
+    def register(self, serviceId, scheme, host, port):
+        self.loginfo("register")
+        return self.mediaRegistryProvider.register(serviceId, scheme, host, port)
+        
+    def register_(self, serviceInfo: Dict[str,str]):
         self.loginfo("register")
         return self.mediaRegistryProvider.register_(serviceInfo)
         

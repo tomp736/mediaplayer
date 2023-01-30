@@ -4,8 +4,8 @@ import json
 from pymp_common.abstractions.providers import MediaChunk
 from pymp_common.app.Services import mediaRegistryService, mediaService
 
-from ...app.PympConfig import pymp_env
-from ...dataaccess.redis import  media_meta_da, media_thumb_da
+from pymp_common.app.PympConfig import pymp_env
+from pymp_common.dataaccess.redis import  media_meta_da, media_thumb_da
 
 app_frontend_media = Blueprint('app_frontend_media',__name__)
 app_frontend_meta = Blueprint('app_frontend_meta',__name__)
