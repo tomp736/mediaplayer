@@ -7,25 +7,23 @@ from pymp_common.abstractions.providers import FfmpegProvider
 import ffmpeg
 import logging
 
-from pymp_common.providers.MediaProviderFactory import MediaProviderFactory
-from pymp_common.providers.MediaRegistryProviderFactory import MediaRegistryProviderFactory
+from pymp_common.app.ProviderFactory import *
+from pymp_common.dataaccess.redis import media_meta_da, media_thumb_da
 
-from ..dataaccess.redis import media_meta_da
-from ..dataaccess.redis import media_thumb_da
 
 class FfmpegProviderLocal(FfmpegProvider):
     def __init__(self) -> None:
-        self.mediaRegistryProvider = MediaRegistryProviderFactory.create_instance()
-    
+        self.mediaRegistryProvider = getMediaRegistryProvider()
+
     def gen_thumb(self, mediaId) -> bool:
         # TODO BETTER PLACE FOR THIS CHECK
         logging.info("CHECK THUMB")
         if media_thumb_da.has(mediaId):
             return True
         logging.info("GENERATING THUMB")
-        
+
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = MediaProviderFactory.create_instance(mediaServiceId)
+        mediaProvider = getMediaProvider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
@@ -41,7 +39,7 @@ class FfmpegProviderLocal(FfmpegProvider):
             return True
         logging.info("GENERATING META")
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = MediaProviderFactory.create_instance(mediaServiceId)
+        mediaProvider = getMediaProvider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
@@ -49,7 +47,7 @@ class FfmpegProviderLocal(FfmpegProvider):
                 media_meta_da.set(mediaId, media_meta)
                 return True
         return False
-    
+
     def get_thumb(self, mediaId) -> Union[bytes, None]:
         return media_thumb_da.get(mediaId)
 
@@ -85,4 +83,3 @@ class FfmpegProviderLocal(FfmpegProvider):
         )
         logging.info(error)
         return io.BytesIO(out)
-    

@@ -1,13 +1,12 @@
 import logging
 
-from pymp_common.providers.MediaRegistryProviderFactory import MediaRegistryProviderFactory
-from pymp_common.providers.FfmpegProviderFactory import FfmpegProviderFactory
+from pymp_common.app.ProviderFactory import *
 from pymp_common.utils.RepeatTimer import RepeatTimer
 
 class FfmpegService:  
     def __init__(self) -> None:
-        self.ffmpegProvider = FfmpegProviderFactory.create_instance()
-        self.mediaRegistryProvider = MediaRegistryProviderFactory.create_instance()
+        self.ffmpegProvider = getFfmpegProvider()
+        self.mediaRegistryProvider = getMediaRegistryProvider()  
         
     def printServiceInfo(self):
         logging.info("FfmpegService")
