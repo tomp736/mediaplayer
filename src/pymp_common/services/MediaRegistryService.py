@@ -1,13 +1,13 @@
 import logging
 from typing import Dict
 
-from pymp_common.app.ProviderFactory import *
+from pymp_common.app import ProviderFactory
 from pymp_common.utils.RepeatTimer import RepeatTimer
 
 
 class MediaRegistryService():    
     def __init__(self) -> None:
-        self.mediaRegistryProvider = getMediaRegistryProvider()
+        self.mediaRegistryProvider = ProviderFactory.getMediaRegistryProvider()
         
     def printServiceInfo(self):
         logging.info("MediaRegistryService")
@@ -56,7 +56,7 @@ class MediaRegistryService():
         self.loginfo(f"CHECKING SERVICE FOR {serviceId}")
         media_svc_media_ids = []               
         try:
-            mediaProvider = getMediaProvider(serviceId)
+            mediaProvider = ProviderFactory.getMediaProvider(serviceId)
             if mediaProvider:
                 status = mediaProvider.get_status()
                 if status:

@@ -1,6 +1,7 @@
 import logging
 from typing import Union
-from pymp_common.abstractions.providers import MediaProvider, MediaRegistryProvider
+from pymp_common.abstractions.providers import MediaProvider
+from pymp_common.abstractions.providers import MediaRegistryProvider
 from pymp_common.providers.MediaProviderLocal import MediaProviderLocal
 from pymp_common.providers.MediaProviderRemote import MediaProviderRemote
 from pymp_common.providers.MediaRegistryProviderLocal import MediaRegistryProviderLocal
@@ -8,7 +9,8 @@ from pymp_common.providers.MediaRegistryProviderRemote import MediaRegistryProvi
 from pymp_common.providers.FfmpegProviderLocal import FfmpegProviderLocal
 from pymp_common.providers.FfmpegProviderRemote import FfmpegProviderRemote
 
-from pymp_common.app.PympConfig import pymp_env, PympServer
+from pymp_common.app.PympConfig import pymp_env
+from pymp_common.app.PympConfig import PympServer
 
 from pymp_common.dataaccess.redis import media_service_da
 

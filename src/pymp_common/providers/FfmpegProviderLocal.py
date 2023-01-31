@@ -7,13 +7,14 @@ from pymp_common.abstractions.providers import FfmpegProvider
 import ffmpeg
 import logging
 
-from pymp_common.app.ProviderFactory import *
-from pymp_common.dataaccess.redis import media_meta_da, media_thumb_da
+from pymp_common.app import ProviderFactory
+from pymp_common.dataaccess.redis import media_meta_da
+from pymp_common.dataaccess.redis import media_thumb_da
 
 
 class FfmpegProviderLocal(FfmpegProvider):
     def __init__(self) -> None:
-        self.mediaRegistryProvider = getMediaRegistryProvider()
+        self.mediaRegistryProvider = ProviderFactory.getMediaRegistryProvider()
 
     def gen_thumb(self, mediaId) -> bool:
         # TODO BETTER PLACE FOR THIS CHECK
@@ -23,7 +24,7 @@ class FfmpegProviderLocal(FfmpegProvider):
         logging.info("GENERATING THUMB")
 
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = getMediaProvider(mediaServiceId)
+        mediaProvider = ProviderFactory.getMediaProvider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
@@ -39,7 +40,7 @@ class FfmpegProviderLocal(FfmpegProvider):
             return True
         logging.info("GENERATING META")
         mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = getMediaProvider(mediaServiceId)
+        mediaProvider = ProviderFactory.getMediaProvider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:

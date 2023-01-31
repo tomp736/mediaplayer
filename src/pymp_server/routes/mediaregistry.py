@@ -1,5 +1,7 @@
 import json
-from flask import Response, request, Blueprint
+from flask import Response
+from flask import request
+from flask import Blueprint
 
 from pymp_common.app.Services import mediaRegistryService
 

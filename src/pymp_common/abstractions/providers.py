@@ -1,6 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from abc import abstractmethod
 import re
-from typing import IO, Dict, List, Union
+from typing import IO
+from typing import Dict
+from typing import List
+from typing import Union
 
 
 class MediaChunk():
@@ -40,7 +44,7 @@ class MediaProvider(ABC):
     @abstractmethod
     def get_status(self) -> bool:
         pass
-    
+
     @abstractmethod
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         pass
@@ -56,7 +60,7 @@ class MediaProvider(ABC):
     @abstractmethod
     def save_media(self, name: str, stream: IO[bytes]):
         pass
-    
+
     @abstractmethod
     def update_index(self):
         pass
@@ -88,7 +92,7 @@ class MediaRegistryProvider(ABC):
     @abstractmethod
     def register(self, serviceId, scheme, host, port) -> bool:
         pass
-    
+
     @abstractmethod
     def registerMedia(self, serviceId, mediaId) -> bool:
         pass
@@ -96,7 +100,7 @@ class MediaRegistryProvider(ABC):
     @abstractmethod
     def remove(self, serviceId: str) -> Union[int, None]:
         pass
-    
+
     @abstractmethod
     def removeMedia(self, mediaId: str) -> bool:
         pass

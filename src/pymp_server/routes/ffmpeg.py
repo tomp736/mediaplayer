@@ -1,4 +1,5 @@
-from flask import Blueprint, Response
+from flask import Blueprint
+from flask import Response
 
 from pymp_common.app.Services import ffmpegService
 

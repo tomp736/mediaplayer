@@ -3,26 +3,27 @@ from typing import Mapping
 from typing_extensions import TypeAlias
 from requests import Request
 
-from ..app.PympConfig import pymp_env, PympServer
+from pymp_common.app.PympConfig import pymp_env
+from pymp_common.app.PympConfig import PympServer
 
 _HeadersMapping: TypeAlias = Mapping[str, str or bytes]
 
 
 class HttpRequestFactory(metaclass=ABCMeta):
-    def base_url(self, api: PympServer) -> str:
-        if api.value == PympServer.MEDIA_API.value:
-            return pymp_env.getBaseUrl(PympServer.MEDIA_API)
-        elif api.value == PympServer.META_API.value:
-            return pymp_env.getBaseUrl(PympServer.META_API)
-        elif api.value == PympServer.THUMB_API.value:
-            return pymp_env.getBaseUrl(PympServer.THUMB_API)
-        elif api.value == PympServer.MEDIA_SVC.value:
-            return pymp_env.getBaseUrl(PympServer.MEDIA_SVC)
-        elif api.value == PympServer.FFMPEG_SVC.value:
-            return pymp_env.getBaseUrl(PympServer.FFMPEG_SVC)
-        elif api.value == PympServer.MEDIAREGISTRY_SVC.value:
-            return pymp_env.getBaseUrl(PympServer.MEDIAREGISTRY_SVC)
-        return ""
+    def base_url(self, api: PympServer) -> str:        
+        api_map = {
+            PympServer.MEDIA_API: pymp_env.getBaseUrl(PympServer.MEDIA_API),
+            PympServer.META_API: pymp_env.getBaseUrl(PympServer.META_API),
+            PympServer.THUMB_API: pymp_env.getBaseUrl(PympServer.THUMB_API),
+            PympServer.MEDIA_SVC: pymp_env.getBaseUrl(PympServer.MEDIA_SVC),
+            PympServer.FFMPEG_SVC: pymp_env.getBaseUrl(PympServer.FFMPEG_SVC),
+            PympServer.MEDIAREGISTRY_SVC: pymp_env.getBaseUrl(PympServer.MEDIAREGISTRY_SVC)
+        }        
+    
+        if api.value & (api.value - 1) == 0:
+            return api_map.get(api, "")
+        else:
+            return ""
 
     def get(self, api: PympServer, path: str, headers: _HeadersMapping = {}) -> Request:
         base_url = self.base_url(api)

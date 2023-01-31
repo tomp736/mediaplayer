@@ -1,11 +1,16 @@
 import logging
-from flask import Response, request, Blueprint, redirect
+from flask import Blueprint
+from flask import Response
+from flask import request
+from flask import redirect
 import json
 from pymp_common.abstractions.providers import MediaChunk
-from pymp_common.app.Services import mediaRegistryService, mediaService
+from pymp_common.app.Services import mediaRegistryService
+from pymp_common.app.Services import mediaService
 
 from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dataaccess.redis import  media_meta_da, media_thumb_da
+from pymp_common.dataaccess.redis import  media_meta_da
+from pymp_common.dataaccess.redis import  media_thumb_da
 
 app_frontend_media = Blueprint('app_frontend_media',__name__)
 app_frontend_meta = Blueprint('app_frontend_meta',__name__)

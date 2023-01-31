@@ -1,5 +1,6 @@
 
-from typing import Dict, Union
+from typing import Dict
+from typing import Union
 import requests
 from pymp_common.abstractions.providers import MediaRegistryProvider
 from pymp_common.dataaccess.http_request_factory import media_registry_request_factory

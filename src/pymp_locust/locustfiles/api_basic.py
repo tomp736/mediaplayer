@@ -1,7 +1,11 @@
-from locust import HttpUser, TaskSet, between, task
-from locust.clients import HttpSession
+from locust import HttpUser
+from locust import TaskSet
+from locust import between
+from locust import task
 import logging
-import json, random, os
+import json
+import random
+import os
 
 media_url=os.environ.get("MEDIA_URL")
 meta_url=os.environ.get("META_URL")

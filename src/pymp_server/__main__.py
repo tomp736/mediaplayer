@@ -2,16 +2,24 @@
 from flask import Flask
 from prometheus_client import start_http_server
 import logging
-            
+
+from pymp_common.app.PympConfig import pymp_env
+from pymp_common.app.PympConfig import PympServer
+from pymp_common.app.Services import ffmpegService
+from pymp_common.app.Services import mediaRegistryService
+from pymp_common.app.Services import mediaService
+from pymp_common.app.Services import printServiceInfo
+
 from pymp_server.routes.mediaregistry import app_mediaregistry
 from pymp_server.routes.media import app_media
-from pymp_server.routes.ffmpeg import app_ffmpeg_meta, app_ffmpeg_thumb
-from pymp_server.routes.frontend import app_frontend_media, app_frontend_thumb, app_frontend_meta
-from pymp_common.app.PympConfig import pymp_env, PympServer
-
-from pymp_common.app.Services import ffmpegService, mediaRegistryService, mediaService, printServiceInfo
+from pymp_server.routes.ffmpeg import app_ffmpeg_meta
+from pymp_server.routes.ffmpeg import app_ffmpeg_thumb
+from pymp_server.routes.frontend import app_frontend_media
+from pymp_server.routes.frontend import app_frontend_thumb
+from pymp_server.routes.frontend import app_frontend_meta
 
 app = Flask(__name__)
+
 
 def main():
     logging.getLogger().setLevel(logging.INFO)
@@ -32,7 +40,7 @@ def main():
     if (pymp_env.getServerType() & PympServer.MEDIAREGISTRY_SVC):
         mediaRegistryService.watchServices()
         app.register_blueprint(app_mediaregistry)
-        
+
     if (pymp_env.getServerType() & PympServer.FFMPEG_SVC):
         ffmpegService.watchMedia()
         app.register_blueprint(app_ffmpeg_meta)
@@ -47,6 +55,7 @@ def main():
         port=int(pymp_env.get("FLASK_RUN_PORT")),
         debug=False
     )
+
 
 if __name__ == '__main__':
     main()

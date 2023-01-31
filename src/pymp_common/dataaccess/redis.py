@@ -1,9 +1,9 @@
 import json
-from typing import Dict, Union
-import uuid
+from typing import Dict
+from typing import Union
 import redis
 
-from ..app.PympConfig import pymp_env
+from pymp_common.app.PympConfig import pymp_env
 
 
 class RedisDataAccess():
