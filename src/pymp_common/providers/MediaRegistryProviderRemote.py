@@ -1,4 +1,5 @@
 
+import logging
 from typing import Dict
 from typing import Union
 import requests
@@ -7,6 +8,12 @@ from pymp_common.dataaccess.http_request_factory import media_registry_request_f
 from pymp_common.dataaccess.redis import media_source_da
 
 class MediaRegistryProviderRemote(MediaRegistryProvider):
+        
+    def __repr__(self) -> str:
+        return f"MediaRegistryProviderRemote()"
+
+    def loginfo(self, message):
+        logging.info(f"{self.__repr__}{message}")
     
     def register_(self, serviceinfo: Dict):
         self.register(serviceinfo["id"],

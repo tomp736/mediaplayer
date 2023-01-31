@@ -20,6 +20,12 @@ class MediaProviderLocal(MediaProvider):
             os.mkdir(self.mediapath)
         if not os.path.exists(self.indexpath):
             os.mkdir(self.indexpath)
+        
+    def __repr__(self) -> str:
+        return f"MediaProviderLocal({self.mediapath})"
+
+    def loginfo(self, message):
+        logging.info(f"{self.__repr__}{message}")
 
     def get_status(self) -> bool:
         return True

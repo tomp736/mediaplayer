@@ -15,6 +15,12 @@ from pymp_common.dataaccess.redis import media_thumb_da
 class FfmpegProviderLocal(FfmpegProvider):
     def __init__(self) -> None:
         self.mediaRegistryProvider = ProviderFactory.get_media_registry_provider()
+        
+    def __repr__(self) -> str:
+        return f"FfmpegProviderLocal()"
+
+    def loginfo(self, message):
+        logging.info(f"{self.__repr__}{message}")
 
     def gen_thumb(self, mediaId) -> bool:
         # TODO BETTER PLACE FOR THIS CHECK

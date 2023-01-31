@@ -1,4 +1,5 @@
 
+import logging
 from typing import Dict
 from typing import Union
 from pymp_common.abstractions.providers import MediaRegistryProvider
@@ -7,6 +8,12 @@ from pymp_common.dataaccess.redis import media_source_da
 
 
 class MediaRegistryProviderLocal(MediaRegistryProvider):
+        
+    def __repr__(self) -> str:
+        return f"MediaRegistryProviderLocal()"
+
+    def loginfo(self, message):
+        logging.info(f"{self.__repr__}{message}")
 
     def register_(self, serviceinfo: Dict):
         self.register(serviceinfo["id"],

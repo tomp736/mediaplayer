@@ -1,10 +1,18 @@
 
 
+import logging
 from typing import Union
 from pymp_common.abstractions.providers import FfmpegProvider
 
 
 class FfmpegProviderRemote(FfmpegProvider):
+        
+    def __repr__(self) -> str:
+        return f"FfmpegProviderRemote()"
+
+    def loginfo(self, message):
+        logging.info(f"{self.__repr__}{message}")
+    
     def gen_thumb(self, mediaId) -> bool:
         return False
 

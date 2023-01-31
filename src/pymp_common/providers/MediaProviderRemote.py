@@ -19,9 +19,12 @@ class MediaProviderRemote(MediaProvider):
             media_svc_host = serviceinfo["host"]
             media_svc_port = serviceinfo["port"]
             self.media_service_url = f"{media_svc_scheme}://{media_svc_host}:{media_svc_port}"
+        
+    def __repr__(self) -> str:
+        return f"MediaProviderRemote({self.media_service_url})"
 
     def loginfo(self, message):
-        logging.info(f" --- MediaProviderRemote({self.media_service_url}) --- {message}")
+        logging.info(f"{self.__repr__}{message}")
         
     def get_status(self) -> bool:
         scheme = self.serviceinfo["scheme"]
