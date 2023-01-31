@@ -12,7 +12,7 @@ class PympServer(IntFlag):
     FILEUPLOAD_SVC = 64
     
 class PympEnv:
-    env = {
+    config = {
             'FLASK_RUN_HOST': "0.0.0.0",
             'FLASK_RUN_PORT': "80",
             
@@ -29,21 +29,31 @@ class PympEnv:
             'MEDIA_CHUNK_SIZE': 2 ** 22,
             'THUMB_CHUNK_SIZE': 2 ** 10
         }
-    for pympServer in PympServer:
-        env[f"{pympServer.name}_SCHEME"] = "http"
-        env[f"{pympServer.name}_HOST"] = ""
-        env[f"{pympServer.name}_PORT"] = "80"
 
     def __init__(self):
-        self.validate_server_config(self.get_servertype())
-        
+        self.load_configs()
+        self.validate_server_configs()
 
+    def load_configs(self):
+        for envKey in self.config:
+            value = os.environ.get(envKey, self.config[envKey])            
+            self.config[envKey] = value
+        for pympServer in PympServer:
+            self.config[f"{pympServer.name}_SCHEME"] = os.environ.get(f"{pympServer.name}_SCHEME", "http")
+            self.config[f"{pympServer.name}_HOST"] = os.environ.get(f"{pympServer.name}_HOST", "localhost")
+            self.config[f"{pympServer.name}_PORT"] = os.environ.get(f"{pympServer.name}_PORT", "80")
+
+    def validate_server_configs(self) -> bool:
+        valid = True
+        for pympServer in PympServer:
+            valid &= self.get_scheme(pympServer) != ""
+            valid &= self.get_host(pympServer) != ""
+            valid &= self.get_port(pympServer) != ""
+        return valid
+        
     def get(self, key: str) -> str:
-        if key in self.env:
-            value = os.environ.get(key)
-            if not value or value == "":
-                value = str(self.env.get(key))
-            return value
+        if key in self.config:
+            return str(self.config.get(key))
         else:
             raise ValueError(f"{key} is not configured in PympEnv.")
     
@@ -51,8 +61,11 @@ class PympEnv:
         serverType = int(self.get("SERVER_TYPE"))
         return PympServer(serverType)
 
-    def print_servertype(self):        
-        logging.info(self.get_servertype())
+    def print_servertype(self):
+        serverType = self.get_servertype()
+        for pympServer in PympServer:
+            if serverType & pympServer:
+                logging.info(pympServer)
 
     def get_baseurl(self, server:PympServer) -> str:
         scheme = self.get_scheme(server)
@@ -68,12 +81,6 @@ class PympEnv:
 
     def get_port(self, server:PympServer) -> str:
         return self.get(f"{server.name}_PORT")
-
-    def validate_server_config(self, server:PympServer) -> bool:
-        hasScheme = self.get_scheme(server) != ""
-        hasHost = self.get_host(server) != ""
-        hasPort = self.get_port(server) != ""
-        return hasScheme == True & hasHost == True & hasPort == True
 
 
 pymp_env = PympEnv()
