@@ -8,7 +8,7 @@ from typing import Union
 
 
 class MediaChunk():
-    def __init__(self, chunk, startByte=0, endByte=None, fileSize=None) -> None:
+    def __init__(self, chunk, startByte=0, endByte=None, fileSize=None):
         self.chunk = chunk
         self.sByte = startByte
         self.eByte = endByte

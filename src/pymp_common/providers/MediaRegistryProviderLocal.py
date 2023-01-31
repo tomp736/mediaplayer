@@ -13,7 +13,7 @@ class MediaRegistryProviderLocal(MediaRegistryProvider):
         return f"MediaRegistryProviderLocal()"
 
     def loginfo(self, message):
-        logging.info(f"{self.__repr__}{message}")
+        logging.info(f"{self.__repr__()}{message}")
 
     def register_(self, serviceinfo: Dict):
         self.register(serviceinfo["id"],

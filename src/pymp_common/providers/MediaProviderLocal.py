@@ -25,7 +25,7 @@ class MediaProviderLocal(MediaProvider):
         return f"MediaProviderLocal({self.mediapath})"
 
     def loginfo(self, message):
-        logging.info(f"{self.__repr__}{message}")
+        logging.info(f"{self.__repr__()}{message}")
 
     def get_status(self) -> bool:
         return True

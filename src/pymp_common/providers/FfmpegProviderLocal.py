@@ -20,7 +20,7 @@ class FfmpegProviderLocal(FfmpegProvider):
         return f"FfmpegProviderLocal()"
 
     def loginfo(self, message):
-        logging.info(f"{self.__repr__}{message}")
+        logging.info(f"{self.__repr__()}{message}")
 
     def gen_thumb(self, mediaId) -> bool:
         # TODO BETTER PLACE FOR THIS CHECK

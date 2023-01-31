@@ -11,7 +11,7 @@ class FfmpegProviderRemote(FfmpegProvider):
         return f"FfmpegProviderRemote()"
 
     def loginfo(self, message):
-        logging.info(f"{self.__repr__}{message}")
+        logging.info(f"{self.__repr__()}{message}")
     
     def gen_thumb(self, mediaId) -> bool:
         return False

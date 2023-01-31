@@ -137,10 +137,8 @@ services:
     environment:
       - SERVER_TYPE=8
       - SERVER_ID=external
-      - MEDIA_SVC_HOST=s01
-      - MEDIA_SVC_PORT=12001
-      - MEDIAREGISTRY_SVC_HOST=s01
-      - MEDIAREGISTRY_SVC_PORT=8085
+      - MEDIA_SVC_HOST=media_svc_external
+      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
     volumes:
       - /srv/media2/videos:/app/media:rw
       - /srv/media2/index:/app/index:rw
