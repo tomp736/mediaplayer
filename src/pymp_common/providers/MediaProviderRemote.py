@@ -3,7 +3,7 @@ import traceback
 import requests
 from typing import IO
 from typing import Dict
-from typing import List
+from typing import List, Deque
 from typing import Union
 
 from pymp_common.dataaccess.http_request_factory import media_request_factory
