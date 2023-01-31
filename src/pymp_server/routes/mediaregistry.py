@@ -19,7 +19,7 @@ def post_registry_register():
 
 @app_mediaregistry.route('/registry/list')
 def registry_list():
-    mediaServices = mediaRegistryService.getMediaServices()
+    mediaServices = mediaRegistryService.get_media_services()
     media_svc_dict = {}
     for media_svc_key in mediaServices.keys():
         media_svc_dict[media_svc_key] = json.loads(mediaServices[media_svc_key])
@@ -28,7 +28,7 @@ def registry_list():
 
 @app_mediaregistry.route('/registry/media/list')
 def list(): 
-    mediaIndex = mediaRegistryService.getMediaIndex()
+    mediaIndex = mediaRegistryService.get_media_index()
     mediaIds = []
     if mediaIndex:
         for mediaId in mediaIndex:
@@ -37,7 +37,7 @@ def list():
 
 @app_mediaregistry.route('/registry/media/index')
 def registry_media_index():
-    media = mediaRegistryService.getMediaIndex()
+    media = mediaRegistryService.get_media_index()
     if not media is None:
         return Response(json.dumps(media), status=200, content_type="application/json")
 

@@ -18,22 +18,22 @@ class MediaRegistryProviderLocal(MediaRegistryProvider):
         media_service_da.hset(serviceId, scheme, host, port)
         return True
 
-    def registerMedia(self, mediaId, serviceId) -> bool:
+    def register_media(self, mediaId, serviceId) -> bool:
         media_source_da.hset(mediaId, serviceId)
         return True
 
     def remove(self, serviceId: str) -> Union[int, None]:
         return media_service_da.hdel(serviceId)
 
-    def removeMedia(self, mediaId: str) -> bool:
+    def remove_media(self, mediaId: str) -> bool:
         media_source_da.hdel(mediaId)
         return True
 
-    def getMediaServices(self) -> Union[Dict[str, str], None]:
+    def get_media_services(self) -> Union[Dict[str, str], None]:
         return media_service_da.hgetall()
 
-    def getMediaService(self, mediaId: str) -> Union[str, None]:
+    def get_media_service(self, mediaId: str) -> Union[str, None]:
         return media_source_da.hget(mediaId)
 
-    def getMediaIndex(self) -> Union[Dict[str, str], None]:
+    def get_media_index(self) -> Union[Dict[str, str], None]:
         return media_source_da.hgetall()

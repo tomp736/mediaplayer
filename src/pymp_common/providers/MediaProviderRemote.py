@@ -37,8 +37,8 @@ class MediaProviderRemote(MediaProvider):
             return apiRequest.url
         return None
 
-    def get_mediaIds(self) -> List[str]:
-        self.loginfo("get_mediaIds")
+    def get_media_ids(self) -> List[str]:
+        self.loginfo("get_media_ids")
         mediaIds = []           
         session = requests.Session()
         apiRequest = media_request_factory._get_media_list_(self.media_service_url)

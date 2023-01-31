@@ -15,8 +15,8 @@ from pymp_common.app.PympConfig import PympServer
 from pymp_common.dataaccess.redis import media_service_da
 
 
-def getMediaRegistryProvider() -> MediaRegistryProvider:
-    if pymp_env.getServerType() & PympServer.MEDIAREGISTRY_SVC:
+def get_media_registry_provider() -> MediaRegistryProvider:
+    if pymp_env.get_servertype() & PympServer.MEDIAREGISTRY_SVC:
         logging.info("Creating MediaRegistryProviderLocal")
         return MediaRegistryProviderLocal()
     else:
@@ -24,10 +24,10 @@ def getMediaRegistryProvider() -> MediaRegistryProvider:
         return MediaRegistryProviderRemote()
 
 
-def getMediaProvider(serviceId) -> Union[MediaProvider, None]:
+def get_media_provider(serviceId) -> Union[MediaProvider, None]:
     logging.info(f"Creating MediaProvider {serviceId}")
 
-    if pymp_env.getServerType() & PympServer.MEDIA_SVC and pymp_env.get("SERVER_ID") == serviceId:
+    if pymp_env.get_servertype() & PympServer.MEDIA_SVC and pymp_env.get("SERVER_ID") == serviceId:
         return MediaProviderLocal()
 
     serviceinfo = media_service_da.hget(serviceId)
@@ -35,8 +35,8 @@ def getMediaProvider(serviceId) -> Union[MediaProvider, None]:
         return MediaProviderRemote(serviceinfo)
 
 
-def getFfmpegProvider():
-    if pymp_env.getServerType() & PympServer.FFMPEG_SVC:
+def get_ffmpeg_provider():
+    if pymp_env.get_servertype() & PympServer.FFMPEG_SVC:
         logging.info("Creating FfmpegProviderLocal")
         return FfmpegProviderLocal()
     else:

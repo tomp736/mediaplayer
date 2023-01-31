@@ -14,10 +14,10 @@ class MediaChunk():
         self.eByte = endByte
         self.fileSize = fileSize
 
-    def toContentRangeHeader(self) -> str:
+    def to_content_range_header(self) -> str:
         return 'bytes {0}-{1}/{2}'.format(self.sByte, self.eByte, self.fileSize)
 
-    def loadContentRangeHeader(self, headerValue: str):
+    def load_content_range_header(self, headerValue: str):
         sByte, eByte, fileSize = MediaChunk.parse_range_header(headerValue)
         self.sByte = sByte
         self.eByte = eByte
@@ -50,7 +50,7 @@ class MediaProvider(ABC):
         pass
 
     @abstractmethod
-    def get_mediaIds(self) -> List[str]:
+    def get_media_ids(self) -> List[str]:
         pass
 
     @abstractmethod
@@ -94,7 +94,7 @@ class MediaRegistryProvider(ABC):
         pass
 
     @abstractmethod
-    def registerMedia(self, serviceId, mediaId) -> bool:
+    def register_media(self, serviceId, mediaId) -> bool:
         pass
 
     @abstractmethod
@@ -102,17 +102,17 @@ class MediaRegistryProvider(ABC):
         pass
 
     @abstractmethod
-    def removeMedia(self, mediaId: str) -> bool:
+    def remove_media(self, mediaId: str) -> bool:
         pass
 
     @abstractmethod
-    def getMediaIndex(self) -> Union[Dict[str, str], None]:
+    def get_media_index(self) -> Union[Dict[str, str], None]:
         pass
 
     @abstractmethod
-    def getMediaServices(self) -> Dict[str, str]:
+    def get_media_services(self) -> Dict[str, str]:
         pass
 
     @abstractmethod
-    def getMediaService(self, mediaId: str) -> str:
+    def get_media_service(self, mediaId: str) -> str:
         pass

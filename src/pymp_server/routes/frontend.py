@@ -19,7 +19,7 @@ app_frontend_thumb = Blueprint('app_frontend_thumb', __name__)
 @app_frontend_media.route('/api/media/<string:mediaId>')
 def media(mediaId): 
     reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(request.headers["range"])      
-    serviceId = mediaRegistryService.getMediaService(mediaId)
+    serviceId = mediaRegistryService.get_media_service(mediaId)
     mediaChunk = mediaService.get_media_chunk(serviceId, mediaId, reqByte1, reqByte2)   
     if mediaChunk:
         response = Response(
@@ -29,14 +29,14 @@ def media(mediaId):
             content_type='video/webm')
         
         response.headers.set(
-            'Content-Range', mediaChunk.toContentRangeHeader()
+            'Content-Range', mediaChunk.to_content_range_header()
             )
         return response        
     return Response(status=400)
 
 @app_frontend_media.route('/api/media/list')
 def list(): 
-    mediaIndex = mediaRegistryService.getMediaIndex()
+    mediaIndex = mediaRegistryService.get_media_index()
     logging.info(mediaIndex)
     mediaIds = []
     if mediaIndex:

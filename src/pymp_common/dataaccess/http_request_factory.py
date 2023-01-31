@@ -12,12 +12,12 @@ _HeadersMapping: TypeAlias = Mapping[str, str or bytes]
 class HttpRequestFactory(metaclass=ABCMeta):
     def base_url(self, api: PympServer) -> str:        
         api_map = {
-            PympServer.MEDIA_API: pymp_env.getBaseUrl(PympServer.MEDIA_API),
-            PympServer.META_API: pymp_env.getBaseUrl(PympServer.META_API),
-            PympServer.THUMB_API: pymp_env.getBaseUrl(PympServer.THUMB_API),
-            PympServer.MEDIA_SVC: pymp_env.getBaseUrl(PympServer.MEDIA_SVC),
-            PympServer.FFMPEG_SVC: pymp_env.getBaseUrl(PympServer.FFMPEG_SVC),
-            PympServer.MEDIAREGISTRY_SVC: pymp_env.getBaseUrl(PympServer.MEDIAREGISTRY_SVC)
+            PympServer.MEDIA_API: pymp_env.get_baseurl(PympServer.MEDIA_API),
+            PympServer.META_API: pymp_env.get_baseurl(PympServer.META_API),
+            PympServer.THUMB_API: pymp_env.get_baseurl(PympServer.THUMB_API),
+            PympServer.MEDIA_SVC: pymp_env.get_baseurl(PympServer.MEDIA_SVC),
+            PympServer.FFMPEG_SVC: pymp_env.get_baseurl(PympServer.FFMPEG_SVC),
+            PympServer.MEDIAREGISTRY_SVC: pymp_env.get_baseurl(PympServer.MEDIAREGISTRY_SVC)
         }        
     
         if api.value & (api.value - 1) == 0:

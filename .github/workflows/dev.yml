@@ -31,9 +31,10 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Run Best Practices Check
+      - name: Run Best Practices Checks
         run: |
           python dev/check_import_best_practices.py
+          python dev/check_naming_best_practices.py
       
       # Read the current version number from git ls-remote
       - id: current_version

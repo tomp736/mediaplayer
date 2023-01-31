@@ -35,7 +35,7 @@ class PympEnv:
         env[f"{pympServer.name}_PORT"] = "80"
 
     def __init__(self):
-        self.validateServer(self.getServerType())
+        self.validate_server_config(self.get_servertype())
         
 
     def get(self, key: str) -> str:
@@ -47,32 +47,32 @@ class PympEnv:
         else:
             raise ValueError(f"{key} is not configured in PympEnv.")
     
-    def getServerType(self):
+    def get_servertype(self):
         serverType = int(self.get("SERVER_TYPE"))
         return PympServer(serverType)
 
-    def printServerType(self):        
-        logging.info(self.getServerType())
+    def print_servertype(self):        
+        logging.info(self.get_servertype())
 
-    def getBaseUrl(self, server:PympServer) -> str:
-        scheme = self.getScheme(server)
-        host = self.getHost(server)
-        port = self.getPort(server)
+    def get_baseurl(self, server:PympServer) -> str:
+        scheme = self.get_scheme(server)
+        host = self.get_host(server)
+        port = self.get_port(server)
         return f"{scheme}://{host}:{port}"
 
-    def getScheme(self, server:PympServer) -> str:
+    def get_scheme(self, server:PympServer) -> str:
         return self.get(f"{server.name}_SCHEME")
 
-    def getHost(self, server:PympServer) -> str:
+    def get_host(self, server:PympServer) -> str:
         return self.get(f"{server.name}_HOST")
 
-    def getPort(self, server:PympServer) -> str:
+    def get_port(self, server:PympServer) -> str:
         return self.get(f"{server.name}_PORT")
 
-    def validateServer(self, server:PympServer) -> bool:
-        hasScheme = self.getScheme(server) != ""
-        hasHost = self.getHost(server) != ""
-        hasPort = self.getPort(server) != ""
+    def validate_server_config(self, server:PympServer) -> bool:
+        hasScheme = self.get_scheme(server) != ""
+        hasHost = self.get_host(server) != ""
+        hasPort = self.get_port(server) != ""
         return hasScheme == True & hasHost == True & hasPort == True
 
 

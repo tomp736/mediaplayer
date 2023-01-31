@@ -14,7 +14,7 @@ from pymp_common.dataaccess.redis import media_thumb_da
 
 class FfmpegProviderLocal(FfmpegProvider):
     def __init__(self) -> None:
-        self.mediaRegistryProvider = ProviderFactory.getMediaRegistryProvider()
+        self.mediaRegistryProvider = ProviderFactory.get_media_registry_provider()
 
     def gen_thumb(self, mediaId) -> bool:
         # TODO BETTER PLACE FOR THIS CHECK
@@ -23,8 +23,8 @@ class FfmpegProviderLocal(FfmpegProvider):
             return True
         logging.info("GENERATING THUMB")
 
-        mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = ProviderFactory.getMediaProvider(mediaServiceId)
+        mediaServiceId = self.mediaRegistryProvider.get_media_service(mediaId)
+        mediaProvider = ProviderFactory.get_media_provider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
@@ -39,8 +39,8 @@ class FfmpegProviderLocal(FfmpegProvider):
         if media_meta_da.has(mediaId):
             return True
         logging.info("GENERATING META")
-        mediaServiceId = self.mediaRegistryProvider.getMediaService(mediaId)
-        mediaProvider = ProviderFactory.getMediaProvider(mediaServiceId)
+        mediaServiceId = self.mediaRegistryProvider.get_media_service(mediaId)
+        mediaProvider = ProviderFactory.get_media_provider(mediaServiceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:

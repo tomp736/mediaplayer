@@ -8,7 +8,7 @@ from pymp_common.app.PympConfig import PympServer
 from pymp_common.app.Services import ffmpegService
 from pymp_common.app.Services import mediaRegistryService
 from pymp_common.app.Services import mediaService
-from pymp_common.app.Services import printServiceInfo
+from pymp_common.app.Services import print_serviceinfo
 
 from pymp_server.routes.mediaregistry import app_mediaregistry
 from pymp_server.routes.media import app_media
@@ -25,29 +25,29 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     start_http_server(8000)
 
-    printServiceInfo()
+    print_serviceinfo()
 
     # HOW TO DO SWITCH STATEMENT
-    if (pymp_env.getServerType() & PympServer.MEDIA_API):
+    if (pymp_env.get_servertype() & PympServer.MEDIA_API):
         app.register_blueprint(app_frontend_media)
 
-    if (pymp_env.getServerType() & PympServer.THUMB_API):
+    if (pymp_env.get_servertype() & PympServer.THUMB_API):
         app.register_blueprint(app_frontend_thumb)
 
-    if (pymp_env.getServerType() & PympServer.META_API):
+    if (pymp_env.get_servertype() & PympServer.META_API):
         app.register_blueprint(app_frontend_meta)
 
-    if (pymp_env.getServerType() & PympServer.MEDIAREGISTRY_SVC):
-        mediaRegistryService.watchServices()
+    if (pymp_env.get_servertype() & PympServer.MEDIAREGISTRY_SVC):
+        mediaRegistryService.watch_services()
         app.register_blueprint(app_mediaregistry)
 
-    if (pymp_env.getServerType() & PympServer.FFMPEG_SVC):
-        ffmpegService.watchMedia()
+    if (pymp_env.get_servertype() & PympServer.FFMPEG_SVC):
+        ffmpegService.watch_media()
         app.register_blueprint(app_ffmpeg_meta)
         app.register_blueprint(app_ffmpeg_thumb)
 
-    if (pymp_env.getServerType() & PympServer.MEDIA_SVC):
-        mediaService.watchMedia()
+    if (pymp_env.get_servertype() & PympServer.MEDIA_SVC):
+        mediaService.watch_media()
         app.register_blueprint(app_media)
 
     app.run(

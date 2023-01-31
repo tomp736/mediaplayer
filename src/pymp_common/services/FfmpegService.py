@@ -5,20 +5,20 @@ from pymp_common.utils.RepeatTimer import RepeatTimer
 
 class FfmpegService:  
     def __init__(self) -> None:
-        self.ffmpegProvider = ProviderFactory.getFfmpegProvider()
-        self.mediaRegistryProvider = ProviderFactory.getMediaRegistryProvider()  
+        self.ffmpegProvider = ProviderFactory.get_ffmpeg_provider()
+        self.mediaRegistryProvider = ProviderFactory.get_media_registry_provider()  
         
-    def printServiceInfo(self):
+    def print_serviceinfo(self):
         logging.info("FfmpegService")
         logging.info(type(self.ffmpegProvider).__name__)
         logging.info(type(self.mediaRegistryProvider).__name__)
     
-    def watchMedia(self):        
+    def watch_media(self):        
         self.timer = RepeatTimer(60, self.process_media_services)
         self.timer.start()                   
     
     def process_media_services(self):
-        media = self.mediaRegistryProvider.getMediaIndex()
+        media = self.mediaRegistryProvider.get_media_index()
         if media:
             for id in media:
                 logging.info(id)

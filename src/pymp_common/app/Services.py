@@ -8,7 +8,7 @@ mediaRegistryService = MediaRegistryService()
 ffmpegService = FfmpegService()
 mediaService = MediaService()
 
-def printServiceInfo():
-    mediaRegistryService.printServiceInfo()
-    ffmpegService.printServiceInfo()
-    mediaService.printServiceInfo()
+def print_serviceinfo():
+    mediaRegistryService.print_serviceinfo()
+    ffmpegService.print_serviceinfo()
+    mediaService.print_serviceinfo()

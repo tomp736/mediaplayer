@@ -7,9 +7,9 @@ from pymp_common.utils.RepeatTimer import RepeatTimer
 
 class MediaRegistryService():    
     def __init__(self) -> None:
-        self.mediaRegistryProvider = ProviderFactory.getMediaRegistryProvider()
+        self.mediaRegistryProvider = ProviderFactory.get_media_registry_provider()
         
-    def printServiceInfo(self):
+    def print_serviceinfo(self):
         logging.info("MediaRegistryService")
         logging.info(type(self.mediaRegistryProvider).__name__)
         
@@ -24,25 +24,25 @@ class MediaRegistryService():
         self.loginfo("register")
         return self.mediaRegistryProvider.register_(serviceInfo)
         
-    def getMediaServices(self) -> Dict[str, str]:
-        self.loginfo("getMediaServices")
-        return self.mediaRegistryProvider.getMediaServices() 
+    def get_media_services(self) -> Dict[str, str]:
+        self.loginfo("get_media_services")
+        return self.mediaRegistryProvider.get_media_services() 
         
-    def getMediaService(self, mediaId) -> str:
-        self.loginfo("getMediaServices")
-        return self.mediaRegistryProvider.getMediaService(mediaId)   
+    def get_media_service(self, mediaId) -> str:
+        self.loginfo("get_media_services")
+        return self.mediaRegistryProvider.get_media_service(mediaId)   
         
-    def getMediaIndex(self):
-        self.loginfo("getMediaIndex")
-        return self.mediaRegistryProvider.getMediaIndex()     
+    def get_media_index(self):
+        self.loginfo("get_media_index")
+        return self.mediaRegistryProvider.get_media_index()     
         
-    def watchServices(self):        
+    def watch_services(self):        
         self.timer = RepeatTimer(60, self.update_media_services)
         self.timer.start()   
             
     def update_media_services(self):
         self.loginfo("START UPDATE MEDIA SERVICES")        
-        mediaServices = self.mediaRegistryProvider.getMediaServices()        
+        mediaServices = self.mediaRegistryProvider.get_media_services()        
         if not mediaServices:
             return
         
@@ -56,11 +56,11 @@ class MediaRegistryService():
         self.loginfo(f"CHECKING SERVICE FOR {serviceId}")
         media_svc_media_ids = []               
         try:
-            mediaProvider = ProviderFactory.getMediaProvider(serviceId)
+            mediaProvider = ProviderFactory.get_media_provider(serviceId)
             if mediaProvider:
                 status = mediaProvider.get_status()
                 if status:
-                    media_svc_media_ids = mediaProvider.get_mediaIds() 
+                    media_svc_media_ids = mediaProvider.get_media_ids() 
                     logging.info(f"MediaProvider {serviceId} passes status check.")                         
                 else:
                     logging.info(f"MediaProvider {serviceId} fails status check.")   
@@ -76,7 +76,7 @@ class MediaRegistryService():
         self.loginfo(f"CHECKING SOURCES FOR {serviceId}")
         self.loginfo(f"{serviceId} REPORTED {mediaIds}")
         
-        registry_media = self.mediaRegistryProvider.getMediaIndex()        
+        registry_media = self.mediaRegistryProvider.get_media_index()        
         if registry_media is None:
             return
         
@@ -89,16 +89,16 @@ class MediaRegistryService():
             # delete from redis if media_svc no longer has the media
             if not mediaIds.__contains__(registryMediaID):
                 logging.info(f"DELETING: {registryMediaID}")
-                self.mediaRegistryProvider.removeMedia(registryMediaID)
+                self.mediaRegistryProvider.remove_media(registryMediaID)
                 continue
                         
             # if media source for media  has changed, update redis
             if not registry_media[registryMediaID] == serviceId:
                 logging.info(f"UPDATING: {registryMediaID}")
-                self.mediaRegistryProvider.registerMedia(registryMediaID, serviceId)
+                self.mediaRegistryProvider.register_media(registryMediaID, serviceId)
                 continue
                     
         # Update all 
         for mediaId in mediaIds:           
             logging.info(f"ADDING: {mediaId}")     
-            self.mediaRegistryProvider.registerMedia(mediaId, serviceId)
+            self.mediaRegistryProvider.register_media(mediaId, serviceId)

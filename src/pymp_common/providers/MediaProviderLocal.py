@@ -27,7 +27,7 @@ class MediaProviderLocal(MediaProvider):
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         return os.path.join(self.indexpath, media_id)
 
-    def get_mediaIds(self) -> List[str]:
+    def get_media_ids(self) -> List[str]:
         ids = []
         for id in self.read_indexfiles():
             ids.append(os.path.basename(id))
