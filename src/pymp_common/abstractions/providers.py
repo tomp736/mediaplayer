@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+import io
 import re
 from typing import IO
 from typing import Dict
@@ -68,19 +69,19 @@ class MediaProvider(ABC):
 
 class FfmpegProvider(ABC):
     @abstractmethod
-    def gen_thumb(self, mediaId) -> bool:
+    def set_thumb(self, mediaId, serviceId, thumb: io.BytesIO):
         pass
 
     @abstractmethod
-    def gen_meta(self, mediaId) -> bool:
+    def set_meta(self, mediaId, serviceId, meta: str):
         pass
 
     @abstractmethod
-    def get_thumb(self, mediaId) -> Union[bytes, None]:
+    def get_thumb(self, mediaId, serviceId) -> Union[io.BytesIO, None]:
         pass
 
     @abstractmethod
-    def get_meta(self, mediaId) -> Union[bytes, None]:
+    def get_meta(self, mediaId, serviceId) -> Union[str, None]:
         pass
 
 

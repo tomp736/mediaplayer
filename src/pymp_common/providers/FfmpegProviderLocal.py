@@ -8,58 +8,30 @@ import ffmpeg
 import logging
 
 from pymp_common.app import ProviderFactory
-from pymp_common.dataaccess.redis import media_meta_da
-from pymp_common.dataaccess.redis import media_thumb_da
-
 
 class FfmpegProviderLocal(FfmpegProvider):
-    def __init__(self) -> None:
-        self.mediaRegistryProvider = ProviderFactory.get_media_registry_provider()
-        
+
     def __repr__(self) -> str:
         return f"FfmpegProviderLocal()"
 
     def loginfo(self, message):
         logging.info(f"{self.__repr__()}{message}")
 
-    def gen_thumb(self, mediaId) -> bool:
-        # TODO BETTER PLACE FOR THIS CHECK
-        logging.info("CHECK THUMB")
-        if media_thumb_da.has(mediaId):
-            return True
-        logging.info("GENERATING THUMB")
-
-        mediaServiceId = self.mediaRegistryProvider.get_media_service(mediaId)
-        mediaProvider = ProviderFactory.get_media_provider(mediaServiceId)
+    def get_thumb(self, mediaId, serviceId) -> Union[io.BytesIO, None]:
+        mediaProvider = ProviderFactory.get_media_provider(serviceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
-                media_thumb = self.generate_thumb(mediaUri)
-                media_thumb_da.set(mediaId, media_thumb.getvalue())
-                return True
-        return False
+                return self.generate_thumb(mediaUri)
+        return None
 
-    def gen_meta(self, mediaId) -> bool:
-        # TODO BETTER PLACE FOR THIS CHECK
-        logging.info("CHECK META")
-        if media_meta_da.has(mediaId):
-            return True
-        logging.info("GENERATING META")
-        mediaServiceId = self.mediaRegistryProvider.get_media_service(mediaId)
-        mediaProvider = ProviderFactory.get_media_provider(mediaServiceId)
+    def get_meta(self, mediaId, serviceId) -> Union[str, None]:
+        mediaProvider = ProviderFactory.get_media_provider(serviceId)
         if mediaProvider:
             mediaUri = mediaProvider.get_media_uri(mediaId)
             if mediaUri:
-                media_meta = self.generate_meta(mediaUri)
-                media_meta_da.set(mediaId, media_meta)
-                return True
-        return False
-
-    def get_thumb(self, mediaId) -> Union[bytes, None]:
-        return media_thumb_da.get(mediaId)
-
-    def get_meta(self, mediaId) -> Union[bytes, None]:
-        return media_meta_da.get(mediaId)
+                return self.generate_meta(mediaUri)
+        return None
 
     def generate_static(self) -> io.BytesIO:
         out, error = (
