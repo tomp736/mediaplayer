@@ -7,7 +7,7 @@ services:
     environment:
       - SERVER_TYPE=8
       - SERVER_ID=external
-      - MEDIA_SVC_SCHEME=http
+      - MEDIA_SVC_PROTO=http
       - MEDIA_SVC_HOST=prt-dev-01
       - MEDIA_SVC_PORT=8883
       - MEDIAREGISTRY_SVC_HOST=prt-dev-01

@@ -41,8 +41,8 @@ class PympEnv:
             value = os.environ.get(envKey, self.config[envKey])
             self.config[envKey] = value
         for pympServer in PympServer:
-            self.config[f"{pympServer.name}_SCHEME"] = os.environ.get(
-                f"{pympServer.name}_SCHEME", "http")
+            self.config[f"{pympServer.name}_PROTO"] = os.environ.get(
+                f"{pympServer.name}_PROTO", "http")
             self.config[f"{pympServer.name}_HOST"] = os.environ.get(
                 f"{pympServer.name}_HOST", "localhost")
             self.config[f"{pympServer.name}_PORT"] = os.environ.get(
@@ -51,7 +51,7 @@ class PympEnv:
     def validate_server_configs(self) -> bool:
         valid = True
         for pympServer in PympServer:
-            valid &= self.get_scheme(pympServer) != ""
+            valid &= self.get_proto(pympServer) != ""
             valid &= self.get_host(pympServer) != ""
             valid &= self.get_port(pympServer) != ""
         return valid
@@ -73,16 +73,16 @@ class PympEnv:
                 logging.info(pympServer)
 
     def get_baseurl(self, server: PympServer) -> str:
-        scheme = self.get_scheme(server)
+        proto = self.get_proto(server)
         host = self.get_host(server)
         port = self.get_port(server)
-        return f"{scheme}://{host}:{port}"
+        return f"{proto}://{host}:{port}"
 
     def get_server_id(self) -> str:
         return self.get(f"SERVER_ID")
 
-    def get_scheme(self, server: PympServer) -> str:
-        return self.get(f"{server.name}_SCHEME")
+    def get_proto(self, server: PympServer) -> str:
+        return self.get(f"{server.name}_PROTO")
 
     def get_host(self, server: PympServer) -> str:
         return self.get(f"{server.name}_HOST")

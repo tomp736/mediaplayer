@@ -7,6 +7,8 @@ from typing import Dict
 from typing import List
 from typing import Union
 
+from pymp_common.dto.MediaRegistry import ServiceInfo
+
 
 class MediaChunk():
     def __init__(self, chunk, startByte=0, endByte=None, fileSize=None):
@@ -55,7 +57,7 @@ class MediaProvider(ABC):
         pass
 
     @abstractmethod
-    def get_media_chunk(self, mediaId, startByte=0, endByte=None) -> Union[MediaChunk, None]:
+    def get_media_chunk(self, media_id, startByte=0, endByte=None) -> Union[MediaChunk, None]:
         pass
 
     @abstractmethod
@@ -69,51 +71,68 @@ class MediaProvider(ABC):
 
 class FfmpegProvider(ABC):
     @abstractmethod
-    def set_thumb(self, mediaId, serviceId, thumb: io.BytesIO):
+    def get_status(self) -> bool:
+        pass
+    
+    def readonly(self) -> bool:
         pass
 
     @abstractmethod
-    def set_meta(self, mediaId, serviceId, meta: str):
+    def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
         pass
 
     @abstractmethod
-    def get_thumb(self, mediaId, serviceId) -> Union[io.BytesIO, None]:
+    def get_meta(self, media_id) -> Union[str, None]:
+        pass
+    
+    @abstractmethod
+    def set_thumb(self, media_id, thumb: io.BytesIO):
         pass
 
     @abstractmethod
-    def get_meta(self, mediaId, serviceId) -> Union[str, None]:
+    def set_meta(self, media_id, meta: str):
+        pass
+    
+    @abstractmethod
+    def del_thumb(self, media_id):
+        pass
+
+    @abstractmethod
+    def del_meta(self, media_id):
         pass
 
 
 class MediaRegistryProvider(ABC):
     @abstractmethod
-    def register_(self, serviceInfo: Dict) -> bool:
+    def get_status(self) -> bool:
+        pass
+    
+    # service_id => service_info{}
+    @abstractmethod
+    def get_service_info(self, service_id: str) -> Union[ServiceInfo, None]:
+        pass
+    
+    @abstractmethod
+    def get_all_service_info(self) -> Union[ServiceInfo, None]:
+        pass
+    
+    @abstractmethod
+    def set_service_info(self, service_id, service_info: ServiceInfo) -> bool:
         pass
 
     @abstractmethod
-    def register(self, serviceId, scheme, host, port) -> bool:
+    def del_service_info(self, service_id: str) -> Union[int, None]:
+        pass
+    
+    # service_id => MEDIAINFO{}
+    @abstractmethod
+    def set_service_media(self,service_id: str,  media_id: str) -> bool:
+        pass
+    
+    @abstractmethod
+    def del_service_media(self, service_id: str, media_id: str) -> bool:
         pass
 
     @abstractmethod
-    def register_media(self, serviceId, mediaId) -> bool:
-        pass
-
-    @abstractmethod
-    def remove(self, serviceId: str) -> Union[int, None]:
-        pass
-
-    @abstractmethod
-    def remove_media(self, mediaId: str) -> bool:
-        pass
-
-    @abstractmethod
-    def get_media_index(self) -> Union[Dict[str, str], None]:
-        pass
-
-    @abstractmethod
-    def get_media_services(self) -> Dict[str, str]:
-        pass
-
-    @abstractmethod
-    def get_media_service(self, mediaId: str) -> str:
+    def get_service_media(self, service_id: Union[str, None] = None) -> Union[ServiceInfo, None]:
         pass

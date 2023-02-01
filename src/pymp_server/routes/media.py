@@ -11,11 +11,11 @@ from pymp_common.app.Services import mediaService
 app_media = Blueprint('app_media', __name__)
 
 
-@app_media.route('/media/<string:mediaId>', methods=['GET'])
-def get_media(mediaId):
+@app_media.route('/media/<string:media_id>', methods=['GET'])
+def get_media(media_id):
     reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(
         request.headers["Range"])
-    mediaChunk = mediaService.get_media_chunk(mediaId, reqByte1, reqByte2)
+    mediaChunk = mediaService.get_media_chunk(media_id, reqByte1, reqByte2)
     if mediaChunk:
         response = Response(
             mediaChunk.chunk,

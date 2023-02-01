@@ -17,8 +17,8 @@ class MediaService:
     def __repr__(self) -> str:
         return f"MediaService({self.mediaRegistryProvider},{self.mediaProvider})"
 
-    def get_media_chunk(self, mediaId, sByte: int = 0, eByte: int = 0, fileSize: int = 0) -> Union[MediaChunk, None]:
-        return self.mediaProvider.get_media_chunk(mediaId, sByte, eByte)
+    def get_media_chunk(self, media_id, sByte: int = 0, eByte: int = 0, fileSize: int = 0) -> Union[MediaChunk, None]:
+        return self.mediaProvider.get_media_chunk(media_id, sByte, eByte)
 
     def save_media(self, name: str, stream: IO[bytes]):
         return self.mediaProvider.save_media(name, stream)
@@ -35,8 +35,8 @@ class MediaService:
 
     def register(self):
         server_id = pymp_env.get("SERVER_ID")
-        service_scheme = pymp_env.get("MEDIA_SVC_SCHEME")
+        service_proto = pymp_env.get("MEDIA_SVC_PROTO")
         service_host = pymp_env.get("MEDIA_SVC_HOST")
         service_port = pymp_env.get("MEDIA_SVC_PORT")
         self.update_index()
-        self.mediaRegistryProvider.register(server_id, service_scheme, service_host, service_port)
+        self.mediaRegistryProvider.register(server_id, service_proto, service_host, service_port)

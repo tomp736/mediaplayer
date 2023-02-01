@@ -18,16 +18,16 @@ app_frontend_meta = Blueprint('app_frontend_meta', __name__)
 app_frontend_thumb = Blueprint('app_frontend_thumb', __name__)
 
 
-@app_frontend_media.route('/api/media/<string:mediaId>')
-def media(mediaId):
+@app_frontend_media.route('/api/media/<string:media_id>')
+def media(media_id):
     reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(
         request.headers["range"])
-    serviceId = mediaRegistryService.get_media_service(mediaId)
+    service_id = mediaRegistryService.get_media_service(media_id)
     mediaService = MediaService(
         mediaRegistryService.mediaRegistryProvider,
-        ProviderFactory.get_media_provider(serviceId))
+        ProviderFactory.get_media_provider(service_id))
 
-    mediaChunk = mediaService.get_media_chunk(mediaId, reqByte1, reqByte2)
+    mediaChunk = mediaService.get_media_chunk(media_id, reqByte1, reqByte2)
     if mediaChunk:
         response = Response(
             mediaChunk.chunk,
@@ -48,22 +48,22 @@ def list():
     logging.info(mediaIndex)
     mediaIds = []
     if mediaIndex:
-        for mediaId in mediaIndex:
-            mediaIds.append(mediaId)
+        for media_id in mediaIndex:
+            mediaIds.append(media_id)
     return Response(json.dumps(mediaIds), status=200, content_type="application/json")
 
 
-@app_frontend_meta.route('/api/meta/<string:mediaId>')
-def meta(mediaId):
-    media_meta = media_meta_da.get(mediaId)
+@app_frontend_meta.route('/api/meta/<string:media_id>')
+def meta(media_id):
+    media_meta = media_meta_da.get(media_id)
     if media_meta:
         return Response(media_meta)
     return {}
 
 
-@app_frontend_thumb.route('/api/thumb/<string:mediaId>')
-def thumb(mediaId):
-    media_thumb = media_thumb_da.get(mediaId)
+@app_frontend_thumb.route('/api/thumb/<string:media_id>')
+def thumb(media_id):
+    media_thumb = media_thumb_da.get(media_id)
     return Response(media_thumb, content_type="image/png")
 
 

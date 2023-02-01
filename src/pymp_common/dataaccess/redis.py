@@ -1,3 +1,4 @@
+from abc import ABC
 import json
 from typing import Dict
 from typing import Union
@@ -6,18 +7,21 @@ import redis
 from pymp_common.app.PympConfig import pymp_env
 
 
-class RedisDataAccess():
+class RedisDataAccess(ABC):
     def __init__(self, decode_responses):
         host = pymp_env.get("REDIS_HOST")
         port = pymp_env.get("REDIS_PORT")
         self.redis = redis.Redis(host=host, port=int(
             port), db=0, decode_responses=decode_responses)
 
+    def is_redis_readonly_replica(self):
+        info = self.redis.info()
+        return info.get("role") == "slave" and info.get("master_link_status") == "up"
 
-class RedisMediaServiceDataAccess():
+class RedisMediaServiceDataAccess(RedisDataAccess):
     def __init__(self):
+        super().__init__(True)
         self.key = "media_service"
-        self.redis = RedisDataAccess(True).redis
 
     def has(self) -> Union[bool, None]:
         return self.redis.exists(f"{self.key}") > 0
@@ -29,9 +33,9 @@ class RedisMediaServiceDataAccess():
         if not self.redis.readonly:
             self.redis.expire(f"{self.key}", 180)
 
-    def hset(self, id: str, scheme: str, host: str, port: str):
+    def hset(self, id: str, proto: str, host: str, port: str):
         self.expire()
-        data = {"scheme": scheme, "host": host, "port": port}
+        data = {"proto": proto, "host": host, "port": port}
         return self.redis.hset(f"{self.key}", id, json.dumps(data))
 
     def hget(self, id: str) -> Union[Dict, None]:
@@ -47,13 +51,13 @@ class RedisMediaServiceDataAccess():
         return self.redis.hgetall(f"{self.key}")
 
 
-media_service_da = RedisMediaServiceDataAccess()
+media_service_info_da = RedisMediaServiceDataAccess()
 
 
-class RedisMediaSourceDataAccess():
+class RedisMediaSourceDataAccess(RedisDataAccess):
     def __init__(self):
+        super().__init__(True)
         self.key = f"media_source"
-        self.redis = RedisDataAccess(True).redis
 
     def has(self) -> Union[bool, None]:
         return self.redis.exists(f"{self.key}") > 0
@@ -79,13 +83,13 @@ class RedisMediaSourceDataAccess():
         return self.redis.hgetall(f"{self.key}")
 
 
-media_source_da = RedisMediaSourceDataAccess()
+media_service_media_da = RedisMediaSourceDataAccess()
 
 
-class RedisMediaMetaDataAccess():
+class RedisMediaMetaDataAccess(RedisDataAccess):
     def __init__(self):
+        super().__init__(False)
         self.key = "media_meta"
-        self.redis = RedisDataAccess(False).redis
 
     def has(self, id: str) -> bool:
         return self.redis.exists(f"{self.key}_{id}") > 0
@@ -106,10 +110,10 @@ class RedisMediaMetaDataAccess():
 media_meta_da = RedisMediaMetaDataAccess()
 
 
-class RedisMediaThumbDataAccess():
+class RedisMediaThumbDataAccess(RedisDataAccess):
     def __init__(self):
+        super().__init__(False)
         self.key = "media_thumb"
-        self.redis = RedisDataAccess(False).redis
 
     def has(self, id: str) -> bool:
         return self.redis.exists(f"{self.key}_{id}") > 0

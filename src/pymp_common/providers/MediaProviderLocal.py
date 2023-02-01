@@ -11,33 +11,37 @@ from pymp_common.app.PympConfig import pymp_env
 from pymp_common.abstractions.providers import MediaProvider
 from pymp_common.abstractions.providers import MediaChunk
 
+from pymp_common.app.PympConfig import PympServer
 
 class MediaProviderLocal(MediaProvider):
-    def __init__(self):
-        self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
-        self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
-        if not os.path.exists(self.mediapath):
-            os.mkdir(self.mediapath)
-        if not os.path.exists(self.indexpath):
-            os.mkdir(self.indexpath)
+    def __init__(self, service_id):
+        if pymp_env.get_server_id() != service_id:
+            self.status = False
+        elif pymp_env.get_servertype() & PympServer.MEDIA_SVC:
+            self.status = False
+        else:            
+            self.status = True
+            self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
+            self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
+            if not os.path.exists(self.mediapath):
+                os.mkdir(self.mediapath)
+            if not os.path.exists(self.indexpath):
+                os.mkdir(self.indexpath)
         
     def __repr__(self) -> str:
-        return f"MediaProviderLocal({self.mediapath})"
-
-    def loginfo(self, message):
-        logging.info(f"{self.__repr__()}{message}")
+        return f"MediaProviderLocal({self.status})"
 
     def get_status(self) -> bool:
-        return True
+        return self.status
 
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         return os.path.join(self.indexpath, media_id)
 
     def get_media_ids(self) -> List[str]:
-        ids = []
-        for id in self.read_indexfiles():
-            ids.append(os.path.basename(id))
-        return ids
+        media_ids = []
+        for media_id in self.read_indexfiles():
+            media_ids.append(os.path.basename(media_id))
+        return media_ids
 
     def save_media(self, name: str, stream: IO[bytes]):
         fullpath = os.path.join(self.mediapath, name)
@@ -50,8 +54,8 @@ class MediaProviderLocal(MediaProvider):
                     return
                 f.write(chunk)
 
-    def get_media_chunk(self, mediaId, sByte: int = 0, eByte: int = 0, fileSize: int = 0) -> Union[MediaChunk, None]:
-        mediafile = self.get_media_uri(mediaId)
+    def get_media_chunk(self, media_id, sByte: int = 0, eByte: int = 0, fileSize: int = 0) -> Union[MediaChunk, None]:
+        mediafile = self.get_media_uri(media_id)
         if not mediafile:
             logging.info("mediafile None")
             raise OSError(f"uri None")
