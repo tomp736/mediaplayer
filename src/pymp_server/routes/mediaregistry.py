@@ -33,14 +33,14 @@ def post_registry_service():
     }, status=400)
 
 
-# @app_mediaregistry.route('/registry/service/list')
-# def registry_list():
-#     mediaServices = media_registry_provider.get_service_info()
-#     media_svc_dict = {}
-#     for media_svc_key in mediaServices.keys():
-#         media_svc_dict[media_svc_key] = json.loads(
-#             mediaServices[media_svc_key])
-#     return Response(json.dumps(media_svc_dict), status=200, content_type="application/json")
+@app_mediaregistry.route('/registry/service/list')
+def registry_list():
+    mediaServices = media_registry_provider.get_service_info()
+    media_svc_dict = {}
+    for media_svc_key in mediaServices.keys():
+        media_svc_dict[media_svc_key] = json.loads(
+            mediaServices[media_svc_key])
+    return Response(json.dumps(media_svc_dict), status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/media/list')

@@ -24,7 +24,7 @@ def media(media_id):
         request.headers["range"])
     service_id = mediaRegistryService.get_media_service(media_id)
     mediaService = MediaService(
-        mediaRegistryService.mediaRegistryProvider,
+        mediaRegistryService.MediaRegistryDataProvider,
         ProviderFactory.get_media_provider(service_id))
 
     mediaChunk = mediaService.get_media_chunk(media_id, reqByte1, reqByte2)

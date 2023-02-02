@@ -1,52 +1,26 @@
 from abc import ABC
 from abc import abstractmethod
 import io
-import re
 from typing import IO
 from typing import Dict
 from typing import List
 from typing import Union
 
-from pymp_common.dto.MediaRegistry import ServiceInfo
+from pymp_common.dto.Media import MediaChunk
+from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
 
-
-class MediaChunk():
-    def __init__(self, chunk, startByte=0, endByte=None, fileSize=None):
-        self.chunk = chunk
-        self.sByte = startByte
-        self.eByte = endByte
-        self.fileSize = fileSize
-
-    def to_content_range_header(self) -> str:
-        return 'bytes {0}-{1}/{2}'.format(self.sByte, self.eByte, self.fileSize)
-
-    def load_content_range_header(self, headerValue: str):
-        sByte, eByte, fileSize = MediaChunk.parse_range_header(headerValue)
-        self.sByte = sByte
-        self.eByte = eByte
-        self.fileSize = fileSize
-
-    @staticmethod
-    def parse_range_header(headerValue: str):
-        sByte, eByte, fileSize = 0, 0, 0
-        if headerValue:
-            match = re.search(r'(\d+)-(\d*)\/?(\d*)', headerValue)
-            if match is not None:
-                groups = match.groups()
-                if groups[0]:
-                    sByte = int(groups[0])
-                if groups[1]:
-                    eByte = int(groups[1])
-                if groups[2]:
-                    fileSize = int(groups[2])
-
-        return sByte, eByte, fileSize
-
-
-class MediaProvider(ABC):
+class DataProvider(ABC):
+    
+    @abstractmethod
+    def is_readonly(self) -> bool:
+        pass
+    
     @abstractmethod
     def get_status(self) -> bool:
         pass
+    
+
+class MediaDataProvider(DataProvider):
 
     @abstractmethod
     def get_media_uri(self, media_id: str) -> Union[str, None]:
@@ -57,7 +31,7 @@ class MediaProvider(ABC):
         pass
 
     @abstractmethod
-    def get_media_chunk(self, media_id, startByte=0, endByte=None) -> Union[MediaChunk, None]:
+    def get_media_chunk(self, media_id, start_byte=0, end_byte=None) -> Union[MediaChunk, None]:
         pass
 
     @abstractmethod
@@ -69,13 +43,7 @@ class MediaProvider(ABC):
         pass
 
 
-class FfmpegProvider(ABC):
-    @abstractmethod
-    def get_status(self) -> bool:
-        pass
-    
-    def readonly(self) -> bool:
-        pass
+class FfmpegDataProvider(DataProvider):
 
     @abstractmethod
     def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
@@ -102,37 +70,38 @@ class FfmpegProvider(ABC):
         pass
 
 
-class MediaRegistryProvider(ABC):
-    @abstractmethod
-    def get_status(self) -> bool:
-        pass
+class MediaRegistryDataProvider(DataProvider):
     
-    # service_id => service_info{}
+    # service_id => ServiceInfo
     @abstractmethod
-    def get_service_info(self, service_id: str) -> Union[ServiceInfo, None]:
+    def get_service_info(self, service_id: str) -> ServiceInfo:
         pass
     
     @abstractmethod
-    def get_all_service_info(self) -> Union[ServiceInfo, None]:
+    def get_all_service_info(self) -> Dict[str, ServiceInfo]:
         pass
     
     @abstractmethod
-    def set_service_info(self, service_id, service_info: ServiceInfo) -> bool:
+    def set_service_info(self, service_info: ServiceInfo) -> bool:
         pass
 
     @abstractmethod
-    def del_service_info(self, service_id: str) -> Union[int, None]:
+    def del_service_info(self, service_id: str) -> int:
         pass
     
-    # service_id => MEDIAINFO{}
+    # media_id -> MediaInfo
     @abstractmethod
-    def set_service_media(self,service_id: str,  media_id: str) -> bool:
+    def get_media_info(self, media_id: str) -> MediaInfo:
         pass
     
     @abstractmethod
-    def del_service_media(self, service_id: str, media_id: str) -> bool:
+    def get_all_media_info(self) ->Dict[str, MediaInfo]:
         pass
-
+    
     @abstractmethod
-    def get_service_media(self, service_id: Union[str, None] = None) -> Union[ServiceInfo, None]:
+    def set_media_info(self, media_info: MediaInfo) -> bool:
+        pass
+    
+    @abstractmethod
+    def del_media_info(self, media_id: str) -> bool:
         pass

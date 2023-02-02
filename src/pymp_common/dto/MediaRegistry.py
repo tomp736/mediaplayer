@@ -34,3 +34,9 @@ class ServiceInfo():
 class MediaInfo():
     media_id = ""
     service_id = ""
+    
+    @staticmethod
+    def from_json_str(jsonString: str) -> MediaInfo:
+        jobject = json.loads(jsonString)
+        return MediaInfo(**jobject)
+    
