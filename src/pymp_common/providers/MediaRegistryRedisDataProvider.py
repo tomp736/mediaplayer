@@ -1,56 +1,47 @@
 
 import json
+import logging
 from typing import Dict
 from typing import Union
 from pymp_common.abstractions.providers import MediaRegistryDataProvider
 from pymp_common.dataaccess.redis import media_service_info_da
 from pymp_common.dataaccess.redis import media_service_media_da
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.app.PympConfig import PympServer
 from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
 
 
 class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
 
-    def __init__(self):
-        if pymp_env.get_servertype() & PympServer.MEDIAREGISTRY_SVC:
-            self.status = False
-        else:
-            self.status = True
-            self.readonly = media_service_info_da.is_redis_readonly_replica()
-
     def __repr__(self) -> str:
-        return "MediaRegistryRedisDataProvider()"
+        readonly = self.is_readonly()
+        ready = self.is_readonly()
+        return f"MediaRegistryRedisDataProvider({readonly},{ready})"
 
     def is_readonly(self) -> bool:
-        return self.readonly
-    
-    def get_status(self) -> bool:
-        return self.status
+        try:
+            return media_service_info_da.is_redis_readonly_replica()
+        except Exception:
+            return True
+
+    def is_ready(self) -> bool:
+        try:
+            return media_service_info_da.redis.ping()
+        except Exception:
+            return False
 
     # SERVICEID => SERVICEINFO
 
-    def get_service_info(self, service_id: str) -> ServiceInfo:
-        service_info = media_service_info_da.hget(service_id)
-        if service_info:
-            return ServiceInfo.from_dict(service_info)
-        return ServiceInfo()
+    def get_service_info(self, service_id: str) -> Union[ServiceInfo, None]:
+        return media_service_info_da.hget(service_id)
 
     def get_all_service_info(self) -> Dict[str, ServiceInfo]:
-        service_infos = media_service_info_da.hgetall()
-        service_dict = {}
-        if service_infos:
-            for service_id, service_info in service_infos.items():
-                service_dict[service_id] = ServiceInfo.from_dict(json.loads(service_info))
-        return service_dict
-    
+        all_service_info = media_service_info_da.hgetall()
+        if all_service_info:
+            return all_service_info
+        return {}
+
     def set_service_info(self, service_info: ServiceInfo) -> bool:
-        media_service_info_da.hset(
-            service_info.service_id,
-            service_info.service_proto,
-            service_info.service_host,
-            service_info.service_port)
+        media_service_info_da.hset(service_info)
         return True
 
     def del_service_info(self, service_id) -> Union[int, None]:
@@ -59,10 +50,12 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
     # media_id -> MEDIAINFO
 
     def get_media_info(self, media_id: str) -> MediaInfo:
-        media_info_str = media_service_media_da.hget(media_id)
-        if media_info_str:
-            return MediaInfo.from_json_str(media_info_str)
-        return MediaInfo()
+        service_id = media_service_media_da.hget(media_id)
+        media_info = MediaInfo()
+        media_info.media_id = media_id
+        if service_id:
+            media_info.service_id = service_id
+        return media_info
 
     def get_all_media_info(self) -> Dict[str, MediaInfo]:
         redis_media_infos = media_service_media_da.hgetall()
@@ -73,11 +66,11 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
                 media_info.media_id = media_id
                 media_info.service_id = service_id
                 media_info_dict[media_id] = media_info
-                
+
         return media_info_dict
-    
+
     def set_media_info(self, media_info: MediaInfo) -> bool:
         return media_service_media_da.hset(media_info.media_id, media_info.service_id) > 0
 
-    def del_service_media(self, media_id: str) -> bool:
+    def del_media_info(self, media_id: str) -> bool:
         return media_service_media_da.hdel(media_id) > 0

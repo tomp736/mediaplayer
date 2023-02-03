@@ -16,7 +16,7 @@ class DataProvider(ABC):
         pass
     
     @abstractmethod
-    def get_status(self) -> bool:
+    def is_ready(self) -> bool:
         pass
     
 
@@ -46,25 +46,38 @@ class MediaDataProvider(DataProvider):
 class FfmpegDataProvider(DataProvider):
 
     @abstractmethod
-    def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
+    def get_thumb(self, media_uri) -> Union[io.BytesIO, None]:
         pass
 
     @abstractmethod
-    def get_meta(self, media_id) -> Union[str, None]:
+    def get_meta(self, media_uri) -> Union[str, None]:
+        pass
+
+
+class ThumbDataProvider(DataProvider):
+
+    @abstractmethod
+    def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
         pass
     
     @abstractmethod
     def set_thumb(self, media_id, thumb: io.BytesIO):
-        pass
-
-    @abstractmethod
-    def set_meta(self, media_id, meta: str):
         pass
     
     @abstractmethod
     def del_thumb(self, media_id):
         pass
 
+class MetaDataProvider(DataProvider):
+
+    @abstractmethod
+    def get_meta(self, media_id) -> Union[str, None]:
+        pass
+    
+    @abstractmethod
+    def set_meta(self, media_id, meta: str):
+        pass
+    
     @abstractmethod
     def del_meta(self, media_id):
         pass
@@ -95,7 +108,7 @@ class MediaRegistryDataProvider(DataProvider):
         pass
     
     @abstractmethod
-    def get_all_media_info(self) ->Dict[str, MediaInfo]:
+    def get_all_media_info(self) -> Dict[str, MediaInfo]:
         pass
     
     @abstractmethod

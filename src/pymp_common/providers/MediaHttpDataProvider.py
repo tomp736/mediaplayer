@@ -1,15 +1,16 @@
 
+import logging
 from typing import IO
 from typing import List
 from typing import Union
 
 import requests
 
+from pymp_common.dto.MediaRegistry import ServiceInfo
+
 from pymp_common.dataaccess.http_request_factory import http_request_factory
 from pymp_common.abstractions.providers import MediaDataProvider
 from pymp_common.abstractions.providers import MediaChunk
-
-from pymp_common.dto.MediaRegistry import ServiceInfo
 
 
 class MediaHttpDataProvider(MediaDataProvider):
@@ -27,7 +28,7 @@ class MediaHttpDataProvider(MediaDataProvider):
     def get_service_url(self) -> str:
         return self.serviceinfo.get_uri()
 
-    def get_status(self) -> bool:
+    def is_ready(self) -> bool:
         return self.status
 
     def get_media_uri(self, media_id: str) -> str:
@@ -41,6 +42,7 @@ class MediaHttpDataProvider(MediaDataProvider):
         media_request = http_request_factory.get(
             self.get_service_url(), "/media/list")
         media_response = session.send(media_request.prepare())
+        logging.info(media_response.json())
         for media_id in media_response.json():
             media_ids.append(media_id)
         return media_ids
@@ -48,7 +50,7 @@ class MediaHttpDataProvider(MediaDataProvider):
     def get_media_chunk(self, media_id, start_byte=0, end_byte=None) -> Union[MediaChunk, None]:
         media_request = http_request_factory.get(
             self.get_service_url(),
-            media_id,
+            f"/media/{media_id}",
             {
                 'Range': f'bytes {start_byte}-{end_byte}'
             })

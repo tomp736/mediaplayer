@@ -4,11 +4,9 @@ from prometheus_client import start_http_server
 import logging
 
 from pymp_common.app.PympConfig import pymp_env
-from pymp_common.app.PympConfig import PympServer
-from pymp_common.app.Services import ffmpegService
-from pymp_common.app.Services import mediaRegistryService
-from pymp_common.app.Services import mediaService
-from pymp_common.app.Services import print_serviceinfo
+from pymp_common.dto.MediaRegistry import PympServiceType
+
+from pymp_common.app.Services import media_registry_service, media_service, ffmpeg_service
 
 from pymp_server.routes.mediaregistry import app_mediaregistry
 from pymp_server.routes.media import app_media
@@ -25,29 +23,27 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     start_http_server(8000)
 
-    print_serviceinfo()
-
     # HOW TO DO SWITCH STATEMENT
-    if (pymp_env.get_servertype() & PympServer.MEDIA_API):
+    if pymp_env.is_this_service_type(PympServiceType.MEDIA_API):
         app.register_blueprint(app_frontend_media)
 
-    if (pymp_env.get_servertype() & PympServer.THUMB_API):
+    if pymp_env.is_this_service_type(PympServiceType.THUMB_API):
         app.register_blueprint(app_frontend_thumb)
 
-    if (pymp_env.get_servertype() & PympServer.META_API):
+    if pymp_env.is_this_service_type(PympServiceType.META_API):
         app.register_blueprint(app_frontend_meta)
 
-    if (pymp_env.get_servertype() & PympServer.MEDIAREGISTRY_SVC):
-        mediaRegistryService.watch_services()
+    if pymp_env.is_this_service_type(PympServiceType.MEDIAREGISTRY_SVC):
+        media_registry_service.watch_services()
         app.register_blueprint(app_mediaregistry)
 
-    if (pymp_env.get_servertype() & PympServer.FFMPEG_SVC):
-        ffmpegService.watch_media()
+    if pymp_env.is_this_service_type(PympServiceType.FFMPEG_SVC):
+        ffmpeg_service.watch_media()
         app.register_blueprint(app_ffmpeg_meta)
         app.register_blueprint(app_ffmpeg_thumb)
 
-    if (pymp_env.get_servertype() & PympServer.MEDIA_SVC):
-        mediaService.watch_media()
+    if pymp_env.is_this_service_type(PympServiceType.MEDIA_SVC):
+        media_service.watch_media()
         app.register_blueprint(app_media)
 
     app.run(

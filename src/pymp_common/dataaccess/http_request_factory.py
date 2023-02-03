@@ -14,7 +14,8 @@ class HttpRequestFactory():
             headers=headers
         )
 
-    def post(self, base_url: str, path: str, data, headers: _HeadersMapping = {}) -> Request:
+    def post(self, base_url: str, path: str, data, headers = {}) -> Request:        
+        headers['Content-Type'] = 'application/json'
         return Request(
             method='POST',
             url=f"{base_url}{path}",

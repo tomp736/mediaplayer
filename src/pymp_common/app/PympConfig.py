@@ -1,16 +1,6 @@
-import logging
 import os
-from enum import IntFlag
 
-
-class PympServer(IntFlag):
-    MEDIA_API = 1
-    META_API = 2
-    THUMB_API = 4
-    MEDIA_SVC = 8
-    FFMPEG_SVC = 16
-    MEDIAREGISTRY_SVC = 32
-    FILEUPLOAD_SVC = 64
+from pymp_common.dto.MediaRegistry import PympServiceType, ServiceInfo
 
 
 class PympEnv:
@@ -21,8 +11,11 @@ class PympEnv:
         'REDIS_HOST': "",
         'REDIS_PORT': "80",
 
-        'SERVER_TYPE': "63",
-        'SERVER_ID': "DEFAULT",
+        'SERVICE_TYPE': "63",
+        'SERVICE_ID': "DEFAULT",
+        'SERVICE_PROTO': "http",
+        'SERVICE_HOST': "localhost",
+        'SERVICE_PORT': "80",
 
         'MEDIA_SVC_MEDIAPATH': "/app/media",
         'MEDIA_SVC_INDEXPATH': "/app/index",
@@ -34,27 +27,31 @@ class PympEnv:
 
     def __init__(self):
         self.load_configs()
-        self.validate_server_configs()
 
     def load_configs(self):
-        for envKey in self.config:
-            value = os.environ.get(envKey, self.config[envKey])
-            self.config[envKey] = value
-        for pympServer in PympServer:
-            self.config[f"{pympServer.name}_PROTO"] = os.environ.get(
-                f"{pympServer.name}_PROTO", "http")
-            self.config[f"{pympServer.name}_HOST"] = os.environ.get(
-                f"{pympServer.name}_HOST", "localhost")
-            self.config[f"{pympServer.name}_PORT"] = os.environ.get(
-                f"{pympServer.name}_PORT", "80")
+        # load config keys from env
+        for env_key, env_default in self.config.items():
+            self.config[env_key] = os.environ.get(env_key, env_default)
 
-    def validate_server_configs(self) -> bool:
-        valid = True
-        for pympServer in PympServer:
-            valid &= self.get_proto(pympServer) != ""
-            valid &= self.get_host(pympServer) != ""
-            valid &= self.get_port(pympServer) != ""
-        return valid
+        self.config["SERVICE_ID"] = os.environ.get("SERVICE_ID", "")
+        self.config["SERVICE_TYPE"] = os.environ.get("SERVICE_TYPE", "")
+        self.config["SERVICE_PROTO"] = os.environ.get("SERVICE_PROTO", "")
+        self.config["SERVICE_HOST"] = os.environ.get("SERVICE_HOST", "")
+        self.config["SERVICE_PORT"] = os.environ.get("SERVICE_PORT", "")
+
+        # load host service info
+        # used for hard-coded service resolution when needed
+        for pymp_service_type in PympServiceType:
+            self.config[f"{pymp_service_type.name}_ID"] = os.environ.get(
+                f"{pymp_service_type.name}_ID", "")
+            self.config[f"{pymp_service_type.name}_TYPE"] = os.environ.get(
+                f"{pymp_service_type.name}_TYPE", "")
+            self.config[f"{pymp_service_type.name}_PROTO"] = os.environ.get(
+                f"{pymp_service_type.name}_PROTO", "")
+            self.config[f"{pymp_service_type.name}_HOST"] = os.environ.get(
+                f"{pymp_service_type.name}_HOST", "")
+            self.config[f"{pymp_service_type.name}_PORT"] = os.environ.get(
+                f"{pymp_service_type.name}_PORT", "")
 
     def get(self, key: str) -> str:
         if key in self.config:
@@ -62,33 +59,39 @@ class PympEnv:
         else:
             raise ValueError(f"{key} is not configured in PympEnv.")
 
-    def get_servertype(self):
-        serverType = int(self.get("SERVER_TYPE"))
-        return PympServer(serverType)
+    def set(self, key: str, value: str):
+        if key in self.config:
+            self.config[key] = value
+        else:
+            raise ValueError(f"{key} is not configured in PympEnv.")
 
-    def print_servertype(self):
-        serverType = self.get_servertype()
-        for pympServer in PympServer:
-            if serverType & pympServer:
-                logging.info(pympServer)
+    def is_this_service_type(self, pymp_service_type: PympServiceType) -> bool:
+        service_info = self.get_this_service_info()
+        service_type = PympServiceType(service_info.service_type)
+        is_type = bool(service_type & pymp_service_type)
+        return is_type
 
-    def get_baseurl(self, server: PympServer) -> str:
-        proto = self.get_proto(server)
-        host = self.get_host(server)
-        port = self.get_port(server)
-        return f"{proto}://{host}:{port}"
+    def get_service_info(self, pymp_service_type: PympServiceType) -> ServiceInfo:
+        service_info = ServiceInfo()
+        service_info.service_id = self.get(
+            f"{pymp_service_type.name}_ID")
+        service_info.service_type = PympServiceType(pymp_service_type.value)
+        service_info.service_proto = self.get(
+            f"{pymp_service_type.name}_PROTO")
+        service_info.service_host = self.get(
+            f"{pymp_service_type.name}_HOST")
+        service_info.service_port = self.get(
+            f"{pymp_service_type.name}_PORT")
+        return service_info
 
-    def get_server_id(self) -> str:
-        return self.get(f"SERVER_ID")
-
-    def get_proto(self, server: PympServer) -> str:
-        return self.get(f"{server.name}_PROTO")
-
-    def get_host(self, server: PympServer) -> str:
-        return self.get(f"{server.name}_HOST")
-
-    def get_port(self, server: PympServer) -> str:
-        return self.get(f"{server.name}_PORT")
+    def get_this_service_info(self) -> ServiceInfo:
+        service_info = ServiceInfo()
+        service_info.service_id = self.get("SERVICE_ID")
+        service_info.service_type = PympServiceType(int(self.get("SERVICE_TYPE")))
+        service_info.service_proto = self.get("SERVICE_PROTO")
+        service_info.service_host = self.get("SERVICE_HOST")
+        service_info.service_port = self.get("SERVICE_PORT")
+        return service_info
 
 
 pymp_env = PympEnv()

@@ -4,27 +4,26 @@ from flask import Response
 from flask import request
 from flask import Blueprint
 
-from pymp_common.abstractions.providers import MediaChunk
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.app.Services import mediaService
+
+from pymp_common.app.Services import media_service
+from pymp_common.dto.Media import MediaChunk
 
 app_media = Blueprint('app_media', __name__)
 
-
 @app_media.route('/media/<string:media_id>', methods=['GET'])
 def get_media(media_id):
-    reqByte1, reqByte2, fileSize = MediaChunk.parse_range_header(
+    start_byte, end_byte, file_size = MediaChunk.parse_range_header(
         request.headers["Range"])
-    mediaChunk = mediaService.get_media_chunk(media_id, reqByte1, reqByte2)
-    if mediaChunk:
+    media_chunk = media_service.get_media_chunk(media_id, start_byte, end_byte)
+    if media_chunk:
         response = Response(
-            mediaChunk.chunk,
+            media_chunk.chunk,
             206,
             mimetype='video/webm',
             content_type='video/webm')
 
         response.headers.set(
-            'Content-Range', mediaChunk.to_content_range_header()
+            'Content-Range', media_chunk.to_content_range_header()
         )
         logging.info(response)
         logging.info(response.headers)
@@ -33,29 +32,25 @@ def get_media(media_id):
     return Response(status=400)
 
 
-@app_media.route('/media', methods=['POST'])
-def post_media():
-    if request.method == 'POST':
-        if not mediaService:
-            return Response(status=400)
-        mediaService.save_media("output_file", request.stream)
-    return Response(status=404)
+# @app_media.route('/media', methods=['POST'])
+# def post_media():
+#     if request.method == 'POST':
+#         if not media_service:
+#             return Response(status=400)
+#         media_service.save_media("output_file", request.stream)
+#     return Response(status=404)
 
 
 @app_media.route('/media/index', methods=['GET'])
-def index():
-    if not mediaService:
-        return Response(status=400)
-    mediaService.update_index()
+def get_index():
+    media_service.update_index()
     return Response(status=200)
 
 
 @app_media.route('/media/list', methods=['GET'])
-def list():
-    if not mediaService:
-        return Response(status=400)
-    mediaIds = mediaService.get_media_ids()
-    return Response(json.dumps(mediaIds), mimetype='application/json')
+def get_list():
+    media_ids = media_service.get_media_ids()
+    return Response(json.dumps(media_ids), mimetype='application/json')
 
 
 @app_media.after_request

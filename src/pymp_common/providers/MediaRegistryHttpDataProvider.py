@@ -1,4 +1,5 @@
 
+import json
 from typing import Dict
 from typing import Union
 import requests
@@ -14,7 +15,9 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
         self.readonly = True
 
     def __repr__(self) -> str:
-        return "MediaRegistryHttpDataProvider()"
+        readonly = self.is_readonly()
+        ready = self.is_readonly()
+        return f"MediaRegistryHttpDataProvider({readonly},{ready})"
 
     def is_readonly(self) -> bool:
         return self.readonly
@@ -22,7 +25,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
     def get_service_url(self) -> str:
         return self.serviceinfo.get_uri()
 
-    def get_status(self) -> bool:
+    def is_ready(self) -> bool:
         return self.status
 
     def get_service_info(self, service_id: str) -> ServiceInfo:
@@ -30,30 +33,54 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
             self.get_service_url(), f"/registry/service/{service_id}")
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
-        return ServiceInfo(**registry_response.json())
+        jdata = registry_response.json()
+        service_info = ServiceInfo()
+        if jdata:
+            service_info.service_id = jdata["service_id"]
+            service_info.service_type = jdata["service_type"]
+            service_info.service_proto = jdata["service_proto"]
+            service_info.service_host = jdata["service_host"]
+            service_info.service_port = jdata["service_port"]
+        return service_info
 
     def get_all_service_info(self) -> Dict[str, ServiceInfo]:
         registry_request = http_request_factory.get(
             self.get_service_url(), "/registry/service")
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
-        return registry_response.json()
+        jdatas = registry_response.json()
+        rdata = {}
+        for jdata in jdatas:
+            service_info = ServiceInfo()
+            service_info.service_id = jdata["service_id"]
+            service_info.service_type = jdata["service_type"]
+            service_info.service_proto = jdata["service_proto"]
+            service_info.service_host = jdata["service_host"]
+            service_info.service_port = jdata["service_port"]
+            rdata[service_info.service_id] = service_info
+        return rdata
 
-    def set_service_info(self, service_info: ServiceInfo):
+    def set_service_info(self, service_info: ServiceInfo) -> bool:
         registry_request = http_request_factory.post(
-            self.get_service_url(), "/registry/service", service_info)
+            self.get_service_url(), "/registry/service", service_info.__dict__)
         session = requests.Session()
         session.send(registry_request.prepare())
+        return True
 
-    def del_service_info(self, service_id) -> Union[int, None]:
+    def del_service_info(self, service_id: str) -> int:
         raise Exception("NOT IMPLEMENETED")
 
     def get_media_info(self, media_id: str) -> MediaInfo:
         registry_request = http_request_factory.get(
             self.get_service_url(), f"/registry/media/{media_id}")
         session = requests.Session()
-        registry_response = session.send(registry_request.prepare())
-        return MediaInfo(**registry_response.json())
+        registry_response = session.send(registry_request.prepare())        
+        jdata = registry_response.json()
+        
+        media_info = MediaInfo()
+        media_info.media_id = media_id
+        media_info.service_id = jdata["service_id"]
+        return media_info
 
     def get_all_media_info(self) -> Dict[str, MediaInfo]:
         registry_request = http_request_factory.get(
@@ -64,10 +91,10 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
 
     def set_media_info(self, media_info: MediaInfo) -> bool:
         registry_request = http_request_factory.post(
-            self.get_service_url(), "/registry/media", media_info)
+            self.get_service_url(), "/registry/media", media_info.__dict__)
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
         return registry_response.json()
 
-    def del_service_media(self, service_id: str, media_id: str) -> bool:
+    def del_media_info(self, media_id: str) -> bool:
         raise Exception("NOT IMPLEMENETED")

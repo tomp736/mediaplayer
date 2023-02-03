@@ -1,6 +1,5 @@
 import logging
 import os
-import traceback
 import uuid
 from typing import IO
 from typing import Dict
@@ -11,27 +10,25 @@ from pymp_common.app.PympConfig import pymp_env
 from pymp_common.abstractions.providers import MediaDataProvider
 from pymp_common.abstractions.providers import MediaChunk
 
-from pymp_common.app.PympConfig import PympServer
-
 
 class MediaFileDataProvider(MediaDataProvider):
-    def __init__(self, service_id):
-        if pymp_env.get_servertype() & PympServer.MEDIA_SVC and pymp_env.get_server_id() == service_id:
-            self.status = True
-            self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
-            self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
-            if not os.path.exists(self.mediapath):
-                os.mkdir(self.mediapath)
-            if not os.path.exists(self.indexpath):
-                os.mkdir(self.indexpath)
-        else:
-            self.status = False
+    def __init__(self):
+        self.status = True
+        self.mediapath = pymp_env.get("MEDIA_SVC_MEDIAPATH")
+        self.indexpath = pymp_env.get("MEDIA_SVC_INDEXPATH")
+        if not os.path.exists(self.mediapath):
+            os.mkdir(self.mediapath)
+        if not os.path.exists(self.indexpath):
+            os.mkdir(self.indexpath)
 
     def __repr__(self) -> str:
         return f"MediaFileDataProvider({self.status})"
 
-    def get_status(self) -> bool:
+    def is_ready(self) -> bool:
         return self.status
+
+    def is_readonly(self) -> bool:
+        return False
 
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         return os.path.join(self.indexpath, media_id)
@@ -71,7 +68,7 @@ class MediaFileDataProvider(MediaDataProvider):
                 if len(chunk) == 0:
                     return
                 f.write(chunk)
-                
+
     def read_index(self) -> Dict[str, str]:
         fs_indexfiles = self.read_indexfiles()
         index = {}
@@ -100,7 +97,7 @@ class MediaFileDataProvider(MediaDataProvider):
                 media_basename = os.path.basename(realpath)
 
                 logging.info(realpath)
-                if (fs_mediafiles.__contains__(realpath)):
+                if realpath in fs_mediafiles:
                     logging.info(f" -- INDEX OK -- : {realpath}")
                     fs_mediafiles.remove(realpath)
             else:

@@ -1,8 +1,9 @@
 
-import logging
-from pymp_common.app import ProviderFactory
-from pymp_common.app.PympConfig import pymp_env
+from pymp_common.services.FfmpegService import FfmpegService
+from pymp_common.services.MediaRegistryService import MediaRegistryService
+from pymp_common.services.MediaService import MediaService
 
-media_registry_providers = ProviderFactory.get_media_registry_providers()
-ffmpeg_providers = ProviderFactory.get_ffmpeg_providers()
-media_providers = ProviderFactory.get_media_providers(pymp_env.get_server_id())
+
+media_service = MediaService()
+media_registry_service = MediaRegistryService()
+ffmpeg_service = FfmpegService()
