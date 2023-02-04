@@ -6,12 +6,12 @@ import json
 
 class ServiceInfo():
 
-    def __init__(self) -> None:
-        self.service_id = ""
-        self.service_type = 0
-        self.service_proto = ""
-        self.service_host = ""
-        self.service_port = ""
+    def __init__(self, **kwargs) -> None:
+        self.service_id = kwargs.get("service_id", "")
+        self.service_type = kwargs.get("service_type", 0)
+        self.service_proto = kwargs.get("service_proto", "")
+        self.service_host = kwargs.get("service_host", "")
+        self.service_port = kwargs.get("service_port", "")
 
     def to_json(self):
         return json.dumps(
@@ -40,9 +40,9 @@ class ServiceInfo():
 
 class MediaInfo():
 
-    def __init__(self) -> None:
-        self.media_id = ""
-        self.service_id = ""
+    def __init__(self, **kwargs) -> None:
+        self.media_id = kwargs.get("media_id", "")
+        self.service_id = kwargs.get("service_id", "")
 
     def to_json(self):
         return json.dumps(

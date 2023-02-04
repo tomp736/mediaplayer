@@ -11,9 +11,11 @@ scrape_configs:
   - job_name: 'pymp'
     static_configs:
     - targets:
-      - 'pymp_frontend:8000'
-      - 'pymp_frontend_media_api:8000'
-      - 'pymp_frontend_thumb_api:8000'
-      - 'pymp_frontend_meta_api:8000'
-      - 'pymp_media_svc:8000'
-      - 'pymp_ffmpeg_svc:8000'
+      - 'media_api:8000'
+      - 'thumb_api:8000'
+      - 'meta_api:8000'
+      - 'file_svc:8000'
+      - 'ffmpeg_svc:8000'
+      - 'mediaregistry_svc:8000'
+      - 'media_svc_internal:8000'
+      - 's01:12002'

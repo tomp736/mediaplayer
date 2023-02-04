@@ -57,7 +57,7 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
     def hgetall(self) -> Dict[str, ServiceInfo]:
         service_infos_json = self.redis.hgetall(self.key)
         service_infos = {
-            service_id: ServiceInfo.from_json(service_infos_json) for service_id, service_info in service_infos_json.items()
+            service_id: ServiceInfo.from_json(service_info) for service_id, service_info in service_infos_json.items()
         }
         return service_infos
 
@@ -92,8 +92,7 @@ class RedisMediaInfoDataAccess(RedisDataAccess):
 
     def hgetall(self) -> Dict[str, MediaInfo]:
         media_infos_json = self.redis.hgetall(self.key)
-        media_infos = {media_id: MediaInfo.from_json(
-            media_info_json) for media_id, media_info_json in media_infos_json.items()}
+        media_infos = {media_id: MediaInfo.from_json(media_info_json) for media_id, media_info_json in media_infos_json.items()}
         return media_infos
 
 

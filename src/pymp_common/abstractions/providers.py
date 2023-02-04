@@ -63,7 +63,7 @@ class FfmpegDataProvider(DataProvider):
         pass
 
 
-class ThumbDataProvider(DataProvider):
+class MediaThumbProvider(DataProvider):
 
     @abstractmethod
     def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
@@ -72,13 +72,17 @@ class ThumbDataProvider(DataProvider):
     @abstractmethod
     def set_thumb(self, media_id, thumb: io.BytesIO):
         pass
+    
+    @abstractmethod
+    def has_thumb(self, media_id) -> bool:
+        pass
 
     @abstractmethod
     def del_thumb(self, media_id):
         pass
 
 
-class MetaDataProvider(DataProvider):
+class MediaMetaProvider(DataProvider):
 
     @abstractmethod
     def get_meta(self, media_id) -> Union[str, None]:
@@ -86,6 +90,10 @@ class MetaDataProvider(DataProvider):
 
     @abstractmethod
     def set_meta(self, media_id, meta: str):
+        pass
+    
+    @abstractmethod
+    def has_meta(self, media_id) -> bool:
         pass
 
     @abstractmethod

@@ -14,25 +14,22 @@ app_mediaregistry = Blueprint('app_mediaregistry', __name__)
 @app_mediaregistry.route('/registry/service')
 def get_registry_service_list():
     service_infos = media_registry_service.get_registered_services()
-    return Response(json.dumps(service_infos), status=200, content_type="application/json")
+    json_response = json.dumps(service_infos, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
+    return Response(json_response, status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/service/<string:service_id>')
 def get_registry_service(service_id):
     service_infos = media_registry_service.get_registered_services()
     service_info = service_infos[service_id]
-    return Response(json.dumps(service_info), status=200, content_type="application/json")
+    json_response = json.dumps(service_info, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
+    return Response(json_response, status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/service', methods=['POST'])
 def post_registry_service():
     if request.json:
-        service_info = ServiceInfo()
-        service_info.service_id = request.json['service_id']
-        service_info.service_type = request.json['service_type']
-        service_info.service_proto = request.json['service_proto']
-        service_info.service_host = request.json['service_host']
-        service_info.service_port = request.json['service_port']
+        service_info = ServiceInfo.from_json(request.json)
 
         if service_info.service_id == "":
             service_info.service_id = str(uuid.uuid4())
@@ -51,26 +48,22 @@ def post_registry_service():
 
 @app_mediaregistry.route('/registry/media')
 def get_registry_media_list():
-    media_infos = media_registry_service.get_media_index()
-    media_ids = []
-    if media_infos:
-        for media_id in media_infos:
-            media_ids.append(media_id)
-    return Response(json.dumps(media_ids), status=200, content_type="application/json")
+    media_index = media_registry_service.get_media_index()
+    json_response = json.dumps(media_index, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
+    return Response(json_response, status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/media/<string:media_id>')
 def get_registry_media(media_id):
     media_info = media_registry_service.get_media_info(media_id)
-    return Response(json.dumps(media_info), status=200, content_type="application/json")
+    json_response = json.dumps(media_info, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
+    return Response(json_response, status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/media')
 def post_registry_media():
     if request.json:
-        media_info = MediaInfo()
-        media_info.media_id = request.json['media_id']
-        media_info.service_id = request.json['service_id']
+        media_info = MediaInfo.from_json(request.json)
         media_registry_service.register_media(media_info)
         return Response({
             "success": True
@@ -83,9 +76,10 @@ def post_registry_media():
 
 @app_mediaregistry.route('/registry/media/index')
 def get_registry_media_index():
-    media = media_registry_service.get_media_index()
-    if not media is None:
-        return Response(json.dumps(media), status=200, content_type="application/json")
+    media_index = media_registry_service.get_media_index()
+    if not media_index is None:
+        json_response = json.dumps(media_index, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
+        return Response(json_response, status=200, content_type="application/json")
 
     return Response(status=503)
 
