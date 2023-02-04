@@ -1,11 +1,16 @@
 import logging
 from typing import Dict
-from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
 
-from pymp_common.app.ProviderFactory import get_media_providers, get_media_registry_providers
-from pymp_common.utils.RepeatTimer import RepeatTimer
 from pymp_common.app.PympConfig import pymp_env
+
+from pymp_common.dto.MediaRegistry import MediaInfo
+from pymp_common.dto.MediaRegistry import ServiceInfo
 from pymp_common.dto.MediaRegistry import PympServiceType
+
+from pymp_common.app.ProviderFactory import get_media_providers
+from pymp_common.app.ProviderFactory import get_media_registry_providers
+
+from pymp_common.utils.RepeatTimer import RepeatTimer
 
 
 class MediaRegistryService():
@@ -15,24 +20,28 @@ class MediaRegistryService():
     def __repr__(self) -> str:
         return "MediaRegistryService()"
 
-    def register_service(self, service_info: ServiceInfo):
+    def get_media_registry_provider(self):
         media_registry_provider = get_media_registry_providers()[0]
+        return media_registry_provider
+
+    def register_service(self, service_info: ServiceInfo):
+        media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.set_service_info(service_info)
 
     def register_media(self, media_info: MediaInfo):
-        media_registry_provider = get_media_registry_providers()[0]
+        media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.set_media_info(media_info)
 
     def get_registered_services(self) -> Dict[str, ServiceInfo]:
-        media_registry_provider = get_media_registry_providers()[0]
+        media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_all_service_info()
 
     def get_media_index(self) -> Dict[str, MediaInfo]:
-        media_registry_provider = get_media_registry_providers()[0]
+        media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_all_media_info()
 
     def get_media_info(self, media_id) -> MediaInfo:
-        media_registry_provider = get_media_registry_providers()[0]
+        media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_media_info(media_id)
 
     def watch_services(self):
@@ -40,43 +49,32 @@ class MediaRegistryService():
 
     def update_media_services(self):
         service_info = pymp_env.get_this_service_info()
-        if PympServiceType(service_info.service_type) & PympServiceType.MEDIAREGISTRY_SVC:
-            media_service = self.get_registered_services()
-            if not media_service:
-                return
+        if not PympServiceType(service_info.service_type) & PympServiceType.MEDIAREGISTRY_SVC:
+            return
+        
+        media_service = self.get_registered_services()
+        if not media_service:
+            return
 
-            for media_service_id in media_service:
-                media_svc_media_ids = self.check_media_service(media_service_id)
-                self.check_media_sources(media_service_id, media_svc_media_ids)
+        for media_service_id in media_service:
+            media_svc_media_ids = self.check_media_service(media_service_id)
+            self.check_media_sources(media_service_id, media_svc_media_ids)
 
     def check_media_service(self, service_id):
         self.logstuff(f"CHECKING SERVICE FOR {service_id}")
         media_svc_media_ids = []
         try:
-            logging.info("1")
             media_registry_provider = get_media_registry_providers()[0]
-            logging.info("2")
             media_provider = get_media_providers(service_id)[0]
-            logging.info("3")
-            if media_provider:
-                logging.info("4")
-                status = media_provider.is_ready()
-                logging.info("5")
-                if status:
-                    logging.info(media_provider)
-                    media_svc_media_ids = media_provider.get_media_ids()
-                    self.logstuff(
-                        f"MediaDataProvider {service_id} passes status check.")
-                else:
-                    logging.info("7")
-                    self.logstuff(
-                        f"MediaDataProvider {service_id} fails status check.")
-                    media_registry_provider.del_service_info(service_id)
+            if media_provider and media_provider.is_ready():
+                logging.info(media_provider)
+                media_svc_media_ids = media_provider.get_media_ids()
+                self.logstuff(f"{media_provider} registered.")
             else:
-                self.logstuff(f"MediaDataProvider {service_id} is None.")
+                self.logstuff(f"{media_provider} is not ready.")
+                media_registry_provider.del_service_info(service_id)
         except Exception as ex:
             logging.info(ex)
-            media_registry_provider.del_service_info(service_id)
         return media_svc_media_ids
 
     def check_media_sources(self, service_id, service_media_ids):
@@ -95,7 +93,7 @@ class MediaRegistryService():
 
         for registry_media_id in redis_svc_media_ids:
             # delete from redis if media_svc no longer has the media
-            if not registry_media_id in service_media_ids:
+            if registry_media_id not in service_media_ids:
                 self.logstuff(f"DELETING: {registry_media_id}")
                 media_registry_provider.del_media_info(registry_media_id)
                 continue

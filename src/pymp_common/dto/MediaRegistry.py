@@ -1,6 +1,7 @@
 
 
 from enum import IntFlag
+import json
 
 
 class ServiceInfo():
@@ -12,12 +13,24 @@ class ServiceInfo():
         self.service_host = ""
         self.service_port = ""
 
+    def to_json(self):
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__,
+            sort_keys=True,
+            indent=4)
+
+    @staticmethod
+    def from_json(json_string):
+        json_dict = json.loads(json_string)
+        return ServiceInfo(**json_dict)
+
     def is_valid(self):
         if self.service_proto in ["http", "https"]:
             return True
         else:
             return False
-        
+
     def get_uri(self):
         if self.service_proto in ["http", "https"]:
             return f"{self.service_proto}://{self.service_host}:{self.service_port}"
@@ -31,6 +44,17 @@ class MediaInfo():
         self.media_id = ""
         self.service_id = ""
 
+    def to_json(self):
+        return json.dumps(
+            self,
+            default=lambda o: o.__dict__,
+            sort_keys=True,
+            indent=4)
+
+    @staticmethod
+    def from_json(json_string):
+        json_dict = json.loads(json_string)
+        return MediaInfo(**json_dict)
 
 
 class PympServiceType(IntFlag):

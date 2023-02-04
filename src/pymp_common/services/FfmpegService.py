@@ -3,7 +3,11 @@ from pymp_common.utils.RepeatTimer import RepeatTimer
 from pymp_common.app.PympConfig import pymp_env
 from pymp_common.dto.MediaRegistry import PympServiceType
 
-from pymp_common.app.ProviderFactory import get_ffmpeg_providers, get_media_registry_providers, get_media_providers, get_meta_providers, get_thumb_providers
+from pymp_common.app.ProviderFactory import get_media_registry_providers
+from pymp_common.app.ProviderFactory import get_media_providers
+from pymp_common.app.ProviderFactory import get_ffmpeg_providers
+from pymp_common.app.ProviderFactory import get_meta_providers
+from pymp_common.app.ProviderFactory import get_thumb_providers
 
 
 class FfmpegService:

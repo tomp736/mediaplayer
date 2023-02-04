@@ -14,14 +14,14 @@ app_mediaregistry = Blueprint('app_mediaregistry', __name__)
 @app_mediaregistry.route('/registry/service')
 def get_registry_service_list():
     service_infos = media_registry_service.get_registered_services()
-    return Response(json.dumps(service_infos.__dict__), status=200, content_type="application/json")
+    return Response(json.dumps(service_infos), status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/service/<string:service_id>')
 def get_registry_service(service_id):
     service_infos = media_registry_service.get_registered_services()
     service_info = service_infos[service_id]
-    return Response(json.dumps(service_info.__dict__), status=200, content_type="application/json")
+    return Response(json.dumps(service_info), status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/service', methods=['POST'])
@@ -62,7 +62,7 @@ def get_registry_media_list():
 @app_mediaregistry.route('/registry/media/<string:media_id>')
 def get_registry_media(media_id):
     media_info = media_registry_service.get_media_info(media_id)
-    return Response(json.dumps(media_info.__dict__), status=200, content_type="application/json")
+    return Response(json.dumps(media_info), status=200, content_type="application/json")
 
 
 @app_mediaregistry.route('/registry/media')

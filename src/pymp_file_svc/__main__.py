@@ -7,8 +7,8 @@ from flask_dropzone import Dropzone
 from prometheus_client import start_http_server
 import requests
 from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dataaccess.redis import media_service_media_da
-from pymp_common.dataaccess.redis import media_service_info_da
+from pymp_common.dataaccess.redis import redis_media_info
+from pymp_common.dataaccess.redis import redis_service_info
 from pymp_common.dataaccess.http_request_factory import media_request_factory
 import logging
 import os
@@ -29,9 +29,9 @@ def upload():
 
         media_svc_url = None
         # check if media_source exists in redis
-        if media_service_media_da.has():
+        if redis_media_info.has():
             # get sourceid by mediaid
-            media_svcs = media_service_info_da.hgetall()
+            media_svcs = redis_service_info.hgetall()
             if media_svcs:
                 media_svc = random.choice(list(media_svcs.items()))
                 if media_svc:

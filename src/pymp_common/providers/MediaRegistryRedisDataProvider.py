@@ -4,8 +4,8 @@ import logging
 from typing import Dict
 from typing import Union
 from pymp_common.abstractions.providers import MediaRegistryDataProvider
-from pymp_common.dataaccess.redis import media_service_info_da
-from pymp_common.dataaccess.redis import media_service_media_da
+from pymp_common.dataaccess.redis import redis_service_info
+from pymp_common.dataaccess.redis import redis_media_info
 
 from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
 
@@ -19,38 +19,38 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
 
     def is_readonly(self) -> bool:
         try:
-            return media_service_info_da.is_redis_readonly_replica()
+            return redis_service_info.is_redis_readonly_replica()
         except Exception:
             return True
 
     def is_ready(self) -> bool:
         try:
-            return media_service_info_da.redis.ping()
+            return redis_service_info.redis.ping()
         except Exception:
             return False
 
     # SERVICEID => SERVICEINFO
 
     def get_service_info(self, service_id: str) -> Union[ServiceInfo, None]:
-        return media_service_info_da.hget(service_id)
+        return redis_service_info.hget(service_id)
 
     def get_all_service_info(self) -> Dict[str, ServiceInfo]:
-        all_service_info = media_service_info_da.hgetall()
+        all_service_info = redis_service_info.hgetall()
         if all_service_info:
             return all_service_info
         return {}
 
     def set_service_info(self, service_info: ServiceInfo) -> bool:
-        media_service_info_da.hset(service_info)
+        redis_service_info.hset(service_info)
         return True
 
     def del_service_info(self, service_id) -> Union[int, None]:
-        return media_service_info_da.hdel(service_id)
+        return redis_service_info.hdel(service_id)
 
     # media_id -> MEDIAINFO
 
     def get_media_info(self, media_id: str) -> MediaInfo:
-        service_id = media_service_media_da.hget(media_id)
+        service_id = redis_media_info.hget(media_id)
         media_info = MediaInfo()
         media_info.media_id = media_id
         if service_id:
@@ -58,7 +58,7 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
         return media_info
 
     def get_all_media_info(self) -> Dict[str, MediaInfo]:
-        redis_media_infos = media_service_media_da.hgetall()
+        redis_media_infos = redis_media_info.hgetall()
         media_info_dict = {}
         if redis_media_infos:
             for media_id, service_id in redis_media_infos.items():
@@ -70,7 +70,7 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
         return media_info_dict
 
     def set_media_info(self, media_info: MediaInfo) -> bool:
-        return media_service_media_da.hset(media_info.media_id, media_info.service_id) > 0
+        return redis_media_info.hset(media_info.media_id, media_info.service_id) > 0
 
     def del_media_info(self, media_id: str) -> bool:
-        return media_service_media_da.hdel(media_id) > 0
+        return redis_media_info.hdel(media_id) > 0

@@ -33,36 +33,24 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
             self.get_service_url(), f"/registry/service/{service_id}")
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
-        jdata = registry_response.json()
-        service_info = ServiceInfo()
-        if jdata:
-            service_info.service_id = jdata["service_id"]
-            service_info.service_type = jdata["service_type"]
-            service_info.service_proto = jdata["service_proto"]
-            service_info.service_host = jdata["service_host"]
-            service_info.service_port = jdata["service_port"]
-        return service_info
+        return ServiceInfo.from_json(registry_response.json())
 
     def get_all_service_info(self) -> Dict[str, ServiceInfo]:
         registry_request = http_request_factory.get(
             self.get_service_url(), "/registry/service")
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
-        jdatas = registry_response.json()
-        rdata = {}
-        for jdata in jdatas:
-            service_info = ServiceInfo()
-            service_info.service_id = jdata["service_id"]
-            service_info.service_type = jdata["service_type"]
-            service_info.service_proto = jdata["service_proto"]
-            service_info.service_host = jdata["service_host"]
-            service_info.service_port = jdata["service_port"]
-            rdata[service_info.service_id] = service_info
-        return rdata
+        json_datas = registry_response.json()
+
+        service_infos = {}
+        for json_data in json_datas:
+            service_info = ServiceInfo.from_json(json_data)
+            service_infos[service_info.service_id] = service_info
+        return service_infos
 
     def set_service_info(self, service_info: ServiceInfo) -> bool:
-        registry_request = http_request_factory.post(
-            self.get_service_url(), "/registry/service", service_info.__dict__)
+        registry_request = http_request_factory.post_json(
+            self.get_service_url(), "/registry/service", service_info)
         session = requests.Session()
         session.send(registry_request.prepare())
         return True
@@ -74,9 +62,9 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
         registry_request = http_request_factory.get(
             self.get_service_url(), f"/registry/media/{media_id}")
         session = requests.Session()
-        registry_response = session.send(registry_request.prepare())        
+        registry_response = session.send(registry_request.prepare())
         jdata = registry_response.json()
-        
+
         media_info = MediaInfo()
         media_info.media_id = media_id
         media_info.service_id = jdata["service_id"]
@@ -90,8 +78,8 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
         return registry_request.json()
 
     def set_media_info(self, media_info: MediaInfo) -> bool:
-        registry_request = http_request_factory.post(
-            self.get_service_url(), "/registry/media", media_info.__dict__)
+        registry_request = http_request_factory.post_json(
+            self.get_service_url(), "/registry/media", media_info)
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
         return registry_response.json()

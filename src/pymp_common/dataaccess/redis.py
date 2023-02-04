@@ -1,11 +1,12 @@
 from abc import ABC
-import json
-import logging
-from typing import Dict
-from typing import Union
+
 import redis
 
+from typing import Dict
+from typing import Union
+
 from pymp_common.app.PympConfig import pymp_env
+from pymp_common.dto.MediaRegistry import MediaInfo
 from pymp_common.dto.MediaRegistry import ServiceInfo
 
 
@@ -21,140 +22,120 @@ class RedisDataAccess(ABC):
         return info.get("role") == "slave" and info.get("master_link_status") == "up"
 
 
-class RedisMediaServiceDataAccess(RedisDataAccess):
+class RedisServiceInfoDataAccess(RedisDataAccess):
     def __init__(self):
         super().__init__(True)
         self.key = "media_service"
 
     def has(self) -> Union[bool, None]:
-        return self.redis.exists(f"{self.key}") > 0
+        return self.redis.exists(self.key) > 0
 
-    def hhas(self, id: str) -> Union[bool, None]:
-        return self.redis.hexists(f"{self.key}", id)
+    def hhas(self, media_id: str) -> Union[bool, None]:
+        return self.redis.hexists(self.key, media_id)
 
     def expire(self):
         if not self.redis.readonly:
-            self.redis.expire(f"{self.key}", 180)
+            self.redis.expire(self.key, 180)
 
     def hset(self, service_info: ServiceInfo):
         self.expire()
-        return self.redis.hset(f"{self.key}", service_info.service_id, json.dumps(service_info.__dict__))
+        return self.redis.hset(
+            self.key,
+            service_info.service_id,
+            service_info.to_json()
+        )
 
     def hget(self, service_id: str) -> Union[ServiceInfo, None]:
-        service_info = self.redis.hget(f"{self.key}", service_id)
-        if not service_info is None:
-            # TODO
-            logging.info(service_info)
-            data = json.loads(service_info)
-            logging.info(data)
-            service_info = ServiceInfo()
-            service_info.service_id = data['service_id']
-            service_info.service_type = data['service_type']
-            service_info.service_proto = data['service_proto']
-            service_info.service_host = data['service_host']
-            service_info.service_port = data['service_port']
-            return service_info
+        service_info = self.redis.hget(self.key, service_id)
+        if service_info is not None:
+            return ServiceInfo.from_json(service_info)
         return None
 
-    def hdel(self, id: str):
-        return self.redis.hdel(f"{self.key}", id)
+    def hdel(self, media_id: str):
+        return self.redis.hdel(f"{self.key}", media_id)
 
-    def hgetall(self) -> Union[Dict[str, ServiceInfo], None]:
-        service_infos = self.redis.hgetall(f"{self.key}")
-        service_info_return = {}
-        for service_id, service_info in service_infos.items():
-            logging.info(service_info)
-            data = json.loads(service_info)
-            logging.info(data)
-            service_info = ServiceInfo()
-            service_info.service_id = data['service_id']
-            service_info.service_type = data['service_type']
-            service_info.service_proto = data['service_proto']
-            service_info.service_host = data['service_host']
-            service_info.service_port = data['service_port']
-            service_info_return[service_id] = service_info
-
-        return service_info_return
+    def hgetall(self) -> Dict[str, ServiceInfo]:
+        service_infos_json = self.redis.hgetall(self.key)
+        service_infos = {
+            service_id: ServiceInfo.from_json(service_infos_json) for service_id, service_info in service_infos_json.items()
+        }
+        return service_infos
 
 
-media_service_info_da = RedisMediaServiceDataAccess()
+redis_service_info = RedisServiceInfoDataAccess()
 
 
-class RedisMediaSourceDataAccess(RedisDataAccess):
+class RedisMediaInfoDataAccess(RedisDataAccess):
     def __init__(self):
         super().__init__(True)
-        self.key = f"media_source"
+        self.key = f"media_info"
 
-    def has(self) -> Union[bool, None]:
-        return self.redis.exists(f"{self.key}") > 0
+    def has(self) -> bool:
+        return self.redis.exists(self.key) > 0
 
-    def hhas(self, id: str) -> Union[bool, None]:
-        return self.redis.hexists(f"{self.key}", id)
+    def hhas(self, media_id: str) -> bool:
+        return self.redis.hexists(self.key, media_id)
 
     def expire(self):
         if not self.redis.readonly:
-            self.redis.expire(f"{self.key}", 180)
+            self.redis.expire(self.key, 180)
 
-    def hset(self, id: str, value: str):
-        self.expire()
-        return self.redis.hset(f"{self.key}", id, value)
+    def hset(self, media_info: MediaInfo):
+        return self.redis.hset(self.key, media_info.media_id, media_info.to_json())
 
-    def hget(self, id: str) -> Union[str, None]:
-        return self.redis.hget(f"{self.key}", id)
+    def hget(self, media_id: str) -> MediaInfo:
+        return MediaInfo.from_json(self.redis.hget(self.key, media_id))
 
-    def hdel(self, id: str):
-        return self.redis.hdel(f"{self.key}", id)
+    def hdel(self, media_id: str):
+        if not self.redis.readonly:
+            return self.redis.hdel(self.key, media_id)
 
-    def hgetall(self) -> Union[Dict[str, str], None]:
-        return self.redis.hgetall(f"{self.key}")
+    def hgetall(self) -> Dict[str, MediaInfo]:
+        media_infos_json = self.redis.hgetall(self.key)
+        media_infos = {media_id: MediaInfo.from_json(
+            media_info_json) for media_id, media_info_json in media_infos_json.items()}
+        return media_infos
 
 
-media_service_media_da = RedisMediaSourceDataAccess()
+redis_media_info = RedisMediaInfoDataAccess()
 
 
-class RedisMediaMetaDataAccess(RedisDataAccess):
-    def __init__(self):
+class RedisMedia(RedisDataAccess):
+    def __init__(self, key):
         super().__init__(False)
-        self.key = "media_meta"
+        self.key = key
 
-    def has(self, id: str) -> bool:
-        return self.redis.exists(f"{self.key}_{id}") > 0
+    def has(self, media_id: str) -> bool:
+        return self.redis.exists(f"{self.key}_{media_id}") > 0
 
-    def expire(self):
+    def expire(self, media_id: str):
         if not self.redis.readonly:
-            self.redis.expire(f"{self.key}", 360)
+            self.redis.expire(f"{self.key}_{media_id}", 360)
 
-    def set(self, id: str, value: str):
-        self.expire()
-        return self.redis.set(f"{self.key}_{id}", value)
+    def set(self, media_id: str, value: bytes):
+        return self.redis.set(f"{self.key}_{media_id}", value)
 
-    def get(self, id: str) -> Union[bytes, None]:
-        self.expire()
-        return self.redis.get(f"{self.key}_{id}")
+    def get(self, media_id: str) -> Union[bytes, None]:
+        return self.redis.get(f"{self.key}_{media_id}")
 
 
-media_meta_da = RedisMediaMetaDataAccess()
-
-
-class RedisMediaThumbDataAccess(RedisDataAccess):
+class RedisMediaData(RedisMedia):
     def __init__(self):
-        super().__init__(False)
-        self.key = "media_thumb"
+        super().__init__("media_data")
 
-    def has(self, id: str) -> bool:
-        return self.redis.exists(f"{self.key}_{id}") > 0
-
-    def expire(self):
-        if not self.redis.readonly:
-            self.redis.expire(f"{self.key}", 360)
-
-    def set(self, id: str, value: bytes):
-        self.expire()
-        return self.redis.set(f"{self.key}_{id}", value)
-
-    def get(self, id: str) -> Union[bytes, None]:
-        self.expire()
-        return self.redis.get(f"{self.key}_{id}")
+redis_media_meta = RedisMediaData()
 
 
-media_thumb_da = RedisMediaThumbDataAccess()
+class RedisMediaMeta(RedisMedia):
+    def __init__(self):
+        super().__init__("media_meta")
+
+redis_media_meta = RedisMediaMeta()
+
+
+class RedisMediaThumb(RedisMedia):
+    def __init__(self):
+        super().__init__("media_thumb")
+
+
+redis_media_thumb = RedisMediaThumb()

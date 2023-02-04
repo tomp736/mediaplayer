@@ -3,7 +3,7 @@
 from typing import Union
 from pymp_common.abstractions.providers import MetaDataProvider
 
-from pymp_common.dataaccess.redis import media_meta_da
+from pymp_common.dataaccess.redis import redis_media_meta
 
 
 class MetaRedisDataProvider(MetaDataProvider):
@@ -13,18 +13,18 @@ class MetaRedisDataProvider(MetaDataProvider):
     
     def is_readonly(self) -> bool:
         try:
-            return media_meta_da.is_redis_readonly_replica()
+            return redis_media_meta.is_redis_readonly_replica()
         except Exception:
             return True
 
     def is_ready(self) -> bool:
         try:
-            return media_meta_da.redis.ping()
+            return redis_media_meta.redis.ping()
         except Exception:
             return False
 
     def get_meta(self, media_id) -> Union[str, None]:
-        meta = media_meta_da.get(media_id)
+        meta = redis_media_meta.get(media_id)
         if meta:
             return meta.decode()
         return None
@@ -32,7 +32,7 @@ class MetaRedisDataProvider(MetaDataProvider):
     def set_meta(self, media_id, meta: str):
         if self.is_readonly():
             raise Exception("Not configured for writing")
-        media_meta_da.set(media_id, meta)
+        redis_media_meta.set(media_id, meta)
 
     def del_meta(self, media_id):
         if self.is_readonly():
