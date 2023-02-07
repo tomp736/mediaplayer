@@ -18,4 +18,4 @@ scrape_configs:
       - 'ffmpeg_svc:8000'
       - 'mediaregistry_svc:8000'
       - 'media_svc_internal:8000'
-      - 's01:12002'
+      # - '""${PYMP_HOSTNAME}"":12002' TODO

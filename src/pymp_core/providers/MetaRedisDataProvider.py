@@ -1,11 +1,11 @@
 
 
 from typing import Union
-from pymp_common.abstractions.providers import MediaMetaProvider
+from pymp_core.abstractions.providers import MediaMetaProvider
 
 
-from pymp_common.dataaccess.redis import redis_media_meta
-from pymp_common.decorators.prom import prom_count
+from pymp_core.dataaccess.redis import redis_media_meta
+from pymp_core.decorators.prom import prom_count
 
 
 class MetaRedisDataProvider(MediaMetaProvider):

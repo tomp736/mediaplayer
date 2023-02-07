@@ -7,8 +7,10 @@ services:
     image: ghcr.io/tomp736/pymp/pymp_frontend:latest-dev
     ports:
       - "8080:80"
-    env_file:
-      - 'frontend.env'
+    environment:
+      MEDIA_URL: "http://${PYMP_HOSTNAME}:8081"
+      THUMB_URL: "http://${PYMP_HOSTNAME}:8082"
+      META_URL: "http://${PYMP_HOSTNAME}:8083"
     deploy:
       resources:
         limits:

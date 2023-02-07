@@ -1,4 +1,4 @@
-FROM ghcr.io/tomp736/pymp/pymp_common:latest-dev
+FROM ghcr.io/tomp736/pymp/pymp_core:latest-dev
 
 COPY ./src/pymp_server/ ./pymp_server
 RUN pip3 install ./pymp_server

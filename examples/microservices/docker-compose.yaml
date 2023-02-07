@@ -7,8 +7,10 @@ services:
     image: ghcr.io/tomp736/pymp/pymp_frontend:latest-dev
     ports:
       - "8080:80"
-    env_file:
-      - 'frontend.env'
+    environment:
+      MEDIA_URL: "http://${PYMP_HOSTNAME}:8081"
+      THUMB_URL: "http://${PYMP_HOSTNAME}:8082"
+      META_URL: "http://${PYMP_HOSTNAME}:8083"
     deploy:
       resources:
         limits:
@@ -153,10 +155,10 @@ services:
       - SERVICE_TYPE=8
       - SERVICE_ID=external
       - SERVICE_PROTO=http
-      - SERVICE_HOST=s01
+      - SERVICE_HOST="${PYMP_HOSTNAME}"
       - SERVICE_PORT=12001
       - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=s01
+      - MEDIAREGISTRY_SVC_HOST="${PYMP_HOSTNAME}"
       - MEDIAREGISTRY_SVC_PORT=8085
     volumes:
       - /srv/media2/videos:/app/media:rw

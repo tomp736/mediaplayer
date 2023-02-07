@@ -1,7 +1,7 @@
 import os
 
-from pymp_common.dto.MediaRegistry import PympServiceType
-from pymp_common.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import ServiceInfo
 
 
 class PympEnv:

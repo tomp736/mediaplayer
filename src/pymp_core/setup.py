@@ -3,7 +3,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 setup(
-    name="pymp_common",
+    name="pymp_core",
     description="",
     long_description=open("README.md").read(),
     url="",

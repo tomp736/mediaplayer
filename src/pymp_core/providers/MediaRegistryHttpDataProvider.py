@@ -4,11 +4,11 @@ import logging
 from typing import Dict
 from typing import Union
 import requests
-from pymp_common.abstractions.providers import MediaRegistryDataProvider
+from pymp_core.abstractions.providers import MediaRegistryDataProvider
 
-from pymp_common.dataaccess.http_request_factory import http_request_factory
-from pymp_common.decorators.prom import prom_count
-from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
+from pymp_core.dataaccess.http_request_factory import http_request_factory
+from pymp_core.decorators.prom import prom_count
+from pymp_core.dto.MediaRegistry import MediaInfo, ServiceInfo
 
 
 class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):

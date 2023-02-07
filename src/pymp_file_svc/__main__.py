@@ -6,10 +6,10 @@ from flask import request
 from flask_dropzone import Dropzone
 from prometheus_client import start_http_server
 import requests
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dataaccess.redis import redis_media_info
-from pymp_common.dataaccess.redis import redis_service_info
-from pymp_common.dataaccess.http_request_factory import media_request_factory
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dataaccess.redis import redis_media_info
+from pymp_core.dataaccess.redis import redis_service_info
+from pymp_core.dataaccess.http_request_factory import media_request_factory
 import logging
 import os
 

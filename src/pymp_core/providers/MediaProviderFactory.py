@@ -1,14 +1,14 @@
 import logging
 from typing import List
 
-from pymp_common.abstractions.providers import DataProvider, MediaDataProvider, MediaMetaProvider, MediaThumbProvider
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dto.MediaRegistry import PympServiceType
-from pymp_common.providers import MediaRegistryProviderFactory
-from pymp_common.providers.MetaRedisDataProvider import MetaRedisDataProvider
-from pymp_common.providers.ThumbRedisDataProvider import ThumbRedisDataProvider
-from pymp_common.providers.MediaFileDataProvider import MediaFileDataProvider
-from pymp_common.providers.MediaHttpDataProvider import MediaHttpDataProvider
+from pymp_core.abstractions.providers import DataProvider, MediaDataProvider, MediaMetaProvider, MediaThumbProvider
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.providers import MediaRegistryProviderFactory
+from pymp_core.providers.MetaRedisDataProvider import MetaRedisDataProvider
+from pymp_core.providers.ThumbRedisDataProvider import ThumbRedisDataProvider
+from pymp_core.providers.MediaFileDataProvider import MediaFileDataProvider
+from pymp_core.providers.MediaHttpDataProvider import MediaHttpDataProvider
 
 
 def get_data_providers(service_id, wants_write_access: bool = False) -> List[MediaDataProvider]:

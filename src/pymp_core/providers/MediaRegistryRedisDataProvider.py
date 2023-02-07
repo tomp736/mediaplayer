@@ -3,13 +3,13 @@ import json
 import logging
 from typing import Dict
 from typing import Union
-from pymp_common.abstractions.providers import MediaRegistryDataProvider
+from pymp_core.abstractions.providers import MediaRegistryDataProvider
 
-from pymp_common.dataaccess.redis import redis_service_info
-from pymp_common.dataaccess.redis import redis_media_info
-from pymp_common.decorators.prom import prom_count
+from pymp_core.dataaccess.redis import redis_service_info
+from pymp_core.dataaccess.redis import redis_media_info
+from pymp_core.decorators.prom import prom_count
 
-from pymp_common.dto.MediaRegistry import MediaInfo, ServiceInfo
+from pymp_core.dto.MediaRegistry import MediaInfo, ServiceInfo
 
 
 class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):

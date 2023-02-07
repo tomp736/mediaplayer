@@ -8,9 +8,9 @@ from typing import Dict
 from typing import List
 from typing import Union
 
-from pymp_common.dto.Media import MediaChunk
-from pymp_common.dto.MediaRegistry import MediaInfo
-from pymp_common.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.Media import MediaChunk
+from pymp_core.dto.MediaRegistry import MediaInfo
+from pymp_core.dto.MediaRegistry import ServiceInfo
 
 
 class DataProvider(ABC):

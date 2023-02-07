@@ -5,11 +5,11 @@ from flask import Blueprint
 from flask import Response
 from flask import request
 from flask import redirect
-from pymp_common.abstractions.providers import MediaChunk
+from pymp_core.abstractions.providers import MediaChunk
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.app.Services import media_service
-from pymp_common.app.Services import media_registry_service
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.Services import media_service
+from pymp_core.app.Services import media_registry_service
 
 app_frontend_media = Blueprint('app_frontend_media', __name__)
 app_frontend_meta = Blueprint('app_frontend_meta', __name__)

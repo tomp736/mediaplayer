@@ -1,10 +1,10 @@
 import logging
 from typing import List
-from pymp_common.abstractions.providers import DataProvider, MediaRegistryDataProvider
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dto.MediaRegistry import PympServiceType
-from pymp_common.providers.MediaRegistryHttpDataProvider import MediaRegistryHttpDataProvider
-from pymp_common.providers.MediaRegistryRedisDataProvider import MediaRegistryRedisDataProvider
+from pymp_core.abstractions.providers import DataProvider, MediaRegistryDataProvider
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.providers.MediaRegistryHttpDataProvider import MediaRegistryHttpDataProvider
+from pymp_core.providers.MediaRegistryRedisDataProvider import MediaRegistryRedisDataProvider
 
 
 def get_media_registry_providers(wants_write_access: bool = False) -> List[MediaRegistryHttpDataProvider]:

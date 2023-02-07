@@ -1,8 +1,8 @@
 from flask import Blueprint
 from flask import Response
 
-from pymp_common.app.Services import ffmpeg_service
-from pymp_common.app.Services import media_registry_service
+from pymp_core.app.Services import ffmpeg_service
+from pymp_core.app.Services import media_registry_service
 
 
 app_ffmpeg_meta = Blueprint('app_ffmpeg_meta', __name__)

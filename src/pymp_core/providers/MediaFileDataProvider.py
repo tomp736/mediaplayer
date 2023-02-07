@@ -6,10 +6,10 @@ from typing import Dict
 from typing import List
 from typing import Union
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.abstractions.providers import MediaDataProvider
-from pymp_common.abstractions.providers import MediaChunk
-from pymp_common.decorators.prom import prom_count
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.abstractions.providers import MediaDataProvider
+from pymp_core.abstractions.providers import MediaChunk
+from pymp_core.decorators.prom import prom_count
 
 
 

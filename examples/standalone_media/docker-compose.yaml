@@ -8,9 +8,9 @@ services:
       - SERVICE_TYPE=8
       - SERVICE_ID=external
       - MEDIA_SVC_PROTO=http
-      - MEDIA_SVC_HOST=s01
+      - "MEDIA_SVC_HOST=${PYMP_HOSTNAME}"
       - MEDIA_SVC_PORT=8883
-      - MEDIAREGISTRY_SVC_HOST=s01
+      - "MEDIAREGISTRY_SVC_HOST=${PYMP_HOSTNAME}"
       - MEDIAREGISTRY_SVC_PORT=8081
     ports:
       - "8883:80"

@@ -1,12 +1,12 @@
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dto.MediaRegistry import PympServiceType
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dto.MediaRegistry import PympServiceType
 
 import logging
 from typing import List
-from pymp_common.abstractions.providers import DataProvider, FfmpegDataProvider
-from pymp_common.providers.FfmpegFileDataProvider import FfmpegFileDataProvider
-from pymp_common.providers.FfmpegHttpDataProvider import FfmpegHttpDataProvider
+from pymp_core.abstractions.providers import DataProvider, FfmpegDataProvider
+from pymp_core.providers.FfmpegFileDataProvider import FfmpegFileDataProvider
+from pymp_core.providers.FfmpegHttpDataProvider import FfmpegHttpDataProvider
 
 
 def get_ffmpeg_providers(wants_write_access: bool = False) -> List[FfmpegDataProvider]:

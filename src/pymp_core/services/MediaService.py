@@ -3,15 +3,15 @@ from typing import List
 from typing import Union
 import io
 
-from pymp_common.app.PympConfig import pymp_env
+from pymp_core.app.PympConfig import pymp_env
 
-from pymp_common.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import PympServiceType
 
-from pymp_common.abstractions.providers import MediaChunk
-from pymp_common.abstractions.providers import MediaDataProvider
-from pymp_common.providers import MediaProviderFactory, MediaRegistryProviderFactory
+from pymp_core.abstractions.providers import MediaChunk
+from pymp_core.abstractions.providers import MediaDataProvider
+from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFactory
 
-from pymp_common.utils.RepeatTimer import RepeatTimer
+from pymp_core.utils.RepeatTimer import RepeatTimer
 
 
 class MediaService:

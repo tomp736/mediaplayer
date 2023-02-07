@@ -4,9 +4,9 @@ import logging
 from typing import Union
 
 import ffmpeg
-from pymp_common.abstractions.providers import FfmpegDataProvider
+from pymp_core.abstractions.providers import FfmpegDataProvider
 
-from pymp_common.decorators.prom import prom_count
+from pymp_core.decorators.prom import prom_count
 
 
 class FfmpegFileDataProvider(FfmpegDataProvider):

@@ -2,10 +2,10 @@
 
 import io
 from typing import Union
-from pymp_common.abstractions.providers import FfmpegDataProvider
-from pymp_common.decorators.prom import prom_count
+from pymp_core.abstractions.providers import FfmpegDataProvider
+from pymp_core.decorators.prom import prom_count
 
-from pymp_common.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.MediaRegistry import ServiceInfo
 
 
 class FfmpegHttpDataProvider(FfmpegDataProvider):

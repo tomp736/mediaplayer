@@ -3,10 +3,10 @@ from flask import Flask
 from prometheus_client import start_http_server
 import logging
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dto.MediaRegistry import PympServiceType
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dto.MediaRegistry import PympServiceType
 
-from pymp_common.app.Services import media_registry_service, media_service, ffmpeg_service
+from pymp_core.app.Services import media_registry_service, media_service, ffmpeg_service
 
 from pymp_server.routes.mediaregistry import app_mediaregistry
 from pymp_server.routes.media import app_media

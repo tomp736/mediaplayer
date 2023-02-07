@@ -5,9 +5,9 @@ import redis
 from typing import Dict
 from typing import Union
 
-from pymp_common.app.PympConfig import pymp_env
-from pymp_common.dto.MediaRegistry import MediaInfo
-from pymp_common.dto.MediaRegistry import ServiceInfo
+from pymp_core.app.PympConfig import pymp_env
+from pymp_core.dto.MediaRegistry import MediaInfo
+from pymp_core.dto.MediaRegistry import ServiceInfo
 
 
 class RedisDataAccess(ABC):

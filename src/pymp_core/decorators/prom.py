@@ -9,7 +9,6 @@ def counter_increment(key: str, amount: float = 1):
     if prom_counter is None:
         prom_counter = Counter(name=key, documentation=key)
         prom_counters[key] = prom_counter
-
     prom_counter.inc(amount)
 
 

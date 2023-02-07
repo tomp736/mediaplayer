@@ -5,8 +5,8 @@ from flask import request
 from flask import Blueprint
 
 
-from pymp_common.app.Services import media_service
-from pymp_common.dto.Media import MediaChunk
+from pymp_core.app.Services import media_service
+from pymp_core.dto.Media import MediaChunk
 
 app_media = Blueprint('app_media', __name__)
 

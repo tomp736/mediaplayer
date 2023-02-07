@@ -1,15 +1,15 @@
 import logging
 from typing import Dict, List
 
-from pymp_common.app.PympConfig import pymp_env
+from pymp_core.app.PympConfig import pymp_env
 
-from pymp_common.dto.MediaRegistry import MediaInfo
-from pymp_common.dto.MediaRegistry import ServiceInfo
-from pymp_common.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import MediaInfo
+from pymp_core.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.MediaRegistry import PympServiceType
 
-from pymp_common.providers import MediaProviderFactory, MediaRegistryProviderFactory
+from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFactory
 
-from pymp_common.utils.RepeatTimer import RepeatTimer
+from pymp_core.utils.RepeatTimer import RepeatTimer
 
 
 class MediaRegistryService():
