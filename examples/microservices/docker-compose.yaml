@@ -283,6 +283,9 @@ services:
     ports:
       - 9091:3000
     volumes: 
+      - ./grafana/dashboards:/etc/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - /srv/pymp/grafana:/var/lib/grafana:rw
     deploy:
       resources:

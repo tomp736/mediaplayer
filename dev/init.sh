@@ -7,7 +7,16 @@ SCRIPTPATH=`dirname $SCRIPT`
 
 cd $SCRIPTPATH
 
-sudo mkdir -p /srv/media/videos
-sudo mkdir -p /srv/media/index
-sudo mkdir -p /srv/media/redis
-sudo chown -R $USER:docker /srv/medias
+sudo mkdir -p /srv/pymp/media1/videos
+sudo mkdir -p /srv/pymp/media1/index
+sudo chown -R $USER:root /srv/media1
+
+sudo mkdir -p /srv/pymp/redis
+sudo chown -R $USER:root /srv/redis
+
+sudo mkdir -p /srv/pymp/grafana
+sudo chown -R $USER:root /srv/grafana
+
+# NOBODY:NOGROUP
+sudo mkdir -p /srv/pymp/prometheus
+sudo chown 65534:65534 /srv/pymp/prometheus

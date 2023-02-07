@@ -13,9 +13,14 @@ DIWHY Media Player  - A microservice experiment.
 ``` sh
 cd dev
 ./build-all.sh
-sudo mkdir -p /srv/media/videos
-sudo mkdir -p /srv/media/redis
-sudo chown -R $USER:docker /srv/media
+sudo mkdir -p /srv/pymp/media1/videos
+sudo mkdir -p /srv/pymp/media1/index
+sudo mkdir -p /srv/pymp/redis
+sudo mkdir -p /srv/pymp/grafana
+sudo chown -R $USER:root /srv/pymp
+
+sudo mkdir -p /srv/pymp/prometheus
+sudo chown 65534:65534 /srv/pymp/prometheus
 ```
 
 
@@ -53,6 +58,7 @@ App Services
 
 Monitoring Services
 - prometheus: localhost:9090
+- grafana: localhost:9091
 - locust: localhost:8089
 
 ![micro](docs/pymp_microservice_flat2.png)
