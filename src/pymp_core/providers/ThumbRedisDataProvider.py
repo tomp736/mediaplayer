@@ -4,7 +4,7 @@ from pymp_core.abstractions.providers import MediaThumbProvider
 
 
 from pymp_core.dataaccess.redis import redis_media_thumb
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 class ThumbRedisDataProvider(MediaThumbProvider):
     
@@ -25,24 +25,28 @@ class ThumbRedisDataProvider(MediaThumbProvider):
         except Exception:
             return False
     
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_thumb(self, media_id) -> Union[io.BytesIO, None]:
         thumb = redis_media_thumb.get(media_id)
         if thumb:
             return io.BytesIO(thumb)
         return None
     
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def has_thumb(self, media_id) -> bool:
         return redis_media_thumb.has(media_id)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def set_thumb(self, media_id, thumb: io.BytesIO):
         if self.is_readonly():
             raise Exception("Not configured for writing")
         redis_media_thumb.set(media_id, thumb.getvalue())
         
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def del_thumb(self, media_id):
         if self.is_readonly():
             raise Exception("Not configured for writing")

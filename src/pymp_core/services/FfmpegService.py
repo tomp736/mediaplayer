@@ -6,6 +6,7 @@ from pymp_core.utils.RepeatTimer import RepeatTimer
 from pymp_core.app.PympConfig import pymp_env
 from pymp_core.dto.MediaRegistry import PympServiceType
 
+from pymp_core.decorators import prom
 
 class FfmpegService:
     def __init__(self) -> None:
@@ -17,6 +18,8 @@ class FfmpegService:
     def watch_media(self):
         self.timer.start()
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def process_media_services(self):
         service_info = pymp_env.get_this_service_info()
         if PympServiceType(service_info.service_type) & PympServiceType.FFMPEG_SVC:
@@ -27,10 +30,14 @@ class FfmpegService:
                 for media_info in all_media_info.values():
                     self.process_media_service(media_info)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def process_media_service(self, media_info: MediaInfo):
         self.process_media_thumb(media_info)
         self.process_media_meta(media_info)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def process_media_thumb(self, media_info: MediaInfo):
         thumb_provider = MediaProviderFactory.get_thumb_providers()[0]
         if not thumb_provider.has_thumb(media_info.media_id):
@@ -42,6 +49,8 @@ class FfmpegService:
             if thumb:
                 thumb_provider.set_thumb(media_info.media_id, thumb)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def process_media_meta(self, media_info: MediaInfo):
         meta_provider = MediaProviderFactory.get_meta_providers()[0]
         if not meta_provider.has_meta(media_info.media_id):

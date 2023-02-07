@@ -13,6 +13,7 @@ from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFacto
 
 from pymp_core.utils.RepeatTimer import RepeatTimer
 
+from pymp_core.decorators import prom
 
 class MediaService:
 
@@ -34,15 +35,21 @@ class MediaService:
 
         return None
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_chunk(self, media_id, start_byte: int = 0, end_byte: int = 0) -> Union[MediaChunk, None]:
         media_provider = self.get_media_provider(media_id)
         if media_provider:
             return media_provider.get_media_chunk(media_id, start_byte, end_byte)
         return None
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_thumb(self, media_id) -> Union[io.BytesIO, None]:
         return MediaProviderFactory.get_thumb_providers()[0].get_thumb(media_id)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_meta(self, media_id) -> Union[str, None]:
         return MediaProviderFactory.get_meta_providers()[0].get_meta(media_id)
 
@@ -52,6 +59,8 @@ class MediaService:
     #     if media_provider:
     #         return media_provider.save_media(name, stream)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_ids(self) -> List[str]:
         service_info = pymp_env.get_this_service_info()
         if PympServiceType(service_info.service_type) & PympServiceType.MEDIA_SVC:
@@ -63,6 +72,8 @@ class MediaService:
     def watch_media(self):
         self.register_timer.start()
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def update_index(self) -> None:
         service_info = pymp_env.get_this_service_info()
         if PympServiceType(service_info.service_type) & PympServiceType.MEDIA_SVC:

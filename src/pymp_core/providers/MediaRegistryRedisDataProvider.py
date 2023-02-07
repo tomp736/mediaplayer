@@ -7,7 +7,7 @@ from pymp_core.abstractions.providers import MediaRegistryDataProvider
 
 from pymp_core.dataaccess.redis import redis_service_info
 from pymp_core.dataaccess.redis import redis_media_info
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 from pymp_core.dto.MediaRegistry import MediaInfo, ServiceInfo
 
@@ -35,37 +35,45 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
 
     # SERVICEID => SERVICEINFO
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_service_info(self, service_id: str) -> Union[ServiceInfo, None]:
         return redis_service_info.hget(service_id)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_all_service_info(self) -> Dict[str, ServiceInfo]:
         return redis_service_info.hgetall()
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def set_service_info(self, service_info: ServiceInfo) -> bool:
         redis_service_info.hset(service_info)
         return True
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def del_service_info(self, service_id) -> Union[int, None]:
         return redis_service_info.hdel(service_id)
 
     # media_id -> MEDIAINFO
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_info(self, media_id: str) -> MediaInfo:
         return redis_media_info.hget(media_id)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_all_media_info(self) -> Dict[str, MediaInfo]:
         return redis_media_info.hgetall()
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def set_media_info(self, media_info: MediaInfo) -> bool:
         return redis_media_info.hset(media_info) > 0
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def del_media_info(self, media_id: str) -> bool:
         return redis_media_info.hdel(media_id) > 0

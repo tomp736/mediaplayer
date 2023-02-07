@@ -134,8 +134,8 @@ services:
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
       - MEDIAREGISTRY_SVC_PORT=80
     volumes:
-      - /srv/media/videos:/app/media:rw
-      - /srv/media/index:/app/index:rw
+      - /srv/pymp/media1/videos:/app/media:rw
+      - /srv/pymp/media1/index:/app/index:rw
     networks:
       - media_net
       - prom_net
@@ -161,8 +161,8 @@ services:
       - MEDIAREGISTRY_SVC_HOST="${PYMP_HOSTNAME}"
       - MEDIAREGISTRY_SVC_PORT=8085
     volumes:
-      - /srv/media2/videos:/app/media:rw
-      - /srv/media2/index:/app/index:rw
+      - /srv/pymp/media2/videos:/app/media:rw
+      - /srv/pymp/media2/index:/app/index:rw
     ports:
       - "12001:80"
       - "12002:8000"
@@ -245,7 +245,7 @@ services:
     networks:
       - redis_be
     volumes: 
-      - /srv/media/redis:/data
+      - /srv/pymp/redis:/data
     deploy:
       resources:
         limits:
@@ -265,6 +265,25 @@ services:
       - 9090:9090
     volumes: 
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - /srv/pymp/prometheus:/prometheus:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.5'
+          memory: 100M
+    restart: always
+    
+  grafana:
+    image: grafana/grafana:latest
+    networks:
+      - prom_net
+    ports:
+      - 9091:3000
+    volumes: 
+      - /srv/pymp/grafana:/var/lib/grafana:rw
     deploy:
       resources:
         limits:

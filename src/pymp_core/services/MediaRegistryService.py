@@ -11,6 +11,7 @@ from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFacto
 
 from pymp_core.utils.RepeatTimer import RepeatTimer
 
+from pymp_core.decorators import prom
 
 class MediaRegistryService():
     def __init__(self) -> None:
@@ -24,22 +25,32 @@ class MediaRegistryService():
             0]
         return media_registry_provider
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def register_service(self, service_info: ServiceInfo):
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.set_service_info(service_info)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def register_media(self, media_info: MediaInfo):
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.set_media_info(media_info)
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_registered_services(self) -> Dict[str, ServiceInfo]:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_all_service_info()
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_index(self) -> Dict[str, MediaInfo]:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_all_media_info()
 
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_info(self, media_id) -> MediaInfo:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_media_info(media_id)

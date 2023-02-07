@@ -5,7 +5,7 @@ from typing import List
 from typing import Union
 
 import requests
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 
 from pymp_core.dto.MediaRegistry import ServiceInfo
@@ -33,13 +33,15 @@ class MediaHttpDataProvider(MediaDataProvider):
     def is_ready(self) -> bool:
         return self.status
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_uri(self, media_id: str) -> str:
         media_request = http_request_factory.get(
             self.get_service_url(), f"/media/{media_id}")
         return media_request.url
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_ids(self) -> List[str]:
         media_ids = []
         session = requests.Session()
@@ -51,7 +53,8 @@ class MediaHttpDataProvider(MediaDataProvider):
             media_ids.append(media_id)
         return media_ids
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_chunk(self, media_id, start_byte=0, end_byte=None) -> Union[MediaChunk, None]:
         media_request = http_request_factory.get(
             self.get_service_url(),
@@ -71,13 +74,15 @@ class MediaHttpDataProvider(MediaDataProvider):
             media_response.headers["content-range"])
         return MediaChunk(media_response.content, response_start_byte, response_end_byte, response_file_size)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def save_media(self, name: str, stream: IO[bytes]):
         media_request = http_request_factory.post_data(
             self.get_service_url(), "/media", stream)
         session = requests.Session()
         session.send(media_request.prepare())
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def update_index(self):
         pass

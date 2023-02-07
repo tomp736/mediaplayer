@@ -5,7 +5,7 @@ from pymp_core.abstractions.providers import MediaMetaProvider
 
 
 from pymp_core.dataaccess.redis import redis_media_meta
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 
 class MetaRedisDataProvider(MediaMetaProvider):
@@ -27,24 +27,28 @@ class MetaRedisDataProvider(MediaMetaProvider):
         except Exception:
             return False
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_meta(self, media_id) -> Union[str, None]:
         meta = redis_media_meta.get(media_id)
         if meta:
             return meta.decode()
         return None
     
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def has_meta(self, media_id) -> bool:
         return redis_media_meta.has(media_id)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def set_meta(self, media_id, meta: str):
         if self.is_readonly():
             raise Exception("Not configured for writing")
         redis_media_meta.set(media_id, meta)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def del_meta(self, media_id):
         if self.is_readonly():
             raise Exception("Not configured for writing")

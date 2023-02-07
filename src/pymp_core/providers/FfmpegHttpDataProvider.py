@@ -3,7 +3,7 @@
 import io
 from typing import Union
 from pymp_core.abstractions.providers import FfmpegDataProvider
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 from pymp_core.dto.MediaRegistry import ServiceInfo
 
@@ -22,10 +22,12 @@ class FfmpegHttpDataProvider(FfmpegDataProvider):
     def is_ready(self) -> bool:
         return True
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_thumb(self, media_uri) -> Union[io.BytesIO, None]:
         raise Exception("Not Implemented")
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_meta(self, media_uri) -> Union[str, None]:
         raise Exception("Not Implemented")

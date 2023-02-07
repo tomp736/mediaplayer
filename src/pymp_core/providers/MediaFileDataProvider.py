@@ -9,7 +9,7 @@ from typing import Union
 from pymp_core.app.PympConfig import pymp_env
 from pymp_core.abstractions.providers import MediaDataProvider
 from pymp_core.abstractions.providers import MediaChunk
-from pymp_core.decorators.prom import prom_count
+from pymp_core.decorators import prom
 
 
 
@@ -32,18 +32,21 @@ class MediaFileDataProvider(MediaDataProvider):
     def is_readonly(self) -> bool:
         return False
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_uri(self, media_id: str) -> Union[str, None]:
         return os.path.join(self.indexpath, media_id)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_ids(self) -> List[str]:
         media_ids = []
         for media_id in self.read_indexfiles():
             media_ids.append(os.path.basename(media_id))
         return media_ids
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_media_chunk(self, media_id, start_byte=0, end_byte=None) -> Union[MediaChunk, None]:
         mediafile = self.get_media_uri(media_id)
         if not mediafile:
@@ -63,7 +66,8 @@ class MediaFileDataProvider(MediaDataProvider):
 
         return MediaChunk(chunk, start, start + length - 1, file_size)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def save_media(self, name: str, stream: IO[bytes]):
         fullpath = os.path.join(self.mediapath, name)
 
@@ -75,7 +79,8 @@ class MediaFileDataProvider(MediaDataProvider):
                     return
                 f.write(chunk)
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def read_index(self) -> Dict[str, str]:
         fs_indexfiles = self.read_indexfiles()
         index = {}
@@ -88,7 +93,8 @@ class MediaFileDataProvider(MediaDataProvider):
 
         return index
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def update_index(self):
         fs_indexfiles = self.read_indexfiles()
         fs_mediafiles = self.read_mediafiles()
@@ -118,7 +124,8 @@ class MediaFileDataProvider(MediaDataProvider):
             os.symlink(f"../media/{media_basename}",
                        f"{self.indexpath}/{index_basename}")
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def read_mediafiles(self):
         file_list = []
         for filename in os.listdir(self.mediapath):
@@ -127,7 +134,8 @@ class MediaFileDataProvider(MediaDataProvider):
                 file_list.append(filepath)
         return file_list
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def read_indexfiles(self):
         file_list = []
         for filename in os.listdir(self.indexpath):
@@ -136,7 +144,8 @@ class MediaFileDataProvider(MediaDataProvider):
                 file_list.append(filepath)
         return file_list
 
-    @prom_count
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
     def get_chunk_info(self, sByte: int = 0, eByte: int = 0, file_size: int = 0):
         start = 0
         if sByte < file_size:
