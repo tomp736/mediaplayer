@@ -2,40 +2,24 @@ name: Create and publish a Docker image
 
 on: 
   push:
+    paths:
+      - 'src'
     branches-ignore:
-    - main
+      - main
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
-  build-and-push-image:
+  prepare:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: 
-        image:
-          - pymp_core
-          - pymp_file_svc
-          - pymp_frontend 
-          - pymp_locust
-          - pymp_server
-
-    permissions:
-      contents: read
-      packages: write    
+    outputs:
+      new_version: ${{ steps.patch_version.outputs.new_version }}
 
     steps:
       - uses: actions/checkout@v3
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.x
-
-      - name: Run Best Practices Checks
-        run: |
-          python dev/check_import_best_practices.py
-          python dev/check_naming_best_practices.py
       
       # Read the current version number from git ls-remote
       - id: current_version
@@ -55,6 +39,47 @@ jobs:
           echo "Updating version to $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
+  build-and-push-image:
+    needs: 
+      - prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: 
+        image:
+          - pymp_core
+          - pymp_file_svc
+          - pymp_frontend 
+          - pymp_locust
+          - pymp_server
+        base-image:
+          - ''
+        exclude:
+          - image: pyfi_server
+            base-image: ''
+        include:
+          - image: pyfi_server
+            base-image: ghcr.io/tomp736/pyfi/pymp_core
+
+    permissions:
+      contents: read
+      packages: write    
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Check if image is available
+        if: matrix.base-image != ''
+        run: |
+          until docker pull ${{ matrix.base-image }}:${{ needs.prepare.outputs.new_version }}; do
+            echo "Image is not available, sleeping for 10 seconds..."
+            sleep 10
+          done
+          echo "Image is available, continuing with the workflow."
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
 
@@ -71,9 +96,32 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
-          file: src/${{ matrix.image }}/dockerfile
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
           push: true
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ needs.prepare.outputs.new_version }}
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest-dev
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ steps.patch_version.outputs.new_version }}-dev
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_version }}-dev
+
+  publish-tag:
+    runs-on: ubuntu-latest
+    needs: 
+      - prepare
+      - build-and-push-image
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git tag ${{ needs.prepare.outputs.new_version }}
+          git push origin --tags
