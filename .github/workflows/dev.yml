@@ -1,9 +1,9 @@
-name: Create and publish a Docker image
+name: Dev Workflow
 
 on: 
   push:
     paths:
-      - 'src'
+      - 'src/**'
     branches-ignore:
       - main
 
