@@ -40,7 +40,7 @@ jobs:
           patch=$(echo "${{ steps.current_version.outputs.version }}" | awk -F'.' '{print $3}')
           new_minor=$((minor+1))
           new_patch=0
-          new_version="$major.$minor.$new_patch"
+          new_version="$major.$new_minor.$new_patch"
           echo "Updating version to $new_version"
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
 
