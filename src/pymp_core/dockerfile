@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
 FROM $BASE_IMAGE
 
-COPY ./src/pymp_core/ ./pymp_core
+COPY ./pymp_core/ ./pymp_core
 RUN pip3 install ./pymp_core
