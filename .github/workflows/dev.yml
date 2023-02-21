@@ -120,7 +120,7 @@ jobs:
           file: ./src/${{ matrix.image }}/dockerfile
           push: true
           build-args: |
-            BASE_IMAGE=${{ matrix.base-image }}:${{ needs.prepare.outputs.new_version }}
+            BASE_IMAGE=${{ matrix.base-image }}:{{ matrix.base-image-tag }}
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest-dev
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_version }}-dev
