@@ -11,8 +11,8 @@ env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 concurrency: 
-  group: ${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: docker_build
+  cancel-in-progress: false
 
 jobs:
   prepare:
