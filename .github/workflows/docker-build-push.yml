@@ -3,7 +3,7 @@ name: Create and publish a Docker image
 on: 
   push:
     paths:
-      - 'src'
+      - 'src/**'
     branches:
       - main
 
