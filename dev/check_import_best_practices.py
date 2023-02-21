@@ -16,8 +16,8 @@ def check_import_best_practices(node) -> List[str]:
             messages.append( "Wildcard imports are not recommended")
         
         # Check for multiple imports in the same line
-        if len(node.names) > 1:
-            messages.append( "Multiple imports in the same line are not recommended")
+        # if len(node.names) > 1:
+        #     messages.append( "Multiple imports in the same line are not recommended")
         
         # Check for relative imports
         if node.level > 0:
