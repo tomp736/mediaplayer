@@ -72,10 +72,10 @@ jobs:
             base-image-tag: latest
           - image: pymp_server
             base-image: ghcr.io/tomp736/pyfi/pymp_core
-            base-image-tag: ${{ needs.prepare.outputs.new_version }}
+            base-image-tag: ${{ needs.prepare.outputs.new_version }}-dev
           - image: pymp_file_svc
             base-image: ghcr.io/tomp736/pyfi/pymp_core
-            base-image-tag: ${{ needs.prepare.outputs.new_version }}
+            base-image-tag: ${{ needs.prepare.outputs.new_version }}-dev
 
     permissions:
       contents: read
