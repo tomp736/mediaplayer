@@ -1,0 +1,18 @@
+apiVersion: v2
+name: pymp
+description: An experimental video player for experimenting with microservices and cloud engineering
+type: application
+version: 0.1.0
+appVersion: "1.0.7"
+sources: 
+  - "https://github.com/tomp736/pymp"
+
+maintainers:
+  - name: Thomas Pisula
+    email: tompisula@labrats.work
+
+dependencies:
+
+  - name: redis
+    version: 17.7.5
+    repository: https://charts.bitnami.com/bitnami
