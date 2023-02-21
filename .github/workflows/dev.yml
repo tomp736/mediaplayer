@@ -10,6 +10,10 @@ on:
 env:
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
+concurrency: 
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   prepare:
     runs-on: ubuntu-latest
@@ -90,7 +94,7 @@ jobs:
       - name: Check if image is available
         if: matrix.base-image != ''
         run: |
-          until docker pull ${{ matrix.base-image }}; do
+          until docker pull ${{ matrix.base-image }}:{{ matrix.base-image-tag }}; do
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
           done
