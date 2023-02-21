@@ -1,3 +1,0 @@
-FROM locustio/locust
-
-COPY ./src/pymp_locust/ /mnt/locust/
