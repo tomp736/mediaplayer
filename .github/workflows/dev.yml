@@ -94,8 +94,8 @@ jobs:
       - name: Check if image is available
         if: matrix.base-image != ''
         run: |
-          until docker pull ${{ matrix.base-image }}:{{ matrix.base-image-tag }}; do
-            echo ${{ matrix.base-image }}:{{ matrix.base-image-tag }}
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
+            echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
           done
@@ -121,7 +121,7 @@ jobs:
           file: ./src/${{ matrix.image }}/dockerfile
           push: true
           build-args: |
-            BASE_IMAGE=${{ matrix.base-image }}:{{ matrix.base-image-tag }}
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest-dev
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.new_version }}-dev
