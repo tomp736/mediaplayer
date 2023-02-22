@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import IO, List
 from typing import Union
 import io
 
@@ -53,11 +53,12 @@ class MediaService:
     def get_media_meta(self, media_id) -> Union[str, None]:
         return MediaProviderFactory.get_meta_providers()[0].get_meta(media_id)
 
-    # TODO
-    # def save_media(self, name: str, stream: IO[bytes]):
-    #     media_provider = self.get_media_provider(media_id)
-    #     if media_provider:
-    #         return media_provider.save_media(name, stream)
+    @prom.prom_count_method_call
+    @prom.prom_count_method_time
+    def save_media(self, name: str, stream: IO[bytes]):        
+        media_provider = MediaProviderFactory.get_data_providers("")[0]
+        if media_provider:
+            return media_provider.save_media(name, stream)
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time

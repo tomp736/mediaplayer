@@ -32,13 +32,23 @@ def get_media(media_id):
     return Response(status=400)
 
 
-# @app_media.route('/media', methods=['POST'])
-# def post_media():
-#     if request.method == 'POST':
-#         if not media_service:
-#             return Response(status=400)
-#         media_service.save_media("output_file", request.stream)
-#     return Response(status=404)
+@app_media.route('/media', methods=['POST'])
+def post_media():
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            logging.info("file not in request")
+            return Response(status=400)
+        file = request.files['file']
+        if not file:
+            logging.info("file not in request 2")
+            return Response(status=400)
+        filename = file.filename
+        if filename is None:            
+            logging.info("filename is none")
+            return Response(status=400)            
+        media_service.save_media(filename, file.stream)        
+        return Response(status=201)
+    return Response(status=404)
 
 
 @app_media.route('/media/index', methods=['GET'])

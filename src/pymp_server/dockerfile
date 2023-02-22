@@ -1,6 +1,9 @@
 ARG BASE_IMAGE=ghcr.io/tomp736/pyfi/pyfi_core:latest
 FROM $BASE_IMAGE
 
+RUN mkdir -p /app/media
+RUN mkdir -p /app/index
+
 COPY ./pymp_server/ ./pymp_server
 RUN pip3 install ./pymp_server
 
