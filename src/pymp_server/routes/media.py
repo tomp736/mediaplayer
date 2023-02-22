@@ -36,12 +36,15 @@ def get_media(media_id):
 def post_media():
     if request.method == 'POST':
         if 'file' not in request.files:
+            logging.info("file not in request")
             return Response(status=400)
         file = request.files['file']
         if not file:
+            logging.info("file not in request 2")
             return Response(status=400)
         filename = file.filename
-        if filename is None:
+        if filename is None:            
+            logging.info("filename is none")
             return Response(status=400)            
         media_service.save_media(filename, file.stream)        
         return Response(status=201)
