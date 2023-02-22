@@ -11,11 +11,4 @@ scrape_configs:
   - job_name: 'pymp'
     static_configs:
     - targets:
-      - 'media_api:8000'
-      - 'thumb_api:8000'
-      - 'meta_api:8000'
-      - 'file_svc:8000'
-      - 'ffmpeg_svc:8000'
-      - 'mediaregistry_svc:8000'
-      - 'media_svc_internal:8000'
-      # - '""${PYMP_HOSTNAME}"":12002' TODO
+      - 'pymp_server:8000'
