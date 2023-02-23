@@ -12,11 +12,11 @@ class PympEnv:
         'REDIS_HOST': "",
         'REDIS_PORT': "80",
 
-        'SERVICE_TYPE': "63",
+        'SERVICE_TYPE': 63,
         'SERVICE_ID': "DEFAULT",
         'SERVICE_PROTO': "http",
         'SERVICE_HOST': "localhost",
-        'SERVICE_PORT': "80",
+        'SERVICE_PORT': 80,
 
         'MEDIA_SVC_MEDIAPATH': "/app/media",
         'MEDIA_SVC_INDEXPATH': "/app/index",
@@ -84,6 +84,13 @@ class PympEnv:
         service_info.service_port = self.get(
             f"{pymp_service_type.name}_PORT")
         return service_info
+
+    def set_this_service_info(self, service_info: ServiceInfo):
+        self.config["SERVICE_ID"] = service_info.service_id
+        self.config["SERVICE_TYPE"] = service_info.service_type
+        self.config["SERVICE_PROTO"] = service_info.service_proto
+        self.config["SERVICE_HOST"] = service_info.service_host
+        self.config["SERVICE_PORT"] = service_info.service_port
 
     def get_this_service_info(self) -> ServiceInfo:
         service_info = ServiceInfo()

@@ -27,7 +27,7 @@ class MediaRegistryService():
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def register_service(self, service_info: ServiceInfo):
+    def register_service(self, service_info: ServiceInfo) -> ServiceInfo:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.set_service_info(service_info)
 

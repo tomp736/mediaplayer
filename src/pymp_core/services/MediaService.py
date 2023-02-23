@@ -89,4 +89,5 @@ class MediaService:
             media_registry_providers = MediaRegistryProviderFactory.get_media_registry_providers()
             media_registry_provider = media_registry_providers[0]
             logging.info(media_registry_provider.__repr__())
-            media_registry_provider.set_service_info(service_info)
+            registered_service_info = media_registry_provider.set_service_info(service_info)
+            pymp_env.set_this_service_info(registered_service_info)
