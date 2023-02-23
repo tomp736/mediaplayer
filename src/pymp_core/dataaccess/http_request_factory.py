@@ -32,8 +32,7 @@ class HttpRequestFactory():
         return LoggingRequest(
             method='GET',
             url=f"{base_url}{path}",
-            headers=headers,
-            timeout=(3.05, 30)
+            headers=headers
         )
 
     def post_json(self, base_url: str, path: str, data, headers={}) -> requests.Request:
@@ -42,8 +41,7 @@ class HttpRequestFactory():
             method='POST',
             url=f"{base_url}{path}",
             headers=headers,
-            json=data,
-            timeout=(3.05, 30)
+            json=data
         )
 
     def post_data(self, base_url: str, path: str, data, headers={}) -> requests.Request:
@@ -51,8 +49,7 @@ class HttpRequestFactory():
             method='POST',
             url=f"{base_url}{path}",
             headers=headers,
-            data=data,
-            timeout=(3.05, 30)
+            data=data
         )
 
 
