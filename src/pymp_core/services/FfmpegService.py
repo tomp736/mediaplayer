@@ -41,23 +41,29 @@ class FfmpegService:
     def process_media_thumb(self, media_info: MediaInfo):
         thumb_provider = MediaProviderFactory.get_thumb_providers()[0]
         if not thumb_provider.has_thumb(media_info.media_id):
-            media_provider = MediaProviderFactory.get_data_providers(media_info.service_id)[
-                0]
-            ffmpeg_provider = FfmpegProviderFactory.get_ffmpeg_providers()[0]
-            thumb = ffmpeg_provider.get_thumb(
-                media_provider.get_media_uri(media_info.media_id))
-            if thumb:
-                thumb_provider.set_thumb(media_info.media_id, thumb)
+            try:
+                media_provider = MediaProviderFactory.get_data_providers(media_info.service_id)[
+                    0]
+                ffmpeg_provider = FfmpegProviderFactory.get_ffmpeg_providers()[0]
+                thumb = ffmpeg_provider.get_thumb(
+                    media_provider.get_media_uri(media_info.media_id))
+                if thumb:
+                    thumb_provider.set_thumb(media_info.media_id, thumb)
+            except Exception as ex:
+                logging.info(ex)
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def process_media_meta(self, media_info: MediaInfo):
         meta_provider = MediaProviderFactory.get_meta_providers()[0]
         if not meta_provider.has_meta(media_info.media_id):
-            media_provider = MediaProviderFactory.get_data_providers(media_info.service_id)[
-                0]
-            ffmpeg_provider = FfmpegProviderFactory.get_ffmpeg_providers()[0]
-            meta = ffmpeg_provider.get_meta(
-                media_provider.get_media_uri(media_info.media_id))
-            if meta:
-                meta_provider.set_meta(media_info.media_id, meta)
+            try:
+                media_provider = MediaProviderFactory.get_data_providers(media_info.service_id)[
+                    0]
+                ffmpeg_provider = FfmpegProviderFactory.get_ffmpeg_providers()[0]
+                meta = ffmpeg_provider.get_meta(
+                    media_provider.get_media_uri(media_info.media_id))
+                if meta:
+                    meta_provider.set_meta(media_info.media_id, meta)
+            except Exception as ex:
+                logging.info(ex)
