@@ -142,7 +142,7 @@ class MediaRegistryService():
 
         hanging_media_ids = []
         for registry_media_id in registry_media_infos:
-            if registry_media_infos[registry_media_id] not in service_ids :
+            if registry_media_infos[registry_media_id].service_id not in service_ids:
                 hanging_media_ids.append(registry_media_id)
 
         for registry_media_id in hanging_media_ids:
