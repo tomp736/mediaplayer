@@ -70,6 +70,8 @@ class MediaRegistryService():
         for media_service_id in media_service:
             media_svc_media_ids = self.check_media_service(media_service_id)
             self.check_media_sources(media_service_id, media_svc_media_ids)
+            
+        self.check_hanging_media()
 
     def check_media_service(self, service_id):
         self.logstuff(f"CHECKING SERVICE FOR {service_id}")
@@ -98,6 +100,7 @@ class MediaRegistryService():
             0]
         registry_media = media_registry_provider.get_all_media_info()
         if registry_media is None:
+            self.logstuff("registry_media is NONE")
             return
 
         redis_svc_media_ids = []
@@ -128,6 +131,26 @@ class MediaRegistryService():
             media_info.media_id = media_id
             media_info.service_id = service_id
             media_registry_provider.set_media_info(media_info)
+
+    def check_hanging_media(self):
+        self.logstuff(f"CHECKING HANGING MEDIA")
+
+        media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[
+            0]
+        registry_media_infos = media_registry_provider.get_all_media_info()
+        registry_service_infos = media_registry_provider.get_all_service_info()
+        
+        service_ids = [service_info.service_id for _, service_info in registry_service_infos.items()]
+
+        hanging_media_ids = []
+        for registry_media_id in registry_media_infos:
+            if registry_media_infos[registry_media_id] not in service_ids :
+                hanging_media_ids.append(registry_media_id)
+
+        for registry_media_id in hanging_media_ids:
+            self.logstuff(f"DELETING: {registry_media_id}")
+            media_registry_provider.del_media_info(registry_media_id)
+            continue
 
     def logstuff(self, message):
         logging.info(f"MEDIASERVICE: {message}")
