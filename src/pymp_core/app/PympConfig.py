@@ -87,10 +87,6 @@ class PympEnv:
 
     def set_this_service_info(self, service_info: ServiceInfo):
         self.config["SERVICE_ID"] = service_info.service_id
-        self.config["SERVICE_TYPE"] = service_info.service_type
-        self.config["SERVICE_PROTO"] = service_info.service_proto
-        self.config["SERVICE_HOST"] = service_info.service_host
-        self.config["SERVICE_PORT"] = service_info.service_port
 
     def get_this_service_info(self) -> ServiceInfo:
         service_info = ServiceInfo()
