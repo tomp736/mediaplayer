@@ -76,4 +76,5 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def del_media_info(self, media_id: str) -> bool:
-        return redis_media_info.hdel(media_id) > 0
+        redis_media_info.hdel(media_id)
+        return True
