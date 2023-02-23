@@ -15,7 +15,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
     def __init__(self, serviceinfo: ServiceInfo):
         self.status = True
         self.serviceinfo = serviceinfo
-        self.readonly = True
+        self.readonly = False
 
     def __repr__(self) -> str:
         readonly = self.is_readonly()
