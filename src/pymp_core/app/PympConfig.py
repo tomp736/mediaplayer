@@ -37,7 +37,11 @@ class PympEnv:
         self.config["SERVICE_ID"] = os.environ.get("SERVICE_ID", "")
         self.config["SERVICE_TYPE"] = os.environ.get("SERVICE_TYPE", "")
         self.config["SERVICE_PROTO"] = os.environ.get("SERVICE_PROTO", "")
-        self.config["SERVICE_HOST"] = os.environ.get("SERVICE_HOST", "")
+        service_ip = os.environ.get("SERVICE_IP", "")
+        if service_ip != "":
+            self.config["SERVICE_HOST"] = service_ip
+        else:            
+            self.config["SERVICE_HOST"] = os.environ.get("SERVICE_HOST", "")
         self.config["SERVICE_PORT"] = os.environ.get("SERVICE_PORT", "")
 
         # load host service info
