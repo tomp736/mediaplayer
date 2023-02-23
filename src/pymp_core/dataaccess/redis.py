@@ -17,7 +17,7 @@ class RedisDataAccess(ABC):
         self.redis = redis.Redis(host=host, port=int(
             port), db=0, decode_responses=decode_responses)
 
-    def is_redis_readonly_replica(self):
+    def is_redis_readonly_replica(self) -> bool:
         info = self.redis.info()
         return info.get("role") == "slave" and info.get("master_link_status") == "up"
 
