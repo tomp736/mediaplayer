@@ -54,10 +54,13 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def set_service_info(self, service_info: ServiceInfo) -> ServiceInfo:
+        logging.info(service_info)
+        logging.info(service_info.to_json())
         registry_request = http_request_factory.post_json(
             self.get_service_url(), "/registry/service", service_info.to_json())
         session = requests.Session()
         response = session.send(registry_request.prepare())
+        logging.info(response)
         response_json = response.json()
         return ServiceInfo(**response_json)
 

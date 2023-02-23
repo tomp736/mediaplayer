@@ -87,6 +87,9 @@ class MediaService:
         if PympServiceType(service_info.service_type) & PympServiceType.MEDIA_SVC:
             self.update_index()
             media_registry_providers = MediaRegistryProviderFactory.get_media_registry_providers(True)
+            if len(media_registry_providers) == 0:
+                raise Exception("No media registry providers available")
+            
             media_registry_provider = media_registry_providers[0]
             logging.info(media_registry_provider.__repr__())
             registered_service_info = media_registry_provider.set_service_info(service_info)
