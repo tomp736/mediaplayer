@@ -310,7 +310,7 @@
             "uid": "RJ41NUA4z"
           },
           "editorMode": "code",
-          "expr": "rate(pymp_core_services_mediaregistryservice_get_media_index_seconds_total[15m])",
+          "expr": "rate(pymp_core_services_mediaregistryservice_get_registered_media_seconds_total[15m])",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
@@ -509,7 +509,7 @@
             "uid": "RJ41NUA4z"
           },
           "editorMode": "code",
-          "expr": "rate(pymp_core_services_mediaregistryservice_get_media_index_seconds_total[15m])",
+          "expr": "rate(pymp_core_services_mediaregistryservice_get_registered_media_seconds_total[15m])",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"

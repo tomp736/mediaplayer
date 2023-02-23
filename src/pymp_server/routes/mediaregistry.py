@@ -45,7 +45,7 @@ def post_registry_service():
 
 @app_mediaregistry.route('/registry/media')
 def get_registry_media_list():
-    media_index = media_registry_service.get_media_index()
+    media_index = media_registry_service.get_registered_media()
     json_response = json.dumps(media_index, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
     return Response(json_response, status=200, content_type="application/json")
 
@@ -73,7 +73,7 @@ def post_registry_media():
 
 @app_mediaregistry.route('/registry/media/index')
 def get_registry_media_index():
-    media_index = media_registry_service.get_media_index()
+    media_index = media_registry_service.get_registered_media()
     if not media_index is None:
         json_response = json.dumps(media_index, default=lambda o: o.__dict__,  sort_keys=True, indent=4)
         return Response(json_response, status=200, content_type="application/json")

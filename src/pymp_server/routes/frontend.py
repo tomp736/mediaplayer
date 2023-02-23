@@ -37,7 +37,7 @@ def get_media_chunk(media_id):
 
 @app_frontend_media.route('/api/media/list')
 def get_media_list():
-    media_index_keys = list(media_registry_service.get_media_index().keys())
+    media_index_keys = list(media_registry_service.get_registered_media().keys())
     return Response(json.dumps(media_index_keys), status=200, content_type="application/json")
 
 

@@ -34,7 +34,7 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
         return self.redis.hexists(self.key, media_id)
 
     def expire(self):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(self.key, 180)
 
     def hset(self, service_info: ServiceInfo):
@@ -77,7 +77,7 @@ class RedisMediaInfoDataAccess(RedisDataAccess):
         return self.redis.hexists(self.key, media_id)
 
     def expire(self):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(self.key, 180)
 
     def hset(self, media_info: MediaInfo):
@@ -87,7 +87,7 @@ class RedisMediaInfoDataAccess(RedisDataAccess):
         return MediaInfo.from_json(self.redis.hget(self.key, media_id))
 
     def hdel(self, media_id: str):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             return self.redis.hdel(self.key, media_id)
 
     def hgetall(self) -> Dict[str, MediaInfo]:
@@ -108,7 +108,7 @@ class RedisMedia(RedisDataAccess):
         return self.redis.exists(f"{self.key}_{media_id}") > 0
 
     def expire(self, media_id: str):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(f"{self.key}_{media_id}", 360)
 
     def set(self, media_id: str, value: bytes):

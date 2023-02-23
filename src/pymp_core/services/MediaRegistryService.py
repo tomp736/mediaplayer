@@ -45,7 +45,7 @@ class MediaRegistryService():
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def get_media_index(self) -> Dict[str, MediaInfo]:
+    def get_registered_media(self) -> Dict[str, MediaInfo]:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_all_media_info()
 
@@ -76,7 +76,7 @@ class MediaRegistryService():
     def check_media_service(self, service_id):
         self.logstuff(f"CHECKING SERVICE FOR {service_id}")
         media_svc_media_ids = []
-        media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[0]
+        media_registry_provider = self.get_media_registry_provider()
         try:
             media_provider = MediaProviderFactory.get_data_providers(service_id)[
                 0]
@@ -96,8 +96,7 @@ class MediaRegistryService():
         self.logstuff(f"CHECKING SOURCES FOR {service_id}")
         self.logstuff(f"{service_id} REPORTED {service_media_ids}")
 
-        media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[
-            0]
+        media_registry_provider = self.get_media_registry_provider()
         registry_media = media_registry_provider.get_all_media_info()
         if registry_media is None:
             self.logstuff("registry_media is NONE")
@@ -135,10 +134,9 @@ class MediaRegistryService():
     def check_hanging_media(self):
         self.logstuff(f"CHECKING HANGING MEDIA")
 
-        media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[
-            0]
-        registry_media_infos = media_registry_provider.get_all_media_info()
-        registry_service_infos = media_registry_provider.get_all_service_info()
+        media_registry_provider = self.get_media_registry_provider()
+        registry_media_infos = self.get_registered_media()
+        registry_service_infos = self.get_registered_services()
         
         service_ids = [service_info.service_id for _, service_info in registry_service_infos.items()]
 
