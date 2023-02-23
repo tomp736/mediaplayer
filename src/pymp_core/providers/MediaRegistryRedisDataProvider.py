@@ -47,9 +47,9 @@ class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def set_service_info(self, service_info: ServiceInfo) -> bool:
+    def set_service_info(self, service_info: ServiceInfo) -> ServiceInfo:
         redis_service_info.hset(service_info)
-        return True
+        return service_info
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
