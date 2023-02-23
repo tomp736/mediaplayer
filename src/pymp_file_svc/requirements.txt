@@ -1,5 +1,0 @@
-Flask==2.1.0
-flask_dropzone
-prometheus_client
-pymp_core
-typing_extensions

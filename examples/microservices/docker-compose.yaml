@@ -97,31 +97,6 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  file_svc:
-    image: ghcr.io/tomp736/pymp/pymp_file_svc:latest-dev
-    networks:
-      - media_net
-      - redis_fe
-      - prom_net
-    env_file:
-      - 'server_api.env'
-    environment:
-      - SERVICE_TYPE=64
-      - SERVICE_ID=fileupload
-      - MEDIA_SVC_HOST=media_svc_internal
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-    ports:
-      - "8087:80"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 50M
-        reservations:
-          cpus: '0.5'
-          memory: 20M
-    restart: unless-stopped
-
   media_svc_internal:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:

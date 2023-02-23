@@ -11,4 +11,5 @@ scrape_configs:
   - job_name: 'pymp'
     static_configs:
     - targets:
-      - 'pymp_server:8000'
+      - 'pymp-server:8000'
+      - 'pymp-server-media-registry:8000'
