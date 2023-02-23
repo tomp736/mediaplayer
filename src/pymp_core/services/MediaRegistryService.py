@@ -74,9 +74,8 @@ class MediaRegistryService():
     def check_media_service(self, service_id):
         self.logstuff(f"CHECKING SERVICE FOR {service_id}")
         media_svc_media_ids = []
+        media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[0]
         try:
-            media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[
-                0]
             media_provider = MediaProviderFactory.get_data_providers(service_id)[
                 0]
             if media_provider and media_provider.is_ready():
@@ -87,6 +86,7 @@ class MediaRegistryService():
                 self.logstuff(f"{media_provider} is not ready.")
                 media_registry_provider.del_service_info(service_id)
         except Exception as ex:
+            media_registry_provider.del_service_info(service_id)
             logging.info(ex)
         return media_svc_media_ids
 
