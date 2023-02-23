@@ -36,7 +36,7 @@ def post_registry_service():
 
         if not service_info is None:
             media_registry_service.register_service(service_info)
-            return Response(json.dumps(service_info), content_type="application/json")
+            return Response(service_info.to_json(), content_type="application/json")
 
     return Response({
         "success": False
