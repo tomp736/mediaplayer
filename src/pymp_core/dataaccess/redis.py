@@ -123,12 +123,12 @@ class RedisMediaProcessQueue(RedisDataAccess):
         super().__init__(True)
         self.key = "media_process_queue"
         
-    def rpop(self, count = 10) -> Dict[str, MediaInfo]:
+    def rpop(self, count = 10) -> list[MediaInfo]:
         media_infos_json = self.redis.rpop(self.key, count)
         if media_infos_json:
-            media_infos = {media_id: MediaInfo.from_json(media_info_json) for media_id, media_info_json in media_infos_json}
+            media_infos = [MediaInfo.from_json(media_info_json) for media_info_json in media_infos_json]
             return media_infos
-        return {}
+        return []
         
     def lpush(self, media_info: MediaInfo):
         self.redis.lpush(self.key, media_info.to_json())
