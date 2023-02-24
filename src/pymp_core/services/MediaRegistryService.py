@@ -122,9 +122,11 @@ class MediaRegistryService():
             media_info.media_id = media_id
             media_info.service_id = service_id
             media_registry_provider.set_media_info(media_info)
-            if not thumb_provider.has_thumb(media_id) or not meta_provider.has_meta(media_id):
-                redis_media_process_queue.lpush(media_info)
-                
+            self.queue_media_info_processing(media_info, thumb_provider, meta_provider, media_id)
+
+    def queue_media_info_processing(self, media_info, thumb_provider, meta_provider, media_id):
+        if not thumb_provider.has_thumb(media_id) or not meta_provider.has_meta(media_id):
+            redis_media_process_queue.lpush(media_info)
 
     def check_hanging_media(self):
         self.logstuff(f"CHECKING HANGING MEDIA")
