@@ -94,7 +94,7 @@ class MediaRegistryService():
 
         redis_svc_media_ids = []
         for registry_media_id in registry_media:
-            if registry_media[registry_media_id] == service_id:
+            if registry_media[registry_media_id].service_id == service_id:
                 redis_svc_media_ids.append(registry_media_id)
 
         for registry_media_id in redis_svc_media_ids:
