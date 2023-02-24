@@ -24,8 +24,10 @@ class FfmpegService:
         service_info = pymp_env.get_this_service_info()
         if PympServiceType(service_info.service_type) & PympServiceType.FFMPEG_SVC:
             media_infos = redis_media_process_queue.rpop()
-            for media_info in media_infos:
-                self.process_media_service(media_info)
+            while media_infos:
+                for media_info in media_infos:
+                    self.process_media_service(media_info)
+                media_infos = redis_media_process_queue.rpop()
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
