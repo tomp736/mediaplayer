@@ -6,6 +6,7 @@ from pymp_core.app.PympConfig import pymp_env
 from pymp_core.dto.MediaRegistry import MediaInfo
 from pymp_core.dto.MediaRegistry import ServiceInfo
 from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.dataaccess.redis import redis_media_process_queue
 
 from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFactory
 
@@ -39,18 +40,6 @@ class MediaRegistryService():
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def get_registered_services(self) -> Dict[str, ServiceInfo]:
-        media_registry_provider = self.get_media_registry_provider()
-        return media_registry_provider.get_all_service_info()
-
-    @prom.prom_count_method_call
-    @prom.prom_count_method_time
-    def get_registered_media(self) -> Dict[str, MediaInfo]:
-        media_registry_provider = self.get_media_registry_provider()
-        return media_registry_provider.get_all_media_info()
-
-    @prom.prom_count_method_call
-    @prom.prom_count_method_time
     def get_media_info(self, media_id) -> MediaInfo:
         media_registry_provider = self.get_media_registry_provider()
         return media_registry_provider.get_media_info(media_id)
@@ -59,17 +48,18 @@ class MediaRegistryService():
         self.timer.start()
 
     def update_media_services(self):
+        media_registry_provider = self.get_media_registry_provider()
         service_info = pymp_env.get_this_service_info()
         if not PympServiceType(service_info.service_type) & PympServiceType.MEDIAREGISTRY_SVC:
             return
 
-        media_service = self.get_registered_services()
+        media_service = media_registry_provider.get_all_service_info()
         if not media_service:
             return
 
         for media_service_id in media_service:
             media_svc_media_ids = self.check_media_service(media_service_id)
-            self.check_media_sources(media_service_id, media_svc_media_ids)
+            self.check_media_info(media_service_id, media_svc_media_ids)
             
         self.check_hanging_media()
 
@@ -92,7 +82,7 @@ class MediaRegistryService():
             logging.info(ex)
         return media_svc_media_ids
 
-    def check_media_sources(self, service_id, service_media_ids):
+    def check_media_info(self, service_id, service_media_ids):
         self.logstuff(f"CHECKING SOURCES FOR {service_id}")
         self.logstuff(f"{service_id} REPORTED {service_media_ids}")
 
@@ -123,20 +113,25 @@ class MediaRegistryService():
                 media_registry_provider.set_media_info(media_info)
                 continue
 
-        # Update all
+        # Update all and queue for processing if needed
+        thumb_provider = MediaProviderFactory.get_thumb_providers()[0]
+        meta_provider = MediaProviderFactory.get_meta_providers()[0]
         for media_id in service_media_ids:
-            self.logstuff(f"ADDING: {media_id}")
+            self.logstuff(f"UPDATING: {media_id}")
             media_info = MediaInfo()
             media_info.media_id = media_id
             media_info.service_id = service_id
             media_registry_provider.set_media_info(media_info)
+            if not thumb_provider.has_thumb(media_id) or not meta_provider.has_meta(media_id):
+                redis_media_process_queue.lpush(media_info)
+                
 
     def check_hanging_media(self):
         self.logstuff(f"CHECKING HANGING MEDIA")
 
         media_registry_provider = self.get_media_registry_provider()
-        registry_media_infos = self.get_registered_media()
-        registry_service_infos = self.get_registered_services()
+        registry_media_infos = media_registry_provider.get_all_media_info()
+        registry_service_infos = media_registry_provider.get_all_service_info()
         
         service_ids = [service_info.service_id for _, service_info in registry_service_infos.items()]
 

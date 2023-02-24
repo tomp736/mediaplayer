@@ -5,7 +5,7 @@ from pymp_core.providers import FfmpegProviderFactory, MediaProviderFactory, Med
 from pymp_core.utils.RepeatTimer import RepeatTimer
 from pymp_core.app.PympConfig import pymp_env
 from pymp_core.dto.MediaRegistry import PympServiceType
-
+from pymp_core.dataaccess.redis import redis_media_process_queue
 from pymp_core.decorators import prom
 
 class FfmpegService:
@@ -23,12 +23,9 @@ class FfmpegService:
     def process_media_services(self):
         service_info = pymp_env.get_this_service_info()
         if PympServiceType(service_info.service_type) & PympServiceType.FFMPEG_SVC:
-            media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[
-                0]
-            all_media_info = media_registry_provider.get_all_media_info()
-            if all_media_info:
-                for media_info in all_media_info.values():
-                    self.process_media_service(media_info)
+            media_infos = redis_media_process_queue.rpop()
+            for media_info in media_infos.values():
+                self.process_media_service(media_info)
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time

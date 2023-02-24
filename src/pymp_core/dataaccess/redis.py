@@ -118,6 +118,23 @@ class RedisMedia(RedisDataAccess):
         return self.redis.get(f"{self.key}_{media_id}")
 
 
+class RedisMediaProcessQueue(RedisDataAccess):
+    def __init__(self):
+        super().__init__(True)
+        self.key = "media_process_queue"
+        
+    def rpop(self, count = 10) -> Dict[str, MediaInfo]:
+        media_infos_json = self.redis.rpop(self.key, count)
+        media_infos = {media_id: MediaInfo.from_json(media_info_json) for media_id, media_info_json in media_infos_json.items()}
+        return media_infos
+        
+    def lpush(self, media_info: MediaInfo):
+        self.redis.lpush(self.key, media_info.to_json())
+        
+
+redis_media_process_queue = RedisMediaProcessQueue()
+
+
 class RedisMediaData(RedisMedia):
     def __init__(self):
         super().__init__("media_data")
