@@ -105,7 +105,7 @@ class MediaRegistryService():
                 continue
 
             # if media source for media  has changed, update redis
-            if not registry_media[registry_media_id] == service_id:
+            if registry_media[registry_media_id].service_id != service_id:
                 self.logstuff(f"UPDATING: {registry_media_id}")
                 media_info = MediaInfo()
                 media_info.media_id = registry_media_id
