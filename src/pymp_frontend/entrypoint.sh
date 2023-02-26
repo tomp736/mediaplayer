@@ -5,6 +5,7 @@ cp ./templates/app.js ./app.js
 cp ./templates/*.png ./
 cp ./templates/*.ico ./
 
+sed -i "s|{{ app_build_version }}|$APP_BUILD_VERSION|g" index.html
 sed -i "s|{{ media_host }}|$MEDIA_URL|g" app.js
 sed -i "s|{{ meta_host }}|$META_URL|g" app.js
 sed -i "s|{{ thumb_host }}|$THUMB_URL|g" app.js

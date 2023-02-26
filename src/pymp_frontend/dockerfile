@@ -1,5 +1,8 @@
 FROM busybox:latest
 
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+
 RUN adduser -D static
 
 WORKDIR /home/static
