@@ -3,3 +3,7 @@ FROM $BASE_IMAGE
 
 COPY ./pymp_core/ ./pymp_core
 RUN pip3 install ./pymp_core
+
+COPY ./pymp_core_tests/ ./pymp_core_tests/
+RUN pip3 install -r ./pymp_core_tests/requirements.txt
+RUN pytest ./pymp_core_tests/
