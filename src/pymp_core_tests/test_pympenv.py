@@ -5,7 +5,7 @@ from pymp_core.app.PympConfig import config
 
 class PympEnvTest(unittest.TestCase):
     
-    def test_config(self):
+    def test_default_config(self):
         self.assertEqual(config['FLASK_RUN_HOST'], '0.0.0.0')
         self.assertEqual(config['FLASK_RUN_PORT'], '80')
         self.assertEqual(config['REDIS_HOST'], '')
