@@ -7,7 +7,7 @@ from flask import request
 from flask import redirect
 from pymp_core.abstractions.providers import MediaChunk
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.app.Services import media_service
 from pymp_core.app.Services import media_registry_service
 

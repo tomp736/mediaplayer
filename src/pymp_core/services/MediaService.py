@@ -3,7 +3,7 @@ from typing import IO, List
 from typing import Union
 import io
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 
 from pymp_core.dto.MediaRegistry import PympServiceType
 

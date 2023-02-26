@@ -5,7 +5,7 @@ import redis
 from typing import Dict, List
 from typing import Union
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.dto.MediaRegistry import MediaInfo
 from pymp_core.dto.MediaRegistry import ServiceInfo
 

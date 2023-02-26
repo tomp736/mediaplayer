@@ -1,5 +1,5 @@
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.dto.MediaRegistry import PympServiceType
 
 import logging
