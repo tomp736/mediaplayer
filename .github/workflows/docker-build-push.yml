@@ -1,7 +1,7 @@
 name: docker-build-push
 on: 
   push:
-    tags-ignore:
+    branches:
       - '**'
     paths:
       - 'src/**'
