@@ -1,6 +1,8 @@
 name: docker-build-push
 on: 
   push:
+    branches:
+      - '**'
     paths:
       - 'src/**'
 
@@ -25,15 +27,15 @@ jobs:
       - id: this_version
         shell: bash
         run: |
-          echo "this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | tail -1)" >> $GITHUB_OUTPUT
+          echo "this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | tail -1)" >> $GITHUB_OUTPUT
       
       # Read the branch name and set a variable to be used for image tag
       - id: this_tag_ref
         shell: bash
         run: |
-          if [[ "${{ github.ref }}" == "refs/heads/release/"* ]]; then
+          if [[ "${{ github.ref }}" = "refs/heads/release/"* ]]; then
             tag_ref="major"
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
             tag_ref="minor"          
           else
             tag_ref="patch"
@@ -47,11 +49,11 @@ jobs:
           minor=$(echo "${{ steps.this_version.outputs.this_version }}" | awk -F'.' '{print $2}')
           patch=$(echo "${{ steps.this_version.outputs.this_version }}" | awk -F'.' '{print $3}')
 
-          if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" == "major" ]]; then
+          if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" = "major" ]]; then
             major=$((major+1))
             minor=0
             patch=0
-          elif [[ "${{ steps.this_tag_ref.outputs.image_ref }}" == "minor" ]]; then
+          elif [[ "${{ steps.this_tag_ref.outputs.image_ref }}" = "minor" ]]; then
             minor=$((minor+1))
             patch=0
           else
@@ -67,7 +69,7 @@ jobs:
       - prepare
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix: 
         image:
           - pymp_core
@@ -104,6 +106,7 @@ jobs:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Check if image is available
+        shell: bash
         if: matrix.base-image != ''
         run: |
           until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
@@ -137,11 +140,22 @@ jobs:
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
           tags: |
-            if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" == "major" ]]; then
-              ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
-            fi
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.next_version }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        if: steps.this_tag_ref.outputs.image_ref == 'major'
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          push: true
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
+            APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
 
   tag:
     runs-on: ubuntu-latest
@@ -163,12 +177,12 @@ jobs:
           git config user.email github-actions@github.com
           
       - run: |
-          if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" == "major" ]]; then
-            git tag latest
+          if [[ "${{ needs.prepare.outputs.this_tag_ref }}" = "major" ]]; then
+            git tag -f latest
           fi          
-          git tag ${{ needs.prepare.outputs.this_tag_ref }}
+          git tag -f ${{ needs.prepare.outputs.this_tag_ref }}
           git tag ${{ needs.prepare.outputs.next_version }}
-          git push origin --tags
+          git push -f origin --tags
 
   dispatch:
     runs-on: ubuntu-latest

@@ -2,12 +2,14 @@ import os
 from setuptools import find_packages
 from setuptools import setup
 
+version = os.environ.get('APP_BUILD_VERSION', '0.0.1')
+
 setup(
     name="pymp_core",
     description="",
     long_description=open("README.md").read(),
     url="",
-    version="0.0.1",
+    version=version,
     author="Thomas Pisula",
     author_email="tompisula@protonmail.com",
     packages=find_packages(exclude=["ez_setup"]),
