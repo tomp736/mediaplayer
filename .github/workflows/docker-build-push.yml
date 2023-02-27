@@ -175,10 +175,10 @@ jobs:
           git config user.email github-actions@github.com
           
       - run: |
-          if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" = "major" ]]; then
-            git tag latest
+          if [[ "${{ needs.prepare.outputs.this_tag_ref }}" = "major" ]]; then
+            git tag -f latest
           fi          
-          git tag ${{ needs.prepare.outputs.this_tag_ref }}
+          git tag -f ${{ needs.prepare.outputs.this_tag_ref }}
           git tag ${{ needs.prepare.outputs.next_version }}
           git push origin --tags
 
