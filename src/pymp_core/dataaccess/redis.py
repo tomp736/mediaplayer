@@ -2,10 +2,10 @@ from abc import ABC
 
 import redis
 
-from typing import Dict
+from typing import Dict, List
 from typing import Union
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.dto.MediaRegistry import MediaInfo
 from pymp_core.dto.MediaRegistry import ServiceInfo
 
@@ -17,7 +17,7 @@ class RedisDataAccess(ABC):
         self.redis = redis.Redis(host=host, port=int(
             port), db=0, decode_responses=decode_responses)
 
-    def is_redis_readonly_replica(self):
+    def is_redis_readonly_replica(self) -> bool:
         info = self.redis.info()
         return info.get("role") == "slave" and info.get("master_link_status") == "up"
 
@@ -34,7 +34,7 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
         return self.redis.hexists(self.key, media_id)
 
     def expire(self):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(self.key, 180)
 
     def hset(self, service_info: ServiceInfo):
@@ -77,7 +77,7 @@ class RedisMediaInfoDataAccess(RedisDataAccess):
         return self.redis.hexists(self.key, media_id)
 
     def expire(self):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(self.key, 180)
 
     def hset(self, media_info: MediaInfo):
@@ -87,7 +87,7 @@ class RedisMediaInfoDataAccess(RedisDataAccess):
         return MediaInfo.from_json(self.redis.hget(self.key, media_id))
 
     def hdel(self, media_id: str):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             return self.redis.hdel(self.key, media_id)
 
     def hgetall(self) -> Dict[str, MediaInfo]:
@@ -108,7 +108,7 @@ class RedisMedia(RedisDataAccess):
         return self.redis.exists(f"{self.key}_{media_id}") > 0
 
     def expire(self, media_id: str):
-        if not self.redis.readonly:
+        if not self.is_redis_readonly_replica():
             self.redis.expire(f"{self.key}_{media_id}", 360)
 
     def set(self, media_id: str, value: bytes):
@@ -116,6 +116,25 @@ class RedisMedia(RedisDataAccess):
 
     def get(self, media_id: str) -> Union[bytes, None]:
         return self.redis.get(f"{self.key}_{media_id}")
+
+
+class RedisMediaProcessQueue(RedisDataAccess):
+    def __init__(self):
+        super().__init__(True)
+        self.key = "media_process_queue"
+        
+    def rpop(self, count = 10) -> List[MediaInfo]:
+        media_infos_json = self.redis.rpop(self.key, count)
+        if media_infos_json:
+            media_infos = [MediaInfo.from_json(media_info_json) for media_info_json in media_infos_json]
+            return media_infos
+        return []
+        
+    def lpush(self, media_info: MediaInfo):
+        self.redis.lpush(self.key, media_info.to_json())
+        
+
+redis_media_process_queue = RedisMediaProcessQueue()
 
 
 class RedisMediaData(RedisMedia):

@@ -4,6 +4,6 @@ from pymp_core.services.MediaRegistryService import MediaRegistryService
 from pymp_core.services.MediaService import MediaService
 
 
-media_service = MediaService()
-media_registry_service = MediaRegistryService()
-ffmpeg_service = FfmpegService()
+MEDIA_SERVICE = MediaService()
+MEDIA_REGISTRY_SERVICE = MediaRegistryService()
+FFMPEG_SERVICE = FfmpegService()

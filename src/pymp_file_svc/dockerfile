@@ -1,8 +1,0 @@
-ARG BASE_IMAGE=ghcr.io/tomp736/pyfi/pymp_core:latest
-FROM $BASE_IMAGE
-
-COPY ./pymp_file_svc/ ./pymp_file_svc
-
-RUN pip3 install ./pymp_file_svc
-
-CMD ["python", "-u", "-m" , "pymp_file_svc"]

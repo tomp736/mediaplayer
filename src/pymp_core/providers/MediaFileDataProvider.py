@@ -6,7 +6,7 @@ from typing import Dict
 from typing import List
 from typing import Union
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.abstractions.providers import MediaDataProvider
 from pymp_core.abstractions.providers import MediaChunk
 from pymp_core.decorators import prom

@@ -15,7 +15,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
     def __init__(self, serviceinfo: ServiceInfo):
         self.status = True
         self.serviceinfo = serviceinfo
-        self.readonly = True
+        self.readonly = False
 
     def __repr__(self) -> str:
         readonly = self.is_readonly()
@@ -53,12 +53,16 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def set_service_info(self, service_info: ServiceInfo) -> bool:
+    def set_service_info(self, service_info: ServiceInfo) -> ServiceInfo:
+        logging.info(service_info)
+        logging.info(service_info.to_json())
         registry_request = http_request_factory.post_json(
             self.get_service_url(), "/registry/service", service_info.to_json())
         session = requests.Session()
-        session.send(registry_request.prepare())
-        return True
+        response = session.send(registry_request.prepare())
+        logging.info(response)
+        response_json = response.json()
+        return ServiceInfo(**response_json)
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time

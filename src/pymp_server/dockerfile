@@ -1,6 +1,9 @@
 ARG BASE_IMAGE=ghcr.io/tomp736/pyfi/pyfi_core:latest
 FROM $BASE_IMAGE
 
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+
 RUN mkdir -p /app/media
 RUN mkdir -p /app/index
 

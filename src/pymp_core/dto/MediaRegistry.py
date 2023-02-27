@@ -64,4 +64,3 @@ class PympServiceType(IntFlag):
     MEDIA_SVC = 8
     FFMPEG_SVC = 16
     MEDIAREGISTRY_SVC = 32
-    FILEUPLOAD_SVC = 64

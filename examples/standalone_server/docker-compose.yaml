@@ -42,26 +42,6 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  pymp_file_svc:
-    image: ghcr.io/tomp736/pymp/pymp_file_svc:latest-dev
-    networks:
-      - fe_api_svc
-    env_file:
-      - 'server.env'
-    ports:
-      - "8087:80"
-    volumes:
-      - /srv/media/videos:/files:rw
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 50M
-        reservations:
-          cpus: '0.5'
-          memory: 20M
-    restart: unless-stopped
-
   # Redis Services
    
   redis:

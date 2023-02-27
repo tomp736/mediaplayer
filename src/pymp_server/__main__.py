@@ -3,10 +3,10 @@ from flask import Flask
 from prometheus_client import start_http_server
 import logging
 
-from pymp_core.app.PympConfig import pymp_env
+from pymp_core.app.config import pymp_env
 from pymp_core.dto.MediaRegistry import PympServiceType
 
-from pymp_core.app.Services import media_registry_service, media_service, ffmpeg_service
+from pymp_core.app.services import MEDIA_REGISTRY_SERVICE, MEDIA_SERVICE, FFMPEG_SERVICE
 
 from pymp_server.routes.mediaregistry import app_mediaregistry
 from pymp_server.routes.media import app_media
@@ -34,16 +34,16 @@ def main():
         app.register_blueprint(app_frontend_meta)
 
     if pymp_env.is_this_service_type(PympServiceType.MEDIAREGISTRY_SVC):
-        media_registry_service.watch_services()
+        MEDIA_REGISTRY_SERVICE.watch_services()
         app.register_blueprint(app_mediaregistry)
 
     if pymp_env.is_this_service_type(PympServiceType.FFMPEG_SVC):
-        ffmpeg_service.watch_media()
+        FFMPEG_SERVICE.watch_media()
         app.register_blueprint(app_ffmpeg_meta)
         app.register_blueprint(app_ffmpeg_thumb)
 
     if pymp_env.is_this_service_type(PympServiceType.MEDIA_SVC):
-        media_service.watch_media()
+        MEDIA_SERVICE.watch_media()
         app.register_blueprint(app_media)
 
     app.run(
