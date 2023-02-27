@@ -180,7 +180,7 @@ jobs:
           fi          
           git tag -f ${{ needs.prepare.outputs.this_tag_ref }}
           git tag ${{ needs.prepare.outputs.next_version }}
-          git push origin --tags
+          git push -f origin --tags
 
   dispatch:
     runs-on: ubuntu-latest
