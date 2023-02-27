@@ -27,19 +27,6 @@ jobs:
         run: |
           echo "this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | tail -1)" >> $GITHUB_OUTPUT
       
-      # Read the branch name and set a variable to be used for image tag
-      - id: this_tag_ref
-        shell: bash
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/release/"* ]]; then
-            tag_ref="major"
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            tag_ref="minor"          
-          else
-            tag_ref="patch"
-          fi
-          echo "this_tag_ref=$tag_ref" >> $GITHUB_OUTPUT
-      
       # Increment the patch version number by one
       - id: next_version
         run: |
@@ -61,6 +48,19 @@ jobs:
           next_version="$major.$minor.$patch"
           echo "Updating version to $next_version"
           echo "next_version=$next_version" >> $GITHUB_OUTPUT
+      
+      # Read the branch name and set a variable to be used for image tag
+      - id: this_tag_ref
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/release/"* ]]; then
+            tag_ref="major"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            tag_ref="minor"          
+          else
+            tag_ref="patch"
+          fi
+          echo "this_tag_ref=$tag_ref" >> $GITHUB_OUTPUT
 
   docker-build-push:
     needs: 
@@ -137,7 +137,7 @@ jobs:
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
           tags: |
-            if [[ "${{ needs.prepare.outputs.this_tag_ref }}" == "major" ]]; then
+            if "${{ needs.prepare.outputs.this_tag_ref }}" == "major"; then
               ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
             fi
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
