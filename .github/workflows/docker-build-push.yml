@@ -1,8 +1,8 @@
 name: docker-build-push
 on: 
   push:
-    paths:
-      - 'src/**'
+    # paths:
+    #   - 'src/**'
 
 concurrency: 
   group: docker_build
