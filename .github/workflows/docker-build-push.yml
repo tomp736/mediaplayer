@@ -138,11 +138,22 @@ jobs:
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
           tags: |
-            if [[ "${{ needs.prepare.outputs.this_tag_ref }}" = "major" ]]; then
-              ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
-            fi
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.next_version }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        if: steps.this_tag_ref.outputs.image_ref = "major"
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          push: true
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
+            APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
 
   tag:
     runs-on: ubuntu-latest
