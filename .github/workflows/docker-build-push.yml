@@ -67,7 +67,7 @@ jobs:
       - prepare
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix: 
         image:
           - pymp_core
@@ -137,7 +137,7 @@ jobs:
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
           tags: |
-            if [[ "${{ steps.this_tag_ref.outputs.image_ref }}" == "major" ]]; then
+            if [[ "${{ needs.prepare.outputs.this_tag_ref }}" == "major" ]]; then
               ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
             fi
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
