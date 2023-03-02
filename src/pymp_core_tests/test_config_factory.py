@@ -33,3 +33,18 @@ class ConfigFactoryTest(unittest.TestCase):
         
         server_config = config_factory.create_server_config()
         self.assertEqual(server_config.server_roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
+        
+    def test_create_server_config_runtime(self):
+        
+        json_config_reader = MagicMock()
+        runtime_config_provider = RuntimeConfigProvider()
+        environment_config_reader = EnvironmentConfigReader()        
+        config_factory = ConfigFactory(json_config_reader, environment_config_reader, runtime_config_provider)
+        
+        server_config = config_factory.create_server_config()
+        self.assertEqual(server_config.server_roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
+        
+        runtime_config_provider.set_config(ServerConfig, "ROLES", PympServerRoles.NONE)
+        
+        server_config = config_factory.create_server_config()
+        self.assertEqual(server_config.server_roles, PympServerRoles.NONE)

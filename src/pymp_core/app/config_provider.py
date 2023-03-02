@@ -43,8 +43,8 @@ class RuntimeConfigProvider:
             thumb_chunk_size=int(self.config.get('THUMB_CHUNK_SIZE', 1048576))
         )     
     
-    def set_config(self, config_type, config_key, config_value):
-        if config_type == ServerConfig:
+    def set_config(self, config_type: type, config_key, config_value):
+        if issubclass(config_type, ServerConfig):
             self.config[f"SERVER_{config_key}"] = config_value
         else:
             raise ValueError(f"Unsupported config type: {config_type}")
