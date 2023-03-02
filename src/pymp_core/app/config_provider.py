@@ -8,9 +8,7 @@ from pymp_core.app.config import FlaskConfig, MediaConfig, PympServerRoles, Redi
 class RuntimeConfigProvider:
     
     config: Dict[str, Any] = {}
-    
-    def __init__(self):
-    
+        
     def load_config(self, **kwargs):
         for key, value in kwargs.items():
             self.config[key] = value
