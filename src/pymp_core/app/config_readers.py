@@ -45,8 +45,11 @@ class EnvironmentConfigReader:
 class JsonServiceConfigReader:
     def __init__(self, config_file_path: str) -> None:
         self.config_file_path = config_file_path
+        self.exists = os.path.exists(self.config_file_path)
 
     def load_config(self) -> List[ServiceConfig]:
-        with open(self.config_file_path, 'r', encoding='utf-8') as file_io:
-            data = json.load(file_io)
-        return [ServiceConfig(**config) for config in data]
+        if self.exists:
+            with open(self.config_file_path, 'r', encoding='utf-8') as file_io:
+                data = json.load(file_io)
+            return [ServiceConfig(**config) for config in data]
+        return []
