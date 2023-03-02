@@ -2,7 +2,7 @@ import logging
 from typing import List
 from pymp_core.abstractions.providers import DataProvider, MediaRegistryDataProvider
 from pymp_core.app.config import pymp_env
-from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import PympServerRoles
 from pymp_core.providers.MediaRegistryHttpDataProvider import MediaRegistryHttpDataProvider
 from pymp_core.providers.MediaRegistryRedisDataProvider import MediaRegistryRedisDataProvider
 
@@ -12,7 +12,7 @@ def get_media_registry_providers(wants_write_access: bool = False) -> List[Media
     media_registry_providers = []
 
     env_media_registry_service_info = pymp_env.get_service_info(
-        PympServiceType.MEDIAREGISTRY_SVC)
+        PympServerRoles.MEDIAREGISTRY_SVC)
 
     media_registry_redis_data_provider = MediaRegistryRedisDataProvider()
     if check_data_provider(wants_write_access, media_registry_redis_data_provider):

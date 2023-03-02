@@ -33,9 +33,9 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def get_service_info(self, service_id: str) -> ServiceInfo:
+    def get_service_info(self, server_id: str) -> ServiceInfo:
         registry_request = http_request_factory.get(
-            self.get_service_url(), f"/registry/service/{service_id}")
+            self.get_service_url(), f"/registry/service/{server_id}")
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
         response_json = registry_response.json()
@@ -49,7 +49,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
         session = requests.Session()
         registry_response = session.send(registry_request.prepare())
         response_json = registry_response.json()
-        return {service_id: ServiceInfo(**service_info) for service_id, service_info in response_json.items()}
+        return {server_id: ServiceInfo(**service_info) for server_id, service_info in response_json.items()}
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
@@ -66,7 +66,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
 
     @prom.prom_count_method_call
     @prom.prom_count_method_time
-    def del_service_info(self, service_id: str) -> int:
+    def del_service_info(self, server_id: str) -> int:
         raise Exception("NOT IMPLEMENETED")
 
     @prom.prom_count_method_call

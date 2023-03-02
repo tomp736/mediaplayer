@@ -103,9 +103,9 @@ class MediaMetaProvider(DataProvider):
 
 class MediaRegistryDataProvider(DataProvider):
 
-    # service_id => ServiceInfo
+    # server_id => ServiceInfo
     @abstractmethod
-    def get_service_info(self, service_id: str) -> ServiceInfo:
+    def get_service_info(self, server_id: str) -> ServiceInfo:
         pass
 
     @abstractmethod
@@ -117,7 +117,7 @@ class MediaRegistryDataProvider(DataProvider):
         pass
 
     @abstractmethod
-    def del_service_info(self, service_id: str) -> int:
+    def del_service_info(self, server_id: str) -> int:
         pass
 
     # media_id -> MediaInfo

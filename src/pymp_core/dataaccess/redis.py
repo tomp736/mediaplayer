@@ -41,12 +41,12 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
         self.expire()
         return self.redis.hset(
             self.key,
-            service_info.service_id,
+            service_info.server_id,
             service_info.to_json()
         )
 
-    def hget(self, service_id: str) -> Union[ServiceInfo, None]:
-        service_info = self.redis.hget(self.key, service_id)
+    def hget(self, server_id: str) -> Union[ServiceInfo, None]:
+        service_info = self.redis.hget(self.key, server_id)
         if service_info is not None:
             return ServiceInfo.from_json(service_info)
         return None
@@ -57,7 +57,7 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
     def hgetall(self) -> Dict[str, ServiceInfo]:
         service_infos_json = self.redis.hgetall(self.key)
         service_infos = {
-            service_id: ServiceInfo.from_json(service_info) for service_id, service_info in service_infos_json.items()
+            server_id: ServiceInfo.from_json(service_info) for server_id, service_info in service_infos_json.items()
         }
         return service_infos
 

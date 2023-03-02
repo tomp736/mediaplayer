@@ -7,11 +7,11 @@ import json
 class ServiceInfo():
 
     def __init__(self, **kwargs) -> None:
-        self.service_id = kwargs.get("service_id", "")
-        self.service_type = kwargs.get("service_type", 0)
-        self.service_proto = kwargs.get("service_proto", "")
-        self.service_host = kwargs.get("service_host", "")
-        self.service_port = kwargs.get("service_port", "")
+        self.server_id = kwargs.get("server_id", "")
+        self.server_roles = kwargs.get("server_roles", 0)
+        self.server_proto = kwargs.get("server_proto", "")
+        self.server_host = kwargs.get("server_host", "")
+        self.server_port = kwargs.get("server_port", "")
 
     def to_json(self):
         return json.dumps(
@@ -26,14 +26,14 @@ class ServiceInfo():
         return ServiceInfo(**json_dict)
 
     def is_valid(self):
-        if self.service_proto in ["http", "https"]:
+        if self.server_proto in ["http", "https"]:
             return True
         else:
             return False
 
     def get_uri(self):
-        if self.service_proto in ["http", "https"]:
-            return f"{self.service_proto}://{self.service_host}:{self.service_port}"
+        if self.server_proto in ["http", "https"]:
+            return f"{self.server_proto}://{self.server_host}:{self.server_port}"
         else:
             raise Exception(f"ServiceInfo Not Valid: {self.__dict__}")
 
@@ -42,7 +42,7 @@ class MediaInfo():
 
     def __init__(self, **kwargs) -> None:
         self.media_id = kwargs.get("media_id", "")
-        self.service_id = kwargs.get("service_id", "")
+        self.server_id = kwargs.get("server_id", "")
 
     def to_json(self):
         return json.dumps(
@@ -57,7 +57,7 @@ class MediaInfo():
         return MediaInfo(**json_dict)
 
 
-class PympServiceType(IntFlag):
+class PympServerRoles(IntFlag):
     MEDIA_API = 1
     META_API = 2
     THUMB_API = 4

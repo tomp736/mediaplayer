@@ -3,7 +3,7 @@ from typing import List
 
 from pymp_core.abstractions.providers import DataProvider, MediaDataProvider, MediaMetaProvider, MediaThumbProvider
 from pymp_core.app.config import pymp_env
-from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import PympServerRoles
 from pymp_core.providers import MediaRegistryProviderFactory
 from pymp_core.providers.MetaRedisDataProvider import MetaRedisDataProvider
 from pymp_core.providers.ThumbRedisDataProvider import ThumbRedisDataProvider
@@ -11,14 +11,14 @@ from pymp_core.providers.MediaFileDataProvider import MediaFileDataProvider
 from pymp_core.providers.MediaHttpDataProvider import MediaHttpDataProvider
 
 
-def get_data_providers(service_id, wants_write_access: bool = False) -> List[MediaDataProvider]:
+def get_data_providers(server_id, wants_write_access: bool = False) -> List[MediaDataProvider]:
     logging.info("GETTING MEDIA DATA PROVIDERS")
     media_providers = []
 
     this_service_info = pymp_env.get_this_service_info()
 
     # add local data provider
-    if PympServiceType(this_service_info.service_type) & PympServiceType.MEDIA_SVC:
+    if PympServerRoles(this_service_info.server_roles) & PympServerRoles.MEDIA_SVC:
         media_file_data_provider = MediaFileDataProvider()
         if check_data_provider(wants_write_access, media_file_data_provider):
             media_providers.append(media_file_data_provider)
@@ -27,15 +27,15 @@ def get_data_providers(service_id, wants_write_access: bool = False) -> List[Med
     else:
         media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[0]
         if media_registry_provider:
-            service_info = media_registry_provider.get_service_info(service_id)
+            service_info = media_registry_provider.get_service_info(server_id)
             if service_info and service_info.is_valid():
                 media_provider = MediaHttpDataProvider(service_info)
                 if check_data_provider(wants_write_access, media_provider):
                     media_providers.append(media_provider)
 
     # add hardcoded service
-    env_service_info = pymp_env.get_service_info(PympServiceType.MEDIA_SVC)
-    if env_service_info.is_valid() and env_service_info.service_id == service_id:
+    env_service_info = pymp_env.get_service_info(PympServerRoles.MEDIA_SVC)
+    if env_service_info.is_valid() and env_service_info.server_id == server_id:
         media_http_data_provider = MediaHttpDataProvider(env_service_info)
         if check_data_provider(wants_write_access, media_http_data_provider):
             media_providers.append(media_http_data_provider)

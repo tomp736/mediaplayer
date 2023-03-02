@@ -1,6 +1,6 @@
 
 from pymp_core.app.config import pymp_env
-from pymp_core.dto.MediaRegistry import PympServiceType
+from pymp_core.dto.MediaRegistry import PympServerRoles
 
 import logging
 from typing import List
@@ -13,13 +13,13 @@ def get_ffmpeg_providers(wants_write_access: bool = False) -> List[FfmpegDataPro
     logging.info("GETTING FFMPEG PROVIDERS")
     ffmpeg_providers = []
 
-    if pymp_env.is_this_service_type(PympServiceType.FFMPEG_SVC):
+    if pymp_env.is_this_server_roles(PympServerRoles.FFMPEG_SVC):
         ffmpeg_provider = FfmpegFileDataProvider()
         if check_data_provider(wants_write_access, ffmpeg_provider):
             ffmpeg_providers.append(ffmpeg_provider)
 
     ffmpeg_provider = FfmpegHttpDataProvider(
-        pymp_env.get_service_info(PympServiceType.FFMPEG_SVC))
+        pymp_env.get_service_info(PympServerRoles.FFMPEG_SVC))
     if check_data_provider(wants_write_access, ffmpeg_provider):
         ffmpeg_providers.append(ffmpeg_provider)
 

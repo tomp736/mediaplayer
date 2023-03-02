@@ -28,7 +28,7 @@ services:
     env_file:
       - 'server_api.env'
     environment:
-      - SERVICE_TYPE=1
+      - SERVER_ROLES=1
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
       - MEDIAREGISTRY_SVC_PORT=80
@@ -54,7 +54,7 @@ services:
     env_file:
       - 'server_api.env'
     environment:
-      - SERVICE_TYPE=4
+      - SERVER_ROLES=4
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
       - MEDIAREGISTRY_SVC_PORT=80
@@ -79,7 +79,7 @@ services:
     env_file:
       - 'server_api.env'
     environment:
-      - SERVICE_TYPE=2
+      - SERVER_ROLES=2
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
       - MEDIAREGISTRY_SVC_PORT=80
@@ -100,11 +100,11 @@ services:
   media_svc_internal:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
-      - SERVICE_TYPE=8
-      - SERVICE_ID=internal
-      - SERVICE_PROTO=http
-      - SERVICE_HOST=media_svc_internal
-      - SERVICE_PORT=80
+      - SERVER_ROLES=8
+      - SERVER_ID=internal
+      - SERVER_PROTO=http
+      - SERVER_HOST=media_svc_internal
+      - SERVER_PORT=80
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
       - MEDIAREGISTRY_SVC_PORT=80
@@ -127,11 +127,11 @@ services:
   media_svc_external:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
-      - SERVICE_TYPE=8
-      - SERVICE_ID=external
-      - SERVICE_PROTO=http
-      - SERVICE_HOST="${PYMP_HOSTNAME}"
-      - SERVICE_PORT=12001
+      - SERVER_ROLES=8
+      - SERVER_ID=external
+      - SERVER_PROTO=http
+      - SERVER_HOST="${PYMP_HOSTNAME}"
+      - SERVER_PORT=12001
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST="${PYMP_HOSTNAME}"
       - MEDIAREGISTRY_SVC_PORT=8085
@@ -156,7 +156,7 @@ services:
     env_file:
       - 'server_svc.env'
     environment:
-      - SERVICE_TYPE=32
+      - SERVER_ROLES=32
     networks:
       - media_net
       - redis_be
@@ -178,7 +178,7 @@ services:
     env_file:
       - 'server_svc.env'
     environment:
-      - SERVICE_TYPE=16
+      - SERVER_ROLES=16
       - MEDIA_SVC_HOST=media_svc_internal
       - MEDIAREGISTRY_SVC_PROTO=http
       - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc

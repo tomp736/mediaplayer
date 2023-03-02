@@ -5,8 +5,8 @@ services:
   media_svc_external:
     image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
     environment:
-      - SERVICE_TYPE=8
-      - SERVICE_ID=external
+      - SERVER_ROLES=8
+      - SERVER_ID=external
       - MEDIA_SVC_PROTO=http
       - "MEDIA_SVC_HOST=${PYMP_HOSTNAME}"
       - MEDIA_SVC_PORT=8883
