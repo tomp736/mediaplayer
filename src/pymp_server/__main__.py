@@ -25,7 +25,7 @@ def main():
     server_config = CONFIG_FACTORY.create_server_config()
     flask_config = CONFIG_FACTORY.create_flask_config()
     
-    logging.info(**server_config.__dict__)
+    logging.info(server_config.__dict__)
 
     # HOW TO DO SWITCH STATEMENT
     if server_config.server_roles & PympServerRoles.MEDIA_API:
