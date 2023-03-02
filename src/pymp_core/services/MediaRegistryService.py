@@ -1,11 +1,10 @@
 import logging
 from typing import Dict, List
 
-from pymp_core.app.config import pymp_env
+from pymp_core.app.config import PympServerRoles, pymp_env
 
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.dto.service_info import ServiceInfo
-from pymp_core.dto.media_info import PympServerRoles
 from pymp_core.dataaccess.redis import redis_media_process_queue
 
 from pymp_core.providers import MediaProviderFactory, MediaRegistryProviderFactory
