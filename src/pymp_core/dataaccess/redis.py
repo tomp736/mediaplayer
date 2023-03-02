@@ -4,18 +4,17 @@ import redis
 
 from typing import Dict, List
 from typing import Union
+from pymp_core.app.config import RedisConfig
 
-from pymp_core.app.config import pymp_env
+from pymp_core.app.config_factory import ConfigFactory
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.dto.service_info import ServiceInfo
 
 
 class RedisDataAccess(ABC):
     def __init__(self, decode_responses):
-        host = pymp_env.get("REDIS_HOST")
-        port = pymp_env.get("REDIS_PORT")
-        self.redis = redis.Redis(host=host, port=int(
-            port), db=0, decode_responses=decode_responses)
+        self.config = ConfigFactory().create_redis_config()
+        self.redis = redis.Redis(host=self.config.server_host, port=self.config.server_port, db=0, decode_responses=decode_responses)
 
     def is_redis_readonly_replica(self) -> bool:
         info = self.redis.info()

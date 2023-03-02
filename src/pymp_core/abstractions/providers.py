@@ -2,6 +2,7 @@ from abc import ABC
 from abc import abstractmethod
 
 import io
+import logging
 
 from typing import IO
 from typing import Dict
@@ -22,6 +23,17 @@ class DataProvider(ABC):
     @abstractmethod
     def is_ready(self) -> bool:
         pass
+
+    def check_data_provider(self, wants_write_access) -> bool:
+        if not self.is_ready():
+            logging.info(f"IGNORING {self.__class__}: failed ready check")
+            return False
+
+        if wants_write_access and self.is_readonly():
+            logging.info(f"IGNORING {self.__class__}: failed write_access check")
+            return False
+
+        return True
 
 
 class MediaDataProvider(DataProvider):

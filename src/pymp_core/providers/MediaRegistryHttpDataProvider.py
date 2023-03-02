@@ -5,6 +5,7 @@ from typing import Dict
 from typing import Union
 import requests
 from pymp_core.abstractions.providers import MediaRegistryDataProvider
+from pymp_core.app.config import ServiceConfig
 
 from pymp_core.dataaccess.http_request_factory import http_request_factory
 from pymp_core.decorators import prom
@@ -13,9 +14,10 @@ from pymp_core.dto.service_info import ServiceInfo
 
 
 class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
-    def __init__(self, serviceinfo: ServiceInfo):
+    
+    def __init__(self, service_config: ServiceConfig):
+        self.service_config = service_config
         self.status = True
-        self.serviceinfo = serviceinfo
         self.readonly = False
 
     def __repr__(self) -> str:
@@ -27,7 +29,7 @@ class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
         return self.readonly
 
     def get_service_url(self) -> str:
-        return self.serviceinfo.get_uri()
+        return self.service_config.get_uri()
 
     def is_ready(self) -> bool:
         return self.status

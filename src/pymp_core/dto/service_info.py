@@ -23,15 +23,3 @@ class ServiceInfo():
     def from_json(json_string):
         json_dict = json.loads(json_string)
         return ServiceInfo(**json_dict)
-
-    def is_valid(self):
-        if self.server_proto in ["http", "https"]:
-            return True
-        else:
-            return False
-
-    def get_uri(self):
-        if self.server_proto in ["http", "https"]:
-            return f"{self.server_proto}://{self.server_host}:{self.server_port}"
-        else:
-            raise Exception(f"ServiceInfo Not Valid: {self.__dict__}")
