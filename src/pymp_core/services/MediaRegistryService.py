@@ -1,7 +1,6 @@
 import logging
-from typing import Dict, List
 
-from pymp_core.app.config import PympServerRoles, ServiceConfig
+from pymp_core.app.config import PympServerRoles, ServerConfig
 
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.dto.service_info import ServiceInfo
@@ -15,8 +14,8 @@ from pymp_core.decorators import prom
 
 class MediaRegistryService():
     
-    def __init__(self, service_config: ServiceConfig):
-        self.service_config = service_config
+    def __init__(self, server_config: ServerConfig):
+        self.server_config = server_config
         self.timer = RepeatTimer(60, self.update_media_services)
 
     def __repr__(self) -> str:
@@ -50,7 +49,7 @@ class MediaRegistryService():
 
     def update_media_services(self):
         media_registry_provider = self.get_media_registry_provider()
-        if not self.service_config.service_roles & PympServerRoles.MEDIAREGISTRY_SVC:
+        if not self.server_config.server_roles & PympServerRoles.MEDIAREGISTRY_SVC:
             return
 
         media_service = media_registry_provider.get_all_service_info()

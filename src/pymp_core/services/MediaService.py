@@ -3,7 +3,7 @@ from typing import IO, List
 from typing import Union
 import io
 
-from pymp_core.app.config import PympServerRoles, ServiceConfig
+from pymp_core.app.config import PympServerRoles, ServerConfig
 
 from pymp_core.abstractions.providers import MediaChunk
 from pymp_core.abstractions.providers import MediaDataProvider
@@ -16,8 +16,8 @@ from pymp_core.decorators import prom
 
 class MediaService:
     
-    def __init__(self, service_config: ServiceConfig):
-        self.service_config = service_config
+    def __init__(self, server_config: ServerConfig):
+        self.server_config = server_config
         self.register_timer = RepeatTimer(60, self.register)
 
     def __repr__(self) -> str:
@@ -63,8 +63,8 @@ class MediaService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def get_media_ids(self) -> List[str]:
-        if self.service_config.service_roles & PympServerRoles.MEDIA_SVC:
-            media_provider = MediaProviderFactory.get_data_providers(self.service_config.service_id)[0]
+        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
+            media_provider = MediaProviderFactory.get_data_providers(self.server_config.server_id)[0]
             return media_provider.get_media_ids()
         return []
 
@@ -74,13 +74,13 @@ class MediaService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def update_index(self) -> None:
-        if self.service_config.service_roles & PympServerRoles.MEDIA_SVC:
-            media_provider = MediaProviderFactory.get_data_providers(self.service_config.service_id)[0]
+        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
+            media_provider = MediaProviderFactory.get_data_providers(self.server_config.server_id)[0]
             media_provider.update_index()
 
     def register(self) -> ServiceInfo:
-        service_info = ServiceInfo(**self.service_config.__dict__)
-        if self.service_config.service_roles & PympServerRoles.MEDIA_SVC:
+        service_info = ServiceInfo(**self.server_config.__dict__)
+        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
             self.update_index()
             media_registry_providers = MediaRegistryProviderFactory.get_media_registry_providers(True)
             if len(media_registry_providers) == 0:

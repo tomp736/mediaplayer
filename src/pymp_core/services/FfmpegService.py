@@ -3,13 +3,13 @@ from typing import List
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.providers import FfmpegProviderFactory, MediaProviderFactory
 from pymp_core.utils.RepeatTimer import RepeatTimer
-from pymp_core.app.config import PympServerRoles, ServiceConfig
+from pymp_core.app.config import PympServerRoles, ServerConfig
 from pymp_core.dataaccess.redis import redis_media_process_queue
 from pymp_core.decorators import prom
 
 class FfmpegService:    
-    def __init__(self, service_config: ServiceConfig):
-        self.service_config = service_config
+    def __init__(self, server_config: ServerConfig):
+        self.server_config = server_config
         self.timer = RepeatTimer(60, self.process_media_services)
 
     def __repr__(self) -> str:
@@ -21,7 +21,7 @@ class FfmpegService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def process_media_services(self):
-        if self.service_config.service_roles & PympServerRoles.FFMPEG_SVC:
+        if self.server_config.server_roles & PympServerRoles.FFMPEG_SVC:
             media_infos = redis_media_process_queue.rpop()
             while media_infos:
                 for media_info in media_infos:
