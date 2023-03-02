@@ -8,7 +8,8 @@ from pymp_core.abstractions.providers import MediaRegistryDataProvider
 
 from pymp_core.dataaccess.http_request_factory import http_request_factory
 from pymp_core.decorators import prom
-from pymp_core.dto.media_info import MediaInfo, ServiceInfo
+from pymp_core.dto.media_info import MediaInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 
 class MediaRegistryHttpDataProvider(MediaRegistryDataProvider):
