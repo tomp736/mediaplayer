@@ -6,7 +6,8 @@ from flask import request
 from flask import Blueprint
 
 from pymp_core.app.services import MEDIA_REGISTRY_SERVICE
-from pymp_core.dto.media_info import MediaInfo, ServiceInfo
+from pymp_core.dto.media_info import MediaInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 app_mediaregistry = Blueprint('app_mediaregistry', __name__)
 
