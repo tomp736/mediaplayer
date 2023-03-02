@@ -18,7 +18,8 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
     # configure self
     server_config = CONFIG_FACTORY.create_server_config()    
     if server_config.server_roles & PympServerRoles.MEDIA_SVC:
-        media_file_data_provider = MediaFileDataProvider()
+        media_config = CONFIG_FACTORY.create_media_config()    
+        media_file_data_provider = MediaFileDataProvider(media_config)
         if media_file_data_provider.check_data_provider(wants_write_access):
             media_providers.append(media_file_data_provider)
 

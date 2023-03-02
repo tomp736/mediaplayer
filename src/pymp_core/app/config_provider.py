@@ -39,8 +39,8 @@ class RuntimeConfigProvider:
         return MediaConfig(
             media_path=self.config.get('MEDIA_PATH', '/var/media'),
             index_path=self.config.get('INDEX_PATH', '/var/index'),
-            media_chunk_size=int(self.config.get('MEDIA_CHUNK_SIZE', 1024)),
-            thumb_chunk_size=int(self.config.get('THUMB_CHUNK_SIZE', 512))
+            media_chunk_size=int(self.config.get('MEDIA_CHUNK_SIZE', 4194304)),
+            thumb_chunk_size=int(self.config.get('THUMB_CHUNK_SIZE', 1048576))
         )     
     
     def set_config(self, config_type, config_key, config_value):
