@@ -9,9 +9,9 @@ class RuntimeConfigProvider:
     
     config: Dict[str, Any] = {}
         
-    def load_config(self, **kwargs):
+    def load_config(self, prefix: str, **kwargs):
         for key, value in kwargs.items():
-            self.config[key] = value        
+            self.config[f"{prefix}{key}".upper()] = value        
 
     def create_server_config(self) -> ServerConfig:
         return ServerConfig(

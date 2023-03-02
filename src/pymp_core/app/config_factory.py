@@ -17,13 +17,13 @@ class ConfigFactory:
         self.load_environment_configs()
 
     def load_environment_configs(self):
-        self.runtime_config_provider.load_config(
+        self.runtime_config_provider.load_config("",
             **self.environment_config_reader.load_config(ServerConfig).__dict__)
-        self.runtime_config_provider.load_config(
+        self.runtime_config_provider.load_config("FLASK_",
             **self.environment_config_reader.load_config(FlaskConfig).__dict__)
-        self.runtime_config_provider.load_config(
+        self.runtime_config_provider.load_config("REDIS_",
             **self.environment_config_reader.load_config(RedisConfig).__dict__)
-        self.runtime_config_provider.load_config(
+        self.runtime_config_provider.load_config("",
             **self.environment_config_reader.load_config(MediaConfig).__dict__)
 
     def create_server_config(self) -> ServerConfig:
