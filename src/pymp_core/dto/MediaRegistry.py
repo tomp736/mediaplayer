@@ -58,9 +58,10 @@ class MediaInfo():
 
 
 class PympServerRoles(IntFlag):
-    MEDIA_API = 1
-    META_API = 2
-    THUMB_API = 4
-    MEDIA_SVC = 8
-    FFMPEG_SVC = 16
-    MEDIAREGISTRY_SVC = 32
+    NONE = 1
+    MEDIA_API = 2
+    META_API = 4
+    THUMB_API = 8
+    MEDIA_SVC = 16
+    FFMPEG_SVC = 32
+    MEDIAREGISTRY_SVC = 64
