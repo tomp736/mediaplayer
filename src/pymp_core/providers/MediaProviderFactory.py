@@ -3,7 +3,7 @@ from typing import List
 
 from pymp_core.abstractions.providers import DataProvider, MediaDataProvider, MediaMetaProvider, MediaThumbProvider
 from pymp_core.app.config import PympServerRoles, ServiceConfig
-from pymp_core.app.config_factory import ConfigFactory
+from pymp_core.app.config_factory import CONFIG_FACTORY, ConfigFactory
 from pymp_core.providers import MediaRegistryProviderFactory
 from pymp_core.providers.MetaRedisDataProvider import MetaRedisDataProvider
 from pymp_core.providers.ThumbRedisDataProvider import ThumbRedisDataProvider
@@ -16,14 +16,14 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
     media_providers = []
 
     # configure self
-    server_config = ConfigFactory().create_server_config()    
+    server_config = CONFIG_FACTORY.create_server_config()    
     if server_config.server_roles & PympServerRoles.MEDIA_SVC:
         media_file_data_provider = MediaFileDataProvider()
         if media_file_data_provider.check_data_provider(wants_write_access):
             media_providers.append(media_file_data_provider)
 
     # add hardcoded services
-    service_configs = ConfigFactory().create_service_configs()  
+    service_configs = CONFIG_FACTORY.create_service_configs()  
     for service_config in service_configs:
         if service_config.service_roles & PympServerRoles.FFMPEG_SVC:    
             if service_config.is_valid() and service_config.service_id == service_id:

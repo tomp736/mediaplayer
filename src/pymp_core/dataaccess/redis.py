@@ -6,14 +6,14 @@ from typing import Dict, List
 from typing import Union
 from pymp_core.app.config import RedisConfig
 
-from pymp_core.app.config_factory import ConfigFactory
+from pymp_core.app.config_factory import CONFIG_FACTORY
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.dto.service_info import ServiceInfo
 
 
 class RedisDataAccess(ABC):
     def __init__(self, decode_responses):
-        self.config = ConfigFactory().create_redis_config()
+        self.config = CONFIG_FACTORY.create_redis_config()
         self.redis = redis.Redis(host=self.config.server_host, port=self.config.server_port, db=0, decode_responses=decode_responses)
 
     def is_redis_readonly_replica(self) -> bool:
