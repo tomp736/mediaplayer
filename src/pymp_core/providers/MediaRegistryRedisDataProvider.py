@@ -9,7 +9,7 @@ from pymp_core.dataaccess.redis import redis_service_info
 from pymp_core.dataaccess.redis import redis_media_info
 from pymp_core.decorators import prom
 
-from pymp_core.dto.MediaRegistry import MediaInfo, ServiceInfo
+from pymp_core.dto.media_info import MediaInfo, ServiceInfo
 
 
 class MediaRegistryRedisDataProvider(MediaRegistryDataProvider):

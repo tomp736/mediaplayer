@@ -8,7 +8,7 @@ import requests
 from pymp_core.decorators import prom
 
 
-from pymp_core.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 from pymp_core.dataaccess.http_request_factory import http_request_factory
 from pymp_core.abstractions.providers import MediaDataProvider

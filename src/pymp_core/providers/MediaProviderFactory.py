@@ -2,8 +2,7 @@ import logging
 from typing import List
 
 from pymp_core.abstractions.providers import DataProvider, MediaDataProvider, MediaMetaProvider, MediaThumbProvider
-from pymp_core.app.config import pymp_env
-from pymp_core.dto.MediaRegistry import PympServerRoles
+from pymp_core.app.config import PympServerRoles, pymp_env
 from pymp_core.providers import MediaRegistryProviderFactory
 from pymp_core.providers.MetaRedisDataProvider import MetaRedisDataProvider
 from pymp_core.providers.ThumbRedisDataProvider import ThumbRedisDataProvider

@@ -6,8 +6,8 @@ from typing import Dict, List
 from typing import Union
 
 from pymp_core.app.config import pymp_env
-from pymp_core.dto.MediaRegistry import MediaInfo
-from pymp_core.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.media_info import MediaInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 
 class RedisDataAccess(ABC):

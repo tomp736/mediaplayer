@@ -1,7 +1,7 @@
+from enum import IntFlag
 import os
 
-from pymp_core.dto.MediaRegistry import PympServerRoles
-from pymp_core.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 FLASK_RUN_HOST="0.0.0.0"
 FLASK_RUN_PORT="80"
@@ -18,7 +18,15 @@ CORS_HEADER="*"
 MEDIA_CHUNK_SIZE=2 ** 22
 THUMB_CHUNK_SIZE=2 ** 10
 
-
+class PympServerRoles(IntFlag):
+    NONE = 1
+    MEDIA_API = 2
+    META_API = 4
+    THUMB_API = 8
+    MEDIA_SVC = 16
+    FFMPEG_SVC = 32
+    MEDIAREGISTRY_SVC = 64
+    
 class PympEnv:
 
     def __init__(self):
@@ -95,6 +103,5 @@ class PympEnv:
         service_info.server_host = self.get("SERVER_HOST")
         service_info.server_port = self.get("SERVER_PORT")
         return service_info
-
 
 pymp_env = PympEnv()

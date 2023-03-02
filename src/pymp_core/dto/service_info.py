@@ -1,6 +1,5 @@
 
 
-from enum import IntFlag
 import json
 
 
@@ -36,32 +35,3 @@ class ServiceInfo():
             return f"{self.server_proto}://{self.server_host}:{self.server_port}"
         else:
             raise Exception(f"ServiceInfo Not Valid: {self.__dict__}")
-
-
-class MediaInfo():
-
-    def __init__(self, **kwargs) -> None:
-        self.media_id = kwargs.get("media_id", "")
-        self.server_id = kwargs.get("server_id", "")
-
-    def to_json(self):
-        return json.dumps(
-            self,
-            default=lambda o: o.__dict__,
-            sort_keys=True,
-            indent=4)
-
-    @staticmethod
-    def from_json(json_string):
-        json_dict = json.loads(json_string)
-        return MediaInfo(**json_dict)
-
-
-class PympServerRoles(IntFlag):
-    NONE = 1
-    MEDIA_API = 2
-    META_API = 4
-    THUMB_API = 8
-    MEDIA_SVC = 16
-    FFMPEG_SVC = 32
-    MEDIAREGISTRY_SVC = 64

@@ -5,7 +5,7 @@ from typing import Union
 from pymp_core.abstractions.providers import FfmpegDataProvider
 from pymp_core.decorators import prom
 
-from pymp_core.dto.MediaRegistry import ServiceInfo
+from pymp_core.dto.service_info import ServiceInfo
 
 
 class FfmpegHttpDataProvider(FfmpegDataProvider):

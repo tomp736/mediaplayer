@@ -3,9 +3,7 @@ from typing import IO, List
 from typing import Union
 import io
 
-from pymp_core.app.config import pymp_env
-
-from pymp_core.dto.MediaRegistry import PympServerRoles
+from pymp_core.app.config import PympServerRoles, pymp_env
 
 from pymp_core.abstractions.providers import MediaChunk
 from pymp_core.abstractions.providers import MediaDataProvider
