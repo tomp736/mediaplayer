@@ -131,7 +131,7 @@ class MediaRegistryService():
         registry_media_infos = media_registry_provider.get_all_media_info()
         registry_service_infos = media_registry_provider.get_all_service_info()
         
-        server_ids = [service_info.server_id for _, service_info in registry_service_infos.items()]
+        server_ids = [service_info.id for _, service_info in registry_service_infos.items()]
 
         hanging_media_ids = []
         for registry_media_id in registry_media_infos:
