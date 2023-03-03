@@ -28,7 +28,7 @@ class ConfigFactoryTest(unittest.TestCase):
         runtime_config_source = RuntimeConfigSource()
         environment_config_source = EnvironmentConfigSource()
         
-        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source], [])
         
         server_config = config_factory.get_server_config()
         self.assertEqual(server_config.roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
@@ -38,7 +38,7 @@ class ConfigFactoryTest(unittest.TestCase):
         runtime_config_source = RuntimeConfigSource()
         environment_config_source = EnvironmentConfigSource()
         
-        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source], [])
         
         server_config = config_factory.get_server_config()
         self.assertEqual(server_config.roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
@@ -53,7 +53,7 @@ class ConfigFactoryTest(unittest.TestCase):
         runtime_config_source = RuntimeConfigSource()
         environment_config_source = EnvironmentConfigSource()  
                 
-        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source], [])
         
         server_config = config_factory.get_server_config()
         self.assertEqual(server_config.id, "test_server")
