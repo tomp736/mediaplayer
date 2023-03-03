@@ -89,8 +89,8 @@ jobs:
             base-image-tag: ''
         include:
           - image: pymp_core
-            base-image: registry.hub.docker.com/library/python:3.9-slim-buster
-            base-image-tag: latest
+            base-image: registry.hub.docker.com/library/python
+            base-image-tag: 3.9-slim-buster
           - image: pymp_server
             base-image: ghcr.io/tomp736/pymp/pymp_core
             base-image-tag: ${{ needs.prepare.outputs.next_version }}
