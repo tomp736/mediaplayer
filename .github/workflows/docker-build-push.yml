@@ -130,7 +130,25 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - 
+        name: Build - targeting test
+        uses: docker/build-push-action@v3
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: test
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
+            APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:test
+      - 
+        name: Build - targeting final and push
         uses: docker/build-push-action@v3
         with:
           context: ./src
@@ -138,6 +156,7 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          target: final
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
