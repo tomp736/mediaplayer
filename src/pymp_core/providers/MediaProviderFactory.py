@@ -26,7 +26,7 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
     # add hardcoded services
     service_configs = CONFIG_FACTORY.get_service_configs()  
     for service_config in service_configs:
-        if service_config.roles & PympServerRoles.FFMPEG_SVC:    
+        if service_config.roles & PympServerRoles.MEDIA_SVC:    
             if service_config.is_valid() and service_config.id == service_id:
                 media_http_data_provider = MediaHttpDataProvider(service_config)
                 if media_http_data_provider.check_data_provider(wants_write_access):
