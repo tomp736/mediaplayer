@@ -1,13 +1,5 @@
-ARG BASE_IMAGE=registry.hub.docker.com/library/python:3.9-slim-buster
-
+ARG BASE_IMAGE=ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
 FROM $BASE_IMAGE as base
-
-RUN --mount=type=cache,target=/var/cache/apt \
-    apt-get update \
-    && apt-get install -y --no-install-recommends build-essential gcc ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --upgrade pip
 
 FROM base as build
 WORKDIR /src
