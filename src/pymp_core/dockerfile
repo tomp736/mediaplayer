@@ -1,12 +1,34 @@
-ARG BASE_IMAGE=ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
-FROM $BASE_IMAGE
-
+ARG BASE_IMAGE=python:3.8-slim
 ARG APP_BUILD_VERSION
+
+FROM $BASE_IMAGE as base
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential gcc ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --upgrade pip
+
+FROM base as build
+WORKDIR /src
+
 ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
 
-COPY ./pymp_core/ ./pymp_core
-RUN pip3 install ./pymp_core
+COPY ./pymp_core/requirements.txt ./pymp_core/
+RUN pip3 install --no-cache-dir -r ./pymp_core/requirements.txt 
 
-COPY ./pymp_core_tests/ ./pymp_core_tests/
-RUN pip3 install -r ./pymp_core_tests/requirements.txt
-RUN pytest ./pymp_core_tests/
+COPY ./pymp_core/ ./pymp_core
+RUN pip3 install --no-cache-dir ./pymp_core
+
+FROM build as test
+WORKDIR /src
+
+COPY ./pymp_core_tests/requirements.txt ./pymp_core_tests/
+RUN pip3 install --no-cache-dir -r ./pymp_core_tests/requirements.txt 
+
+COPY ./pymp_core_tests/ ./pymp_core_tests
+RUN pytest ./pymp_core_tests
+
+
+FROM build as final
+WORKDIR /src

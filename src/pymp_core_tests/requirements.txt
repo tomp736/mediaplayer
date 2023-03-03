@@ -1,3 +1,2 @@
 pymp_core
 pytest
-parameterized
