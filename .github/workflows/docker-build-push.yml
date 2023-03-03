@@ -136,6 +136,8 @@ jobs:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
