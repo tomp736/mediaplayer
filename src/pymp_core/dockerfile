@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=python:3.8-slim
+ARG BASE_IMAGE=python:3.9-slim
 ARG APP_BUILD_VERSION
 
 FROM $BASE_IMAGE as base

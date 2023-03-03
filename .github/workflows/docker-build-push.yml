@@ -89,7 +89,7 @@ jobs:
             base-image-tag: ''
         include:
           - image: pymp_core
-            base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
+            base-image: python:3.9-slim
             base-image-tag: latest
           - image: pymp_server
             base-image: ghcr.io/tomp736/pymp/pymp_core
