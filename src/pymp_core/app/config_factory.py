@@ -9,10 +9,11 @@ class ConfigFactory:
     
     _config_sources: List[IConfigSource] = []
     _config_builder: ConfigBuilder = ConfigBuilder()
-    _json_config_reader: JsonServiceConfigReader = JsonServiceConfigReader("/app/services_config.json")
+    _service_readers: List[JsonServiceConfigReader] = []
     
-    def __init__(self, config_sources) -> None:
+    def __init__(self, config_sources, service_readers) -> None:
         self._config_sources = config_sources
+        self._service_readers = service_readers
         
     def get_server_config(self) -> ServerConfig:
         config = ServerConfig()
@@ -39,9 +40,14 @@ class ConfigFactory:
         return config
 
     def get_service_configs(self) -> List[ServiceConfig]:
-        return cast(List[ServiceConfig], self._json_config_reader.load_config())
+        configs: List[ServiceConfig] = []
+        for service_reader in self._service_readers:
+            configs += service_reader.load_config()
+        return configs
     
 CONFIG_FACTORY = ConfigFactory([
     EnvironmentConfigSource(),
     RuntimeConfigSource()
+], [
+    JsonServiceConfigReader("/app/registry-services.json")
 ])
