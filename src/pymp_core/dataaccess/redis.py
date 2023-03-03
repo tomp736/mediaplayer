@@ -13,8 +13,8 @@ from pymp_core.dto.service_info import ServiceInfo
 
 class RedisDataAccess(ABC):
     def __init__(self, decode_responses):
-        self.config = CONFIG_FACTORY.create_redis_config()
-        self.redis = redis.Redis(host=self.config.server_host, port=self.config.server_port, db=0, decode_responses=decode_responses)
+        self.config = CONFIG_FACTORY.get_flask_config()
+        self.redis = redis.Redis(host=self.config.host, port=self.config.port, db=0, decode_responses=decode_responses)
 
     def is_redis_readonly_replica(self) -> bool:
         info = self.redis.info()

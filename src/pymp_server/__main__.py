@@ -22,31 +22,31 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     start_http_server(8000)
     
-    server_config = CONFIG_FACTORY.create_server_config()
-    flask_config = CONFIG_FACTORY.create_flask_config()
+    server_config = CONFIG_FACTORY.get_server_config()
+    flask_config = CONFIG_FACTORY.get_flask_config()
     
     logging.info(server_config.__dict__)
 
     # HOW TO DO SWITCH STATEMENT
-    if server_config.server_roles & PympServerRoles.MEDIA_API:
+    if server_config.roles & PympServerRoles.MEDIA_API:
         app.register_blueprint(app_frontend_media)
 
-    if server_config.server_roles & PympServerRoles.THUMB_API:
+    if server_config.roles & PympServerRoles.THUMB_API:
         app.register_blueprint(app_frontend_thumb)
 
-    if server_config.server_roles & PympServerRoles.META_API:
+    if server_config.roles & PympServerRoles.META_API:
         app.register_blueprint(app_frontend_meta)
 
-    if server_config.server_roles & PympServerRoles.MEDIAREGISTRY_SVC:
+    if server_config.roles & PympServerRoles.MEDIAREGISTRY_SVC:
         MEDIA_REGISTRY_SERVICE.watch_services()
         app.register_blueprint(app_mediaregistry)
 
-    if server_config.server_roles & PympServerRoles.FFMPEG_SVC:
+    if server_config.roles & PympServerRoles.FFMPEG_SVC:
         FFMPEG_SERVICE.watch_media()
         app.register_blueprint(app_ffmpeg_meta)
         app.register_blueprint(app_ffmpeg_thumb)
 
-    if server_config.server_roles & PympServerRoles.MEDIA_SVC:
+    if server_config.roles & PympServerRoles.MEDIA_SVC:
         MEDIA_SERVICE.watch_media()
         app.register_blueprint(app_media)
 

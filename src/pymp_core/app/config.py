@@ -1,4 +1,6 @@
+from abc import abstractmethod, abstractproperty
 from enum import IntFlag
+from typing import Dict
 
 
 class PympServerRoles(IntFlag):
@@ -12,69 +14,113 @@ class PympServerRoles(IntFlag):
 
 
 class IConfig():
-    pass
+
+    @abstractmethod
+    def load(self, kwargs):
+        pass
+
+    @abstractmethod
+    def load_config(self, config: Dict[str, str]):
+        pass
 
 
 class FlaskConfig(IConfig):
+    
     host: str
     port: int
     cors_headers: str
 
     def __init__(self, **kwargs) -> None:
-        self.host = kwargs.get('host', '0.0.0.0')
-        self.port = kwargs.get('port', 80)
-        self.cors_headers = kwargs.get('cors_headers', '*')
+        self.load(kwargs)
+    
+    def load(self, kwargs):
+        self.host = kwargs.get('host', self.host)
+        self.port = kwargs.get('port', self.port)
+        self.cors_headers = kwargs.get('cors_headers', self.cors_headers)
 
+    def load_config(self, config: Dict[str, str]):
+        self.host = config.get('host', self.host)
+        self.port = int(config.get('port', self.port))
+        self.cors_headers = config.get('cors_headers', self.cors_headers)
 
 class ServerConfig(IConfig):
-    server_id: str
-    server_roles: PympServerRoles
-    server_host: str
-    server_proto: str
-    server_port: int
+    
+    id: str = ""
+    roles: PympServerRoles = PympServerRoles.NONE
+    host: str = ""
+    proto: str = "http"
+    port: int = 80
 
     def __init__(self, **kwargs) -> None:
-        self.server_id = kwargs.get('server_id', 'DEFAULT')
-        self.server_roles = kwargs.get('server_roles', PympServerRoles.NONE)
-        self.server_host = kwargs.get('server_host', 'localhost')
-        self.server_proto = kwargs.get('server_proto', 'http')
-        self.server_port = kwargs.get('server_port', 80)
+        self.load(kwargs)
+
+    def load(self, kwargs):
+        self.id = kwargs.get('id', self.id)
+        self.roles = kwargs.get('roles', self.roles)
+        self.proto = kwargs.get('proto', self.proto)
+        self.host = kwargs.get('host', self.host)
+        self.port = kwargs.get('port', self.port)
+
+    def load_config(self, config: Dict[str, str]):
+        self.id = config.get('id', self.id)
+        self.roles = PympServerRoles(int(config.get('roles', self.roles)))
+        self.proto = config.get('proto', self.proto)
+        self.host = config.get('host', self.host)
+        self.port = int(config.get('port', self.port))
 
 
 class ServiceConfig(IConfig):
-    service_id: str
-    service_roles: PympServerRoles
-    service_host: str
-    service_proto: str
-    service_port: int
+    
+    id: str = ""
+    roles: PympServerRoles = PympServerRoles.NONE
+    host: str = ""
+    proto: str = "http"
+    port: int = 80
 
     def __init__(self, **kwargs) -> None:
-        self.service_id = kwargs.get('service_id', 'DEFAULT')
-        self.service_roles = kwargs.get('service_roles', PympServerRoles.NONE)
-        self.service_host = kwargs.get('service_host', 'localhost')
-        self.service_proto = kwargs.get('service_proto', 'http')
-        self.service_port = kwargs.get('service_port', 80)
+        self.load(kwargs)
+
+    def load(self, kwargs):
+        self.id = kwargs.get('id', self.id)
+        self.roles = kwargs.get('roles', self.roles)
+        self.proto = kwargs.get('proto', self.proto)
+        self.host = kwargs.get('host', self.host)
+        self.port = kwargs.get('port', self.port)
+
+    def load_config(self, config: Dict[str, str]):
+        self.id = config.get('id', self.id)
+        self.roles = PympServerRoles(int(config.get('roles', self.roles)))
+        self.proto = config.get('proto', self.proto)
+        self.host = config.get('host', self.host)
+        self.port = int(config.get('port', self.port))
 
     def is_valid(self):
-        if self.service_proto in ["http", "https"]:
+        if self.proto in ["http", "https"]:
             return True
         else:
             return False
 
     def get_uri(self):
-        if self.service_proto in ["http", "https"]:
-            return f"{self.service_proto}://{self.service_host}:{self.service_port}"
+        if self.proto in ["http", "https"]:
+            return f"{self.proto}://{self.host}:{self.port}"
         else:
             raise Exception(f"ServiceInfo Not Valid: {self.__dict__}")
 
 
 class RedisConfig(IConfig):
-    server_host: str
-    server_port: int
+    host: str
+    port: int
 
     def __init__(self, **kwargs) -> None:
-        self.server_host = kwargs.get('server_host', 'localhost')
-        self.server_port = kwargs.get('server_port', '2379')
+        self.load(kwargs)
+
+    def load(self, kwargs):
+        self.host = kwargs.get('host', self.host)
+        self.port = kwargs.get('port', self.port)
+
+    def load_config(self, config: Dict[str, str]):
+        self.host = config.get('host', self.host)
+        self.port = int(config.get('port', self.port))
 
 
 class MediaConfig(IConfig):
@@ -84,7 +130,16 @@ class MediaConfig(IConfig):
     thumb_chunk_size: int
 
     def __init__(self, **kwargs) -> None:
-        self.media_path = kwargs.get('media_path', '/var/media')
-        self.index_path = kwargs.get('index_path', '/var/index')
-        self.media_chunk_size = kwargs.get('media_chunk_size', 2 ** 22)
-        self.thumb_chunk_size = kwargs.get('thumb_chunk_size', 2 ** 10)
+        self.load(kwargs)
+
+    def load(self, kwargs):
+        self.media_path = kwargs.get('media_path', self.media_path)
+        self.index_path = kwargs.get('index_path', self.index_path)
+        self.media_chunk_size = kwargs.get('media_chunk_size', self.media_chunk_size)
+        self.thumb_chunk_size = kwargs.get('thumb_chunk_size', self.thumb_chunk_size)
+
+    def load_config(self, config: Dict[str, str]):
+        self.media_path = config.get('media_path', self.media_path)
+        self.index_path = config.get('index_path', self.index_path)
+        self.media_chunk_size = int(config.get('media_chunk_size', self.media_chunk_size))
+        self.thumb_chunk_size = int(config.get('thumb_chunk_size', self.thumb_chunk_size))

@@ -18,16 +18,16 @@ def get_ffmpeg_providers(wants_write_access: bool = False) -> List[FfmpegDataPro
     ffmpeg_providers = []
     
     # configure self
-    server_config = CONFIG_FACTORY.create_server_config()
-    if server_config.server_roles & PympServerRoles.FFMPEG_SVC:
+    server_config = CONFIG_FACTORY.get_server_config()
+    if server_config.roles & PympServerRoles.FFMPEG_SVC:
         ffmpeg_provider = FfmpegFileDataProvider()
         if ffmpeg_provider.check_data_provider(wants_write_access):
             ffmpeg_providers.append(ffmpeg_provider)
 
     # configure hardcoded services
-    service_configs = CONFIG_FACTORY.create_service_configs()    
+    service_configs = CONFIG_FACTORY.get_service_configs()    
     for service_config in service_configs:
-        if service_config.service_roles & PympServerRoles.FFMPEG_SVC:
+        if service_config.roles & PympServerRoles.FFMPEG_SVC:
             ffmpeg_provider = FfmpegHttpDataProvider(service_config)
             if ffmpeg_provider.check_data_provider(wants_write_access):
                 ffmpeg_providers.append(ffmpeg_provider)

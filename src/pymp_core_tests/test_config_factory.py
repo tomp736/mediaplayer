@@ -3,10 +3,9 @@ import os
 import unittest
 from unittest.mock import MagicMock
 
-from pymp_core.app.config import PympServerRoles, ServerConfig
+from pymp_core.app.config import PympServerRoles
 from pymp_core.app.config_factory import ConfigFactory
-from pymp_core.app.config_provider import RuntimeConfigProvider
-from pymp_core.app.config_readers import EnvironmentConfigReader
+from pymp_core.app.config_source import EnvironmentConfigSource, RuntimeConfigSource
 
 
 class ConfigFactoryTest(unittest.TestCase):
@@ -25,41 +24,41 @@ class ConfigFactoryTest(unittest.TestCase):
         del os.environ['SERVER_PORT']
         
     def test_create_server_config(self):
-        json_config_reader = MagicMock()
-        runtime_config_provider = RuntimeConfigProvider()
-        environment_config_reader = EnvironmentConfigReader()
         
-        config_factory = ConfigFactory(json_config_reader, environment_config_reader, runtime_config_provider)
+        runtime_config_source = RuntimeConfigSource()
+        environment_config_source = EnvironmentConfigSource()
         
-        server_config = config_factory.create_server_config()
-        self.assertEqual(server_config.server_roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
+        
+        server_config = config_factory.get_server_config()
+        self.assertEqual(server_config.roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
         
     def test_create_server_config_runtime_update_server_role(self):
         
-        json_config_reader = MagicMock()
-        runtime_config_provider = RuntimeConfigProvider()
-        environment_config_reader = EnvironmentConfigReader()        
-        config_factory = ConfigFactory(json_config_reader, environment_config_reader, runtime_config_provider)
+        runtime_config_source = RuntimeConfigSource()
+        environment_config_source = EnvironmentConfigSource()
         
-        server_config = config_factory.create_server_config()
-        self.assertEqual(server_config.server_roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
         
-        runtime_config_provider.set_config(ServerConfig, "ROLES", PympServerRoles.NONE)
+        server_config = config_factory.get_server_config()
+        self.assertEqual(server_config.roles, PympServerRoles.MEDIA_API | PympServerRoles.META_API | PympServerRoles.THUMB_API | PympServerRoles.MEDIA_SVC)
         
-        server_config = config_factory.create_server_config()
-        self.assertEqual(server_config.server_roles, PympServerRoles.NONE)
+        runtime_config_source.set_value("SERVER_ROLES", PympServerRoles.NONE)
+        
+        server_config = config_factory.get_server_config()
+        self.assertEqual(server_config.roles, PympServerRoles.NONE)
         
     def test_create_server_config_runtime_update_server_id(self):
+                
+        runtime_config_source = RuntimeConfigSource()
+        environment_config_source = EnvironmentConfigSource()  
+                
+        config_factory = ConfigFactory([environment_config_source, runtime_config_source])
         
-        json_config_reader = MagicMock()
-        runtime_config_provider = RuntimeConfigProvider()
-        environment_config_reader = EnvironmentConfigReader()        
-        config_factory = ConfigFactory(json_config_reader, environment_config_reader, runtime_config_provider)
+        server_config = config_factory.get_server_config()
+        self.assertEqual(server_config.id, "test_server")
         
-        server_config = config_factory.create_server_config()
-        self.assertEqual(server_config.server_id, "test_server")
+        runtime_config_source.set_value("SERVER_ID", "NEWID")
         
-        runtime_config_provider.set_config(ServerConfig, "ID", "NEWID")
-        
-        server_config = config_factory.create_server_config()
-        self.assertEqual(server_config.server_id, "NEWID")
+        server_config = config_factory.get_server_config()
+        self.assertEqual(server_config.id, "NEWID")

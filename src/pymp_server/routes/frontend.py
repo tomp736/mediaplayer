@@ -59,7 +59,7 @@ def get_media_thumb(media_id):
 @app_frontend_media.after_request
 @app_frontend_thumb.after_request
 def after_request(response):
-    flask_config = CONFIG_FACTORY.create_flask_config()
+    flask_config = CONFIG_FACTORY.get_flask_config()
     response.headers.set('Accept-Ranges', 'bytes')
     response.headers.set('Access-Control-Allow-Origin', flask_config.cors_headers)
     return response

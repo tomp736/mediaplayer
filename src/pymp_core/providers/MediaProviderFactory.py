@@ -16,24 +16,24 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
     media_providers = []
 
     # configure self
-    server_config = CONFIG_FACTORY.create_server_config()    
-    if server_config.server_roles & PympServerRoles.MEDIA_SVC:
-        media_config = CONFIG_FACTORY.create_media_config()    
+    server_config = CONFIG_FACTORY.get_server_config()    
+    if server_config.roles & PympServerRoles.MEDIA_SVC:
+        media_config = CONFIG_FACTORY.get_media_config()    
         media_file_data_provider = MediaFileDataProvider(media_config)
         if media_file_data_provider.check_data_provider(wants_write_access):
             media_providers.append(media_file_data_provider)
 
     # add hardcoded services
-    service_configs = CONFIG_FACTORY.create_service_configs()  
+    service_configs = CONFIG_FACTORY.get_service_configs()  
     for service_config in service_configs:
-        if service_config.service_roles & PympServerRoles.FFMPEG_SVC:    
-            if service_config.is_valid() and service_config.service_id == service_id:
+        if service_config.roles & PympServerRoles.FFMPEG_SVC:    
+            if service_config.is_valid() and service_config.id == service_id:
                 media_http_data_provider = MediaHttpDataProvider(service_config)
                 if media_http_data_provider.check_data_provider(wants_write_access):
                     media_providers.append(media_http_data_provider)
                     
     # add data provider from media_registry
-    if not server_config.server_roles & PympServerRoles.MEDIA_SVC:
+    if not server_config.roles & PympServerRoles.MEDIA_SVC:
         media_registry_provider = MediaRegistryProviderFactory.get_media_registry_providers()[0]
         if media_registry_provider:
             service_info = media_registry_provider.get_service_info(service_id)
