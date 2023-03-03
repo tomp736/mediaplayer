@@ -142,6 +142,7 @@ jobs:
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
+            BUILDKIT_PROGRESS=plain
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.next_version }}
