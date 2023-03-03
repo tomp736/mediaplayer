@@ -11,13 +11,14 @@ RUN pip3 install --upgrade pip
 FROM base as build
 WORKDIR /src
 
-ARG APP_BUILD_VERSION
-ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
-
 COPY ./pymp_core/requirements.txt ./pymp_core/
 RUN pip3 install --no-cache-dir -r ./pymp_core/requirements.txt 
 
 COPY ./pymp_core/ ./pymp_core
+
+
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
 RUN pip3 install --no-cache-dir ./pymp_core
 
 FROM build as test
