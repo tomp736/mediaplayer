@@ -1,5 +1,4 @@
 ARG BASE_IMAGE=ghcr.io/tomp736/pyfi/pyfi_core:latest
-ARG APP_BUILD_VERSION
 
 FROM $BASE_IMAGE as base
 
@@ -8,6 +7,7 @@ RUN pip3 install --upgrade pip
 FROM base as build
 WORKDIR /src
 
+ARG APP_BUILD_VERSION
 ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
 
 COPY ./pymp_server/requirements.txt ./pymp_server/
