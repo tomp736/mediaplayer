@@ -63,8 +63,8 @@ class MediaService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def get_media_ids(self) -> List[str]:
-        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
-            media_provider = MediaProviderFactory.get_data_providers(self.server_config.server_id)[0]
+        if self.server_config.roles & PympServerRoles.MEDIA_SVC:
+            media_provider = MediaProviderFactory.get_data_providers(self.server_config.id)[0]
             return media_provider.get_media_ids()
         return []
 
@@ -74,13 +74,13 @@ class MediaService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def update_index(self) -> None:
-        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
-            media_provider = MediaProviderFactory.get_data_providers(self.server_config.server_id)[0]
+        if self.server_config.roles & PympServerRoles.MEDIA_SVC:
+            media_provider = MediaProviderFactory.get_data_providers(self.server_config.id)[0]
             media_provider.update_index()
 
     def register(self) -> ServiceInfo:
         service_info = ServiceInfo(**self.server_config.__dict__)
-        if self.server_config.server_roles & PympServerRoles.MEDIA_SVC:
+        if self.server_config.roles & PympServerRoles.MEDIA_SVC:
             self.update_index()
             media_registry_providers = MediaRegistryProviderFactory.get_media_registry_providers(True)
             if len(media_registry_providers) == 0:

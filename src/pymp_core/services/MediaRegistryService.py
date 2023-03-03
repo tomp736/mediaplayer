@@ -49,7 +49,7 @@ class MediaRegistryService():
 
     def update_media_services(self):
         media_registry_provider = self.get_media_registry_provider()
-        if not self.server_config.server_roles & PympServerRoles.MEDIAREGISTRY_SVC:
+        if not self.server_config.roles & PympServerRoles.MEDIAREGISTRY_SVC:
             return
 
         media_service = media_registry_provider.get_all_service_info()

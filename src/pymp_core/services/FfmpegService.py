@@ -21,7 +21,7 @@ class FfmpegService:
     @prom.prom_count_method_call
     @prom.prom_count_method_time
     def process_media_services(self):
-        if self.server_config.server_roles & PympServerRoles.FFMPEG_SVC:
+        if self.server_config.roles & PympServerRoles.FFMPEG_SVC:
             media_infos = redis_media_process_queue.rpop()
             while media_infos:
                 for media_info in media_infos:

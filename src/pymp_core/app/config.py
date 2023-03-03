@@ -1,4 +1,4 @@
-from abc import abstractmethod, abstractproperty
+from abc import abstractmethod
 from enum import IntFlag
 from typing import Dict
 
@@ -25,14 +25,14 @@ class IConfig():
 
 
 class FlaskConfig(IConfig):
-    
+
     host: str = ""
     port: int = 80
     cors_headers: str = "*"
 
     def __init__(self, **kwargs) -> None:
         self.load(kwargs)
-    
+
     def load(self, kwargs):
         self.host = kwargs.get('host', self.host)
         self.port = kwargs.get('port', self.port)
@@ -43,8 +43,9 @@ class FlaskConfig(IConfig):
         self.port = int(config.get('port', self.port))
         self.cors_headers = config.get('cors_headers', self.cors_headers)
 
+
 class ServerConfig(IConfig):
-    
+
     id: str = ""
     roles: PympServerRoles = PympServerRoles.NONE
     host: str = ""
@@ -70,7 +71,7 @@ class ServerConfig(IConfig):
 
 
 class ServiceConfig(IConfig):
-    
+
     id: str = ""
     roles: PympServerRoles = PympServerRoles.NONE
     host: str = ""
@@ -108,7 +109,7 @@ class ServiceConfig(IConfig):
 
 
 class RedisConfig(IConfig):
-    
+
     host: str = ""
     port: int = 2379
 
@@ -125,7 +126,7 @@ class RedisConfig(IConfig):
 
 
 class MediaConfig(IConfig):
-    
+
     media_path: str = ""
     index_path: str = ""
     media_chunk_size: int = 2 ** 22
@@ -137,11 +138,15 @@ class MediaConfig(IConfig):
     def load(self, kwargs):
         self.media_path = kwargs.get('media_path', self.media_path)
         self.index_path = kwargs.get('index_path', self.index_path)
-        self.media_chunk_size = kwargs.get('media_chunk_size', self.media_chunk_size)
-        self.thumb_chunk_size = kwargs.get('thumb_chunk_size', self.thumb_chunk_size)
+        self.media_chunk_size = kwargs.get(
+            'media_chunk_size', self.media_chunk_size)
+        self.thumb_chunk_size = kwargs.get(
+            'thumb_chunk_size', self.thumb_chunk_size)
 
     def load_config(self, config: Dict[str, str]):
         self.media_path = config.get('media_path', self.media_path)
         self.index_path = config.get('index_path', self.index_path)
-        self.media_chunk_size = int(config.get('media_chunk_size', self.media_chunk_size))
-        self.thumb_chunk_size = int(config.get('thumb_chunk_size', self.thumb_chunk_size))
+        self.media_chunk_size = int(config.get(
+            'media_chunk_size', self.media_chunk_size))
+        self.thumb_chunk_size = int(config.get(
+            'thumb_chunk_size', self.thumb_chunk_size))
