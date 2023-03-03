@@ -77,6 +77,8 @@ jobs:
           - pymp_frontend 
           - pymp_locust
           - pymp_server
+        test-target:
+          - ''
         base-image:
           - ''
         base-image-tag:
@@ -85,16 +87,20 @@ jobs:
           - image: pymp_core
             base-image: ''
             base-image-tag: ''
+            test-target: ''
           - image: pymp_server
             base-image: ''
             base-image-tag: ''
+            test-target: ''
         include:
           - image: pymp_core
             base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
             base-image-tag: latest
+            test-target: 'tests'
           - image: pymp_server
             base-image: ghcr.io/tomp736/pymp/pymp_core
             base-image-tag: ${{ needs.prepare.outputs.next_version }}
+            test-target: ''
 
     permissions:
       contents: read
@@ -132,6 +138,7 @@ jobs:
 
       - 
         name: Build - targeting test
+        if: matrix.test-targets != ''
         uses: docker/build-push-action@v3
         with:
           context: ./src
@@ -156,7 +163,6 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          target: final
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
