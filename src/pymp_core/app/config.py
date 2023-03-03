@@ -26,9 +26,9 @@ class IConfig():
 
 class FlaskConfig(IConfig):
     
-    host: str
-    port: int
-    cors_headers: str
+    host: str = ""
+    port: int = 80
+    cors_headers: str = "*"
 
     def __init__(self, **kwargs) -> None:
         self.load(kwargs)
@@ -108,8 +108,9 @@ class ServiceConfig(IConfig):
 
 
 class RedisConfig(IConfig):
-    host: str
-    port: int
+    
+    host: str = ""
+    port: int = 2379
 
     def __init__(self, **kwargs) -> None:
         self.load(kwargs)
@@ -124,10 +125,11 @@ class RedisConfig(IConfig):
 
 
 class MediaConfig(IConfig):
-    media_path: str
-    index_path: str
-    media_chunk_size: int
-    thumb_chunk_size: int
+    
+    media_path: str = ""
+    index_path: str = ""
+    media_chunk_size: int = 2 ** 22
+    thumb_chunk_size: int = 2 ** 20
 
     def __init__(self, **kwargs) -> None:
         self.load(kwargs)
