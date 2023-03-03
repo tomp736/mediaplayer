@@ -12,9 +12,11 @@ def get_media_registry_providers(wants_write_access: bool = False) -> List[Media
     media_registry_providers = []
 
     # configure self
-    media_registry_redis_data_provider = MediaRegistryRedisDataProvider()
-    if media_registry_redis_data_provider.check_data_provider(wants_write_access):
-        media_registry_providers.append(media_registry_redis_data_provider)
+    server_config = CONFIG_FACTORY.get_server_config()
+    if server_config.roles & PympServerRoles.MEDIAREGISTRY_SVC:
+        media_registry_redis_data_provider = MediaRegistryRedisDataProvider()
+        if media_registry_redis_data_provider.check_data_provider(wants_write_access):
+            media_registry_providers.append(media_registry_redis_data_provider)
 
     # configure hardcoded services
     service_configs = CONFIG_FACTORY.get_service_configs()
