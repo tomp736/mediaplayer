@@ -9,7 +9,7 @@ class ConfigFactory:
     
     _config_sources: List[IConfigSource] = []
     _config_builder: ConfigBuilder = ConfigBuilder()
-    _json_config_reader: JsonServiceConfigReader = JsonServiceConfigReader("/app/service_config.json")
+    _json_config_reader: JsonServiceConfigReader = JsonServiceConfigReader("/app/services_config.json")
     
     def __init__(self, config_sources) -> None:
         self._config_sources = config_sources

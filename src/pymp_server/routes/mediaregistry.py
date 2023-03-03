@@ -32,8 +32,8 @@ def post_registry_service():
     if request.json:
         service_info = ServiceInfo.from_json(request.json)
 
-        if service_info.server_id == "":
-            service_info.server_id = str(uuid.uuid4())
+        if service_info.id == "":
+            service_info.id = str(uuid.uuid4())
 
         if not service_info is None:
             MEDIA_REGISTRY_SERVICE.register_service(service_info)
