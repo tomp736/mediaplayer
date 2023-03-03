@@ -20,6 +20,8 @@ WORKDIR /src
 COPY ./pymp_core_tests/requirements.txt ./pymp_core_tests/
 RUN pip3 install --no-cache-dir -r ./pymp_core_tests/requirements.txt 
 
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
 COPY ./pymp_core_tests/ ./pymp_core_tests
 RUN pytest ./pymp_core_tests
 
