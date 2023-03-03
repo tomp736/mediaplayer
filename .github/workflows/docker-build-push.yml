@@ -100,7 +100,7 @@ jobs:
           - image: pymp_server
             base-image: ghcr.io/tomp736/pymp/pymp_core
             base-image-tag: ${{ needs.prepare.outputs.next_version }}
-            test-target: ''
+            test-target: 'tests'
 
     permissions:
       contents: read
