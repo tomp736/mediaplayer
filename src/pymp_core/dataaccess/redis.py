@@ -40,7 +40,7 @@ class RedisServiceInfoDataAccess(RedisDataAccess):
         self.expire()
         return self.redis.hset(
             self.key,
-            service_info.server_id,
+            service_info.id,
             service_info.to_json()
         )
 
