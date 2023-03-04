@@ -278,7 +278,7 @@ jobs:
               --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
 
   create_pull:
-    if: ${{ needs.prepare.outputs.pull_request_create }} == 1
+    if: needs.prepare.outputs.pull_request_create == '1'
     needs:
       - prepare
       - docker-build-push
