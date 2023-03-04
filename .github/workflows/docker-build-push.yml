@@ -24,6 +24,9 @@ jobs:
       this_version: ${{ steps.this_version.outputs.this_version }}
       next_version: ${{ steps.next_version.outputs.next_version }}
       this_tag_ref: ${{ steps.this_tag_ref.outputs.this_tag_ref }}
+      pull_request_create: ${{ steps.pull_request.outputs.pull_request_create }}
+      pull_request_branch_base: ${{ steps.pull_request.outputs.pull_request_branch_base }}
+      pull_request_branch_source: ${{ steps.pull_request.outputs.pull_request_branch_source }}
 
     steps:
       - uses: actions/checkout@v3
@@ -76,6 +79,36 @@ jobs:
           next_version="${major}.${minor}.${patch}${patch_iter}"
           echo "Updating version to $next_version"
           echo "next_version=$next_version" >> $GITHUB_OUTPUT
+      
+      # Adds variables to github output for pull-request job
+      # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
+      # pull_request_branch: { branch-name } that the pull request will be made for
+      - id: pull_request
+        run: |
+          pull_request_create=0
+          pull_request_branch_source="${GITHUB_REF#refs/heads/}"
+          pull_request_branch_target="dev"
+
+          # dont create pull request for a pull request
+          if [[ "${{ github.event_name }}" = 'pull_request' ]]; them
+            pull_request_create = 0
+          fi
+
+          if [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "major" ]]; then
+            pull_request_create=0
+          elif [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "minor" ]]; then
+            pull_request_create=0
+          elif [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "patch" ]]; then
+            pull_request_branch_target="main"
+            pull_request_create=1
+          else [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "patch" ]]; then
+            pull_request_branch_target="dev"
+            pull_request_create=1
+          fi
+
+          echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
 
   docker-build-push:
     needs: 
@@ -244,4 +277,19 @@ jobs:
               -H "Content-Type: application/json" \
               https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches \
               --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
+
+  create_pull:
+    if: ${{ needs.prepare.outputs.pull_request_create }} == 1
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+      - docker-build-push
+
+    steps:
+    - name: Create pull request
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+        base: ${{ needs.prepare.outputs.pull_request_branch_base }}
 
