@@ -163,6 +163,7 @@ jobs:
       - 
         name: Build - targeting final and push
         uses: docker/build-push-action@v3
+        if: ${{ github.event_name }} == 'push_request'
         with:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
@@ -179,9 +180,9 @@ jobs:
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.next_version }}
 
       - 
-        name: Build and push Docker image
+        name: Build - targeting final and push
         uses: docker/build-push-action@v3
-        if: steps.this_tag_ref.outputs.image_ref == 'major'
+        if: steps.this_tag_ref.outputs.image_ref == 'major' && ${{ github.event_name }} == 'push_request'
         with:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
@@ -190,10 +191,12 @@ jobs:
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             APP_BUILD_VERSION=${{ needs.prepare.outputs.next_version }}
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
+            BUILDKIT_PROGRESS=plain
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:latest
 
   tag:
+    if: ${{ github.event_name }} == 'push_request'
     runs-on: ubuntu-latest
     needs: 
       - prepare
@@ -221,6 +224,7 @@ jobs:
           git push -f origin --tags
 
   dispatch:
+    if: ${{ github.event_name }} == 'push_request'
     runs-on: ubuntu-latest
     needs:
       - tag
