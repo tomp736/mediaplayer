@@ -3,16 +3,24 @@ name: Create PR
 on:
   workflow_call:
     inputs:
-      branch_name:
+      source_branch:
         type: string
-        description: 'branch-name'
+        description: 'source branch name'
+        required: true
+      target_branch:
+        type: string
+        description: 'target branch name'
         required: true
 
   workflow_dispatch:
     inputs:
-      branch_name:
+      source_branch:
+        type: string
+        description: 'source branch name'
+        required: true
+      target_branch:
         type: choice
-        description: 'branch-name'
+        description: 'target branch name'
         default: dev
         options:
           - dev
@@ -26,12 +34,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.source_branch }}
       - name: Create PR
         id: create_pr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.branch_name }}
+          branch: ${{ github.event.inputs.target_branch }}
 
       # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
       # - name: enable auto-merge
