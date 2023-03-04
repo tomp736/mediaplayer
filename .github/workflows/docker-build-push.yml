@@ -25,7 +25,7 @@ jobs:
       next_version: ${{ steps.next_version.outputs.next_version }}
       this_tag_ref: ${{ steps.this_tag_ref.outputs.this_tag_ref }}
       pull_request_create: ${{ steps.pull_request.outputs.pull_request_create }}
-      pull_request_branch_base: ${{ steps.pull_request.outputs.pull_request_branch_base }}
+      pull_request_branch_target: ${{ steps.pull_request.outputs.pull_request_branch_target }}
       pull_request_branch_source: ${{ steps.pull_request.outputs.pull_request_branch_source }}
 
     steps:
