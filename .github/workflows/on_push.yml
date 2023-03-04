@@ -58,5 +58,5 @@ jobs:
     with:
       source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
       target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
-      promotion-tag: 'promotion'
+      promotion_tag: 'promotion'
     secrets: inherit
