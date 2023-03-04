@@ -57,7 +57,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      
+
     needs:
       - prepare
     uses: ./.github/workflows/docker_build_push.yml
@@ -72,5 +72,5 @@ jobs:
       - docker_build
     uses: ./.github/workflows/create_tag.yml
     with:
-      tag: ${{ needs.prepare.outputs.next_version }}
+      version: ${{ needs.prepare.outputs.next_version }}
     secrets: inherit
