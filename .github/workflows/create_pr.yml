@@ -23,8 +23,8 @@ on:
         description: 'target branch name'
         default: dev
         options:
-          - dev
-          - main
+          - dev-promotion
+          - main-promotion
         required: true
 
 jobs:
