@@ -106,6 +106,10 @@ jobs:
             pull_request_create=1
           fi
 
+          echo $pull_request_create
+          echo $pull_request_branch_source
+          echo $pull_request_branch_target
+
           echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
           echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
           echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
@@ -291,5 +295,5 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
-        base: ${{ needs.prepare.outputs.pull_request_branch_base }}
+        base: ${{ needs.prepare.outputs.pull_request_branch_target }}
 
