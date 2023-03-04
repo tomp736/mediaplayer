@@ -1,13 +1,35 @@
 ARG BASE_IMAGE=ghcr.io/tomp736/pyfi/pyfi_core:latest
-FROM $BASE_IMAGE
+FROM $BASE_IMAGE as base
+
+FROM base as build
+WORKDIR /app
+
+COPY ./pymp_server/requirements.txt ./pymp_server/
+RUN pip3 install --no-cache-dir -r ./pymp_server/requirements.txt 
+
+COPY ./pymp_server/ ./pymp_server
 
 ARG APP_BUILD_VERSION
 ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+RUN pip3 install --no-cache-dir ./pymp_server
+
+
+FROM build as test
+WORKDIR /app
+
+COPY ./pymp_server_tests/requirements.txt ./pymp_server_tests/
+RUN pip3 install --no-cache-dir -r ./pymp_server_tests/requirements.txt 
+
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+COPY ./pymp_server_tests/ ./pymp_server_tests
+RUN pytest ./pymp_server_tests
+
+
+FROM build as final
+WORKDIR /app
 
 RUN mkdir -p /app/media
 RUN mkdir -p /app/index
-
-COPY ./pymp_server/ ./pymp_server
-RUN pip3 install ./pymp_server
 
 CMD ["python", "-u", "-m" , "pymp_server"]
