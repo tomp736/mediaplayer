@@ -48,7 +48,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.source_branch }}
+          branch: ${{ github.event.inputs.target_branch }}-promotion
 
       # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
       # - name: enable auto-merge
