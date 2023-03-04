@@ -101,7 +101,7 @@ jobs:
           elif [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "patch" ]]; then
             pull_request_branch_target="main"
             pull_request_create=1
-          else [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "patch" ]]; then
+          else
             pull_request_branch_target="dev"
             pull_request_create=1
           fi
