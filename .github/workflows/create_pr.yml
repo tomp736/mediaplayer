@@ -19,12 +19,8 @@ on:
         description: 'source branch name'
         required: true
       target_branch:
-        type: choice
+        type: string
         description: 'target branch name'
-        default: dev
-        options:
-          - dev
-          - main
         required: true
 
 jobs:
@@ -43,7 +39,7 @@ jobs:
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.target_branch }}-promotion
+          branch: ${{ github.event.inputs.target_branch }}
 
       # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
       # - name: enable auto-merge
