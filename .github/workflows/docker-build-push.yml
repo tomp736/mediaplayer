@@ -1,8 +1,15 @@
 name: docker-build-push
 on: 
+  workflow_dispatch:    
   push:
     branches:
       - '**'
+    paths:
+      - 'src/**'
+  pull_request:
+    branches:
+      - main
+      - dev
     paths:
       - 'src/**'
 
