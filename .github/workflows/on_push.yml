@@ -54,7 +54,6 @@ jobs:
     if: needs.prepare.outputs.pull_request_create == '1'
     needs:
       - prepare
-      - docker-build-push
     uses: ./.github/workflows/create_pr.yml
     with:
       source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
