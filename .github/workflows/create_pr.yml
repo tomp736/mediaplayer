@@ -40,7 +40,7 @@ jobs:
 
       - name: Reset promotion branch
         run: |
-          git fetch origin ${{ github.event.inputs.source_branch }}
+          git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
           git reset --hard ${{ github.event.inputs.source_branch }}
 
       - name: Create PR
