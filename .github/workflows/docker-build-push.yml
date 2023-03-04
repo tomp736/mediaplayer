@@ -284,20 +284,10 @@ jobs:
 
   create_pull:
     if: ${{ needs.prepare.outputs.pull_request_create }} == 1
-    runs-on: ubuntu-latest
     needs:
       - prepare
       - docker-build-push
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ needs.prepare.outputs.pull_request_branch_target }}
-      - name: Reset promotion branch
-        run: |
-          git fetch origin ${{ needs.prepare.outputs.pull_request_branch_source }}:${{ needs.prepare.outputs.pull_request_branch_source }}
-          git reset --hard ${{ needs.prepare.outputs.pull_request_branch_source }}
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          branch: ${{ needs.prepare.outputs.pull_request_branch_target }}-promotion
+    uses: ./.github/workflows/create-pr.yml
+    with:
+      branch_name: ${{ steps.this_version.outputs.pull_request_branch_target }}
+    secrets: inherit
