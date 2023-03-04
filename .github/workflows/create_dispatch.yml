@@ -1,0 +1,19 @@
+name: create dispatch
+
+on:
+  workflow_call:
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Trigger Repository Dispatch
+        run: |
+          curl -X POST \
+              -H "Authorization: Bearer ${{ secrets.WF_DISPATCH_PYMP_INFRA_FLUX }}" \
+              -H "Accept: application/vnd.github.everest-preview+json" \
+              -H "Content-Type: application/json" \
+              https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches \
+              --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
