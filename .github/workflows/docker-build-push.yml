@@ -295,14 +295,9 @@ jobs:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           ref: ${{ needs.prepare.outputs.pull_request_branch_target }}
 
-      - name: Reset promotion branch
-        run: |
-          git fetch origin ${{ needs.prepare.outputs.pull_request_branch_source }}:${{ needs.prepare.outputs.pull_request_branch_source }}
-          git reset --hard ${{ needs.prepare.outputs.pull_request_branch_source }}
-
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ needs.prepare.outputs.pull_request_branch_target }}-promotion
+          branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
 
