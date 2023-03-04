@@ -32,14 +32,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.source_branch }}
+          ref: ${{ github.event.inputs.target_branch }}
+
+      - name: Reset promotion branch
+        run: |
+          git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
+          git reset --hard ${{ github.event.inputs.source_branch }}
 
       - name: Create PR
         id: create_pr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.target_branch }}
+          branch: ${{ github.event.inputs.target_branch }}-promotion
 
       # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
       # - name: enable auto-merge
