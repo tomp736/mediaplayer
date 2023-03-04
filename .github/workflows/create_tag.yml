@@ -1,7 +1,7 @@
 name: create tag
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       version:
         type: string
