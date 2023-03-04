@@ -35,11 +35,7 @@ jobs:
           patch=$(echo $this_version | awk -F'.' '{print $3}')
           patch_iter=""
 
-          if [[ "${{ github.ref }}" = "refs/heads/release" ]]; then
-            major=$((major+1))
-            minor=0
-            patch=0
-          elif [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
+          if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
             minor=$((minor+1))
             patch=0
           elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
@@ -64,9 +60,7 @@ jobs:
           pull_request_branch_source="${GITHUB_REF#refs/heads/}"
           pull_request_branch_target=""
 
-          if [[ "${{ github.ref }}" = *-promotion ]]; then
-            pull_request_create=0
-          elif [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
+          if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
             pull_request_create=0
           elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
             pull_request_branch_target="main"
@@ -114,10 +108,13 @@ jobs:
       ignore_push: false
     secrets: inherit
 
+  # create tag if build succeeds
   create-tag:
+
     needs:
       - prepare
       - docker_build
+      
     uses: ./.github/workflows/create_tag.yml
     with:
       version: ${{ needs.prepare.outputs.next_version }}
