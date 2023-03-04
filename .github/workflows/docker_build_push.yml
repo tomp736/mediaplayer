@@ -1,0 +1,132 @@
+name: docker-build-push
+on: 
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        description: 'tag'
+        required: true
+      version:
+        type: string
+        description: 'version'
+        required: true
+
+concurrency: 
+  group: docker_build
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+
+  docker-build-push:
+    needs: 
+      - prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix: 
+        image:
+          - pymp_core
+          - pymp_frontend 
+          - pymp_locust
+          - pymp_server
+        test-target:
+          - ''
+        base-image:
+          - ''
+        base-image-tag:
+          - ''
+        exclude:
+          - image: pymp_core
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+          - image: pymp_server
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+        include:
+          - image: pymp_core
+            base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
+            base-image-tag: latest
+            test-target: 'tests'
+          - image: pymp_server
+            base-image: ghcr.io/tomp736/pymp/pymp_core
+            base-image-tag: ${{ inputs.version }}
+            test-target: 'tests'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - 
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - 
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - 
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Check if image is available
+        shell: bash
+        if: matrix.base-image != ''
+        run: |
+          until docker manifest inspect ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
+            echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            echo "Image is not available, sleeping for 10 seconds..."
+            sleep 10
+          done
+          echo "Image is available, continuing with the workflow."
+      - 
+        name: Build - targeting test
+        if: matrix.test-target != ''
+        uses: docker/build-push-action@v3
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: test
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.version }}
+            APP_REF_VERSION=${{ inputs.tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:test
+      - 
+        name: Build - targeting final and push
+        uses: docker/build-push-action@v3
+        if: ${{ github.event_name }} == 'push_request'
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.version }}
+            APP_REF_VERSION=${{ inputs.tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ inputs.version }}
