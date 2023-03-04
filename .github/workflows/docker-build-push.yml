@@ -91,7 +91,7 @@ jobs:
 
           # dont create pull request for a pull request
           if [[ "${{ github.event_name }}" = 'pull_request' ]]; then
-            pull_request_create = 0
+            pull_request_create=0
           fi
 
           if [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "major" ]]; then
@@ -280,12 +280,13 @@ jobs:
               https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches \
               --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
 
-  # create_pull:
-  #   if: ${{ needs.prepare.outputs.pull_request_create }} == 1
-  #   needs:
-  #     - prepare
-  #     - docker-build-push
-  #   uses: ./.github/workflows/create_pr.yml
-  #   with:
-  #     branch_name: ${{ steps.this_version.outputs.pull_request_branch_target }}
-  #   secrets: inherit
+  create_pull:
+    if: ${{ needs.prepare.outputs.pull_request_create }} == 1
+    needs:
+      - prepare
+      - docker-build-push
+    uses: ./.github/workflows/create_pr.yml
+    with:
+      source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+      target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
+    secrets: inherit

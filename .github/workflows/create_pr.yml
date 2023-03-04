@@ -32,19 +32,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.target_branch }}
+          ref: ${{ inputs.target_branch }}
 
       - name: Reset promotion branch
         run: |
-          git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
-          git reset --hard ${{ github.event.inputs.source_branch }}
+          git fetch origin ${{ inputs.source_branch }}:${{ inputs.source_branch }}
+          git reset --hard ${{ inputs.source_branch }}
 
       - name: Create PR
         id: create_pr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.target_branch }}-promotion
+          branch: ${{ inputs.target_branch }}-promotion
 
       - name: enable auto-merge
         if: steps.create_pull_request.outputs.pull-request-operation == 'created'
