@@ -287,6 +287,6 @@ jobs:
       - docker-build-push
     uses: ./.github/workflows/create_pr.yml
     with:
-      source_branch: ${{ steps.this_version.outputs.pull_request_branch_source }}
-      target_branch: ${{ steps.this_version.outputs.pull_request_branch_target }}
+      source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+      target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
     secrets: inherit
