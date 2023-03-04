@@ -91,7 +91,7 @@ jobs:
 
           # dont create pull request for a pull request
           if [[ "${{ github.event_name }}" = 'pull_request' ]]; then
-            pull_request_create = 0
+            pull_request_create=0
           fi
 
           if [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "major" ]]; then
