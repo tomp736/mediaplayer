@@ -29,13 +29,13 @@ jobs:
         run: |
           pull_request_create=0
           pull_request_branch_source="${GITHUB_REF#refs/heads/}"
-          pull_request_branch_target="dev"
+          pull_request_branch_target=""
 
           if [[ "${{ github.ref }}" = *-promotion ]]; then
             pull_request_create=0
-          elif [[ "${{ github.ref }}" = "main" ]]; then
+          elif [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
             pull_request_create=0
-          elif [[ "${{ github.ref }}" = "dev" ]]; then
+          elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
             pull_request_branch_target="main"
             pull_request_create=1
           else
