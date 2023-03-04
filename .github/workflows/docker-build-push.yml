@@ -50,7 +50,7 @@ jobs:
           elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
             tag_ref="patch"          
           else
-            tag_ref="dev"
+            tag_ref=""
           fi
           echo "this_tag_ref=$tag_ref" >> $GITHUB_OUTPUT
       
@@ -219,7 +219,6 @@ jobs:
             APP_REF_VERSION=${{ needs.prepare.outputs.this_tag_ref }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.this_tag_ref }}
             ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ needs.prepare.outputs.next_version }}
 
       - 
@@ -262,7 +261,6 @@ jobs:
           if [[ "${{ needs.prepare.outputs.this_tag_ref }}" = "major" ]]; then
             git tag -f latest
           fi          
-          git tag -f ${{ needs.prepare.outputs.this_tag_ref }}
           git tag ${{ needs.prepare.outputs.next_version }}
           git push -f origin --tags
 
@@ -282,12 +280,12 @@ jobs:
               https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches \
               --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
 
-  create_pull:
-    if: ${{ needs.prepare.outputs.pull_request_create }} == 1
-    needs:
-      - prepare
-      - docker-build-push
-    uses: ./.github/workflows/create_pr.yml
-    with:
-      branch_name: ${{ steps.this_version.outputs.pull_request_branch_target }}
-    secrets: inherit
+  # create_pull:
+  #   if: ${{ needs.prepare.outputs.pull_request_create }} == 1
+  #   needs:
+  #     - prepare
+  #     - docker-build-push
+  #   uses: ./.github/workflows/create_pr.yml
+  #   with:
+  #     branch_name: ${{ steps.this_version.outputs.pull_request_branch_target }}
+  #   secrets: inherit
