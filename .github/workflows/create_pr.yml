@@ -35,13 +35,15 @@ jobs:
     # https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
 
       - name: Create PR
         id: create_pr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.target_branch }}-promotion
+          branch: ${{ github.event.inputs.source_branch }}
 
       # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
       # - name: enable auto-merge
