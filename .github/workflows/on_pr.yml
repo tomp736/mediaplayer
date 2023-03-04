@@ -53,6 +53,11 @@ jobs:
           echo "next_version=$next_version" >> $GITHUB_OUTPUT
 
   docker_build:
+
+    permissions:
+      contents: read
+      packages: write
+      
     needs:
       - prepare
     uses: ./.github/workflows/docker_build_push.yml
