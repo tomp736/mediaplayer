@@ -3,41 +3,53 @@ name: Create PR
 on:
   workflow_call:
     inputs:
-      branch_name:
+      source_branch:
         type: string
-        description: 'branch-name'
+        description: 'source branch name'
+        required: true
+      target_branch:
+        type: string
+        description: 'target branch name'
         required: true
 
   workflow_dispatch:
     inputs:
-      branch_name:
-        type: choice
-        description: 'branch-name'
-        default: dev
-        options:
-          - dev
-          - main
+      source_branch:
+        type: string
+        description: 'source branch name'
+        required: true
+      target_branch:
+        type: string
+        description: 'target branch name'
         required: true
 
 jobs:
   create_pr:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
 
+    # https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.target_branch }}
+
+      - name: Reset promotion branch
+        run: |
+          git fetch origin ${{ github.event.inputs.source_branch }}:${{ github.event.inputs.source_branch }}
+          git reset --hard ${{ github.event.inputs.source_branch }}
+
       - name: Create PR
         id: create_pr
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
-          branch: ${{ github.event.inputs.branch_name }}
+          branch: ${{ github.event.inputs.target_branch }}-promotion
 
-      # See: https://github.com/peter-evans/create-pull-request/tree/main#auto-merge
-      # - name: enable auto-merge
-      #   if: steps.create_pull_request.outputs.pull-request-operation == 'created'
-      #   uses: peter-evans/enable-pull-request-automerge@v2
-      #   with:
-      #     token: ${{ secrets.PAT }}
-      #     pull-request-number: ${{ steps.create_pull_request.outputs.pull-request-number }}
-      #     merge-method: squash
+      - name: enable auto-merge
+        if: steps.create_pull_request.outputs.pull-request-operation == 'created'
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+          pull-request-number: ${{ steps.create_pull_request.outputs.pull-request-number }}
+          merge-method: squash
