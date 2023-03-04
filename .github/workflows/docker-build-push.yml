@@ -94,7 +94,7 @@ jobs:
             pull_request_create=0
           fi
 
-          if [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "" ]]; then
+          if [[ "${{ github.ref }}" = *-promotion ]]; then
             pull_request_create=0
           elif [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "major" ]]; then
             pull_request_create=0
