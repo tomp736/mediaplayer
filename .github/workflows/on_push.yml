@@ -1,0 +1,63 @@
+name: on branch push
+on: 
+  workflow_dispatch:    
+  push:
+    branches:
+      - '**'
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    outputs:
+      pull_request_create: ${{ steps.pull_request.outputs.pull_request_create }}
+      pull_request_branch_target: ${{ steps.pull_request.outputs.pull_request_branch_target }}
+      pull_request_branch_source: ${{ steps.pull_request.outputs.pull_request_branch_source }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.WORKFLOW_TOKEN }}
+      
+      # Adds variables to github output for pull-request job
+      # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
+      # pull_request_branch: { branch-name } that the pull request will be made for
+      - id: pull_request
+        run: |
+          pull_request_create=0
+          pull_request_branch_source="${GITHUB_REF#refs/heads/}"
+          pull_request_branch_target="dev"
+
+          if [[ "${{ github.ref }}" = *-promotion ]]; then
+            pull_request_create=0
+          elif [[ "${{ github.ref }}" = "main" ]]; then
+            pull_request_create=0
+          elif [[ "${{ github.ref }}" = "dev" ]]; then
+            pull_request_branch_target="main"
+            pull_request_create=1
+          else
+            pull_request_branch_target="dev"
+            pull_request_create=1
+          fi
+
+          echo $pull_request_create
+          echo $pull_request_branch_source
+          echo $pull_request_branch_target
+
+          echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
+
+  create_pull:
+    if: needs.prepare.outputs.pull_request_create == '1'
+    needs:
+      - prepare
+      - docker-build-push
+    uses: ./.github/workflows/create_pr.yml
+    with:
+      source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+      target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
+      promotion-tag: 'promotion'
+    secrets: inherit
