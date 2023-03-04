@@ -292,14 +292,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
           ref: ${{ needs.prepare.outputs.pull_request_branch_target }}
-          fetch-depth: 0
-
-      - name: Create pull request
+      - name: Reset promotion branch
+        run: |
+          git fetch origin ${{ needs.prepare.outputs.pull_request_branch_source }}:${{ needs.prepare.outputs.pull_request_branch_source }}
+          git reset --hard ${{ needs.prepare.outputs.pull_request_branch_source }}
+      - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
-          base: ${{ needs.prepare.outputs.pull_request_branch_target }}
-
+          branch: ${{ needs.prepare.outputs.pull_request_branch_target }}-promotion
