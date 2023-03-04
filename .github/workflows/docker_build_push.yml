@@ -10,6 +10,10 @@ on:
         type: string
         description: 'version'
         required: true
+      ignore_push:
+        type: boolean
+        description: 'dont push'
+        required: true
 
 concurrency: 
   group: docker_build
@@ -116,7 +120,7 @@ jobs:
       - 
         name: Build - targeting final and push
         uses: docker/build-push-action@v3
-        if: ${{ github.event_name }} == 'push_request'
+        if: ${{ inputs.ignore_push == 'false' }}
         with:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
