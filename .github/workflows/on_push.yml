@@ -95,6 +95,7 @@ jobs:
   # create pr if upstream configured
   docker_build:
 
+    if: needs.prepare.outputs.pull_request_create == '0'
     needs:
       - prepare
     permissions:
@@ -111,6 +112,7 @@ jobs:
   # create tag if build succeeds
   create-tag:
 
+    if: needs.prepare.outputs.pull_request_create == '0'
     needs:
       - prepare
       - docker_build
