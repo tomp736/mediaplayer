@@ -1,12 +1,30 @@
 ARG BASE_IMAGE=ghcr.io/labrats-work/ops-images/python-ffmpeg:latest
-FROM $BASE_IMAGE
+FROM $BASE_IMAGE as base
+
+FROM base as build
+WORKDIR /app
+
+COPY ./pymp_core/requirements.txt ./pymp_core/
+RUN pip3 install --no-cache-dir -r ./pymp_core/requirements.txt 
+
+COPY ./pymp_core/ ./pymp_core
+
 
 ARG APP_BUILD_VERSION
 ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+RUN pip3 install --no-cache-dir ./pymp_core
 
-COPY ./pymp_core/ ./pymp_core
-RUN pip3 install ./pymp_core
+FROM build as test
+WORKDIR /app
 
-COPY ./pymp_core_tests/ ./pymp_core_tests/
-RUN pip3 install -r ./pymp_core_tests/requirements.txt
-RUN pytest ./pymp_core_tests/
+COPY ./pymp_core_tests/requirements.txt ./pymp_core_tests/
+RUN pip3 install --no-cache-dir -r ./pymp_core_tests/requirements.txt 
+
+ARG APP_BUILD_VERSION
+ENV APP_BUILD_VERSION ${APP_BUILD_VERSION}
+COPY ./pymp_core_tests/ ./pymp_core_tests
+RUN pytest ./pymp_core_tests
+
+
+FROM build as final
+WORKDIR /app
