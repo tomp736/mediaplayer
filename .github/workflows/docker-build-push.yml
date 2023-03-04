@@ -6,6 +6,12 @@ on:
       - '**'
     paths:
       - 'src/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'src/**'
 
 concurrency: 
   group: docker_build
