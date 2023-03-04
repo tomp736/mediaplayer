@@ -294,10 +294,12 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
           ref: ${{ needs.prepare.outputs.pull_request_branch_target }}
+          fetch-depth: 0
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+          base: ${{ needs.prepare.outputs.pull_request_branch_target }}
 
