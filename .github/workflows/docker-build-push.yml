@@ -90,7 +90,7 @@ jobs:
           pull_request_branch_target="dev"
 
           # dont create pull request for a pull request
-          if [[ "${{ github.event_name }}" = 'pull_request' ]]; them
+          if [[ "${{ github.event_name }}" = 'pull_request' ]]; then
             pull_request_create = 0
           fi
 
