@@ -62,7 +62,7 @@ jobs:
           elif [[ "${{ steps.this_tag_ref.outputs.this_tag_ref }}" = "patch" ]]; then
             patch=$((patch+1))
           else
-            patch_count = $(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep $major.$minor.$patch | wc -l)
+            patch_count=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep $major.$minor.$patch | wc -l)
             patch_iter="-$patch_count"
           fi
           
