@@ -25,15 +25,17 @@ jobs:
 
           echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
 
-            echo "Checking $package_url : $package_tag"
+            tag=$(echo $package_tag | tr -d '"')
+            url=$(echo $package_url | tr -d '"')
+
+            echo "Checking $url : $tag"
           
-            if [[ "$package_tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
-              echo "Tag valid: $user/$image:$package_tag"
-            elif [[ "$package_tag" = 'latest' ]]; then
-              echo "Tag valid: $user/$image:$package_tag"
+            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
+              echo "Tag valid: $user/$image:$tag"
+            elif [[ "$tag" = 'latest' ]]; then
+              echo "Tag valid: $user/$image:$tag"
             else
-              echo "Tag invalid: $user/$image:$package_tag"
-              url=$(echo $package_url | tr -d '"')
+              echo "Tag invalid: $user/$image:$tag"
               curl -L \
                 -X DELETE \
                 -H "Accept: application/vnd.github+json" \
@@ -42,4 +44,3 @@ jobs:
             fi
 
           done
-          
