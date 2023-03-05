@@ -15,10 +15,12 @@ jobs:
           registry_server="ghcr.io"
           user="tomp736"
           image="pymp/pymp_core"
+          image_encoded="pymp%2Fpymp_core"
 
-          TAGS=$(curl -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
-              -H "Accept: application/json" \
-              "https://$registry_server/v2/$user/$image/tags/list?n=500" | jq -r '.tags[]')
+          TAGS=$(curl -L \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}"" \
+              https://api.github.com/users/$user/packages/container/$image_encoded/versions)
 
           for tag in $TAGS; do
             if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -28,12 +30,11 @@ jobs:
             else
               echo "Tag invalid: $user/$image:$tag"
 
-              DIGEST=$(curl -s -I -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
-                "https://$registry_server/v2/$user/$image/manifests/$tag" | grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
-
-              echo "Deleting digest: $DIGEST"
-              curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
-                "https://$registry_server/v2/$user/$image/manifests/$DIGEST"
+              curl -L \
+                -X DELETE \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
+                https://api.github.com/users/$user/packages/container/$image_encoded/versions/$tag
             fi
           done
 
