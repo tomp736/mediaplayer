@@ -17,9 +17,9 @@ jobs:
       version_docker_build_push: ${{ steps.pull_request.versions.docker_build_push }}
       version_current_version: ${{ steps.pull_request.versions.this_version }}
       version_next_version: ${{ steps.pull_request.versions.next_version }}
-      pull_request_create: ${{ steps.pull_request.outputs.pull_request_create }}
-      pull_request_branch_target: ${{ steps.pull_request.outputs.pull_request_branch_target }}
-      pull_request_branch_source: ${{ steps.pull_request.outputs.pull_request_branch_source }}
+      pull_request_create: ${{ steps.pull_request.outputs.create }}
+      pull_request_branch_target: ${{ steps.pull_request.outputs.branch_target }}
+      pull_request_branch_source: ${{ steps.pull_request.outputs.branch_source }}
 
     steps:
       - uses: actions/checkout@v3
@@ -67,58 +67,32 @@ jobs:
           echo "next_version=$next_version" >> $GITHUB_OUTPUT
       
       # Adds variables to github output for create_pull job
-      # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
-      # pull_request_branch: { branch-name } that the pull request will be made for
+      # create: { 0 | 1 } indicating if pull request should be automatically created
+      # branch_source: { branch-name } that the pull request will be made for
+      # branch_target: { branch-name } that the pull request will be made for
       - id: pull_request
         run: |
-          pull_request_create=0
-          pull_request_branch_source="${GITHUB_REF#refs/heads/}"
-          pull_request_branch_target=""
+          create=0
+          branch_source="${GITHUB_REF#refs/heads/}"
+          branch_target=""
 
           if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
-            pull_request_create=0
+            create=0
           elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
-            pull_request_branch_target="main"
-            pull_request_create=1
+            branch_target="main"
+            create=1
           else
-            pull_request_branch_target="dev"
-            pull_request_create=1
+            branch_target="dev"
+            create=1
           fi
 
-          echo $pull_request_create
-          echo $pull_request_branch_source
-          echo $pull_request_branch_target
+          echo $create
+          echo $branch_source
+          echo $branch_target
 
-          echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
-          echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
-          echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
-      
-      # Adds variables to github output for create_pull job
-      # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
-      # pull_request_branch: { branch-name } that the pull request will be made for
-      - id: pull_request
-        run: |
-          pull_request_create=0
-          pull_request_branch_source="${GITHUB_REF#refs/heads/}"
-          pull_request_branch_target=""
-
-          if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
-            pull_request_create=0
-          elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
-            pull_request_branch_target="main"
-            pull_request_create=1
-          else
-            pull_request_branch_target="dev"
-            pull_request_create=1
-          fi
-
-          echo $pull_request_create
-          echo $pull_request_branch_source
-          echo $pull_request_branch_target
-
-          echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
-          echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
-          echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
+          echo "create=$create" >> $GITHUB_OUTPUT
+          echo "branch_source=$branch_source" >> $GITHUB_OUTPUT
+          echo "branch_target=$branch_target" >> $GITHUB_OUTPUT
 
   # create pr if upstream configured
   create_pull:
