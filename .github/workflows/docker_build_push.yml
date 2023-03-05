@@ -2,39 +2,34 @@ name: docker-build-push
 on: 
   workflow_call:
     inputs:
-      tag:
+      build_registry:
         type: string
-        description: 'tag'
+        description: 'version'
         required: true
-      version:
+      build_repo:
+        type: string
+        description: 'version'
+        required: true
+      build_tag:
         type: string
         description: 'version'
         required: true
 
+
 concurrency: 
-  group: docker_build
+  group:  docker_build_${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
-
-  docker-build-push:
-    needs: 
-      - prepare
+  docker-build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix: 
         image:
           - pymp_core
-          - pymp_frontend 
-          - pymp_locust
+          - pymp_frontend
           - pymp_server
         test-target:
           - ''
@@ -57,20 +52,13 @@ jobs:
             base-image-tag: latest
             test-target: 'tests'
           - image: pymp_server
-            base-image: ghcr.io/tomp736/pymp/pymp_core
-            base-image-tag: ${{ inputs.version }}
+            base-image: ${{ inputs.build_registry }}/${{ inputs.build_repo }}/pymp_core
+            base-image-tag: ${{ inputs.build_tag }}
             test-target: 'tests'
-
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - 
         uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
-
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -81,15 +69,16 @@ jobs:
         name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
+          registry: ${{ inputs.build_registry }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Check if image is available
         shell: bash
+        timeout-minutes: 5
         if: matrix.base-image != ''
         run: |
-          until docker manifest inspect ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
             echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
@@ -98,7 +87,7 @@ jobs:
       - 
         name: Build - targeting test
         if: matrix.test-target != ''
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
@@ -108,15 +97,14 @@ jobs:
           target: test
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ inputs.version }}
-            APP_REF_VERSION=${{ inputs.tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}:test
+             ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
       - 
         name: Build - targeting final and push
-        uses: docker/build-push-action@v3
-        if: ${{ github.event_name }} == 'push_request'
+        uses: docker/build-push-action@v4
         with:
           context: ./src
           file: ./src/${{ matrix.image }}/dockerfile
@@ -125,8 +113,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ inputs.version }}
-            APP_REF_VERSION=${{ inputs.tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ghcr.io/${{ github.repository }}/${{ matrix.image }}:${{ inputs.version }}
+            ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
