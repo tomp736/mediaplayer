@@ -20,7 +20,7 @@ jobs:
           TAGS=$(curl -L \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
-              https://api.github.com/users/$user/packages/container/$image_encoded/versions \
+              https://api.github.com/users/$user/packages/container/$image_encoded/versions?per_page=100 \
               | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
 
           echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
