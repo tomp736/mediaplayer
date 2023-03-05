@@ -1,0 +1,23 @@
+name: 'cron cleanup images'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '*/10 * * * *'
+
+jobs:
+  delete-slow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: list image tags
+        run: |
+          # https://ghcr.io/tomp736/pymp/pymp_core/tags
+          registry_server="ghcr.io"
+          user="tomp736"
+          image="pymp/pymp_core"
+
+          tags=$(curl -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
+              -H "Accept: application/json" \
+              "https://$registry_server/v2/$user/$image/tags/list" | jq -r '.tags[]')
+
+          echo $tags
