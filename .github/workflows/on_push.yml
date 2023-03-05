@@ -13,10 +13,10 @@ jobs:
     timeout-minutes: 5
 
     outputs:
-      version_create_tag: ${{ steps.pull_request.versions.create_tag }}
-      version_docker_build_push: ${{ steps.pull_request.versions.docker_build_push }}
-      version_current_version: ${{ steps.pull_request.versions.this_version }}
-      version_next_version: ${{ steps.pull_request.versions.next_version }}
+      version_create_tag: ${{ steps.versions.versions.create_tag }}
+      version_docker_build_push: ${{ steps.versions.versions.docker_build_push }}
+      version_current_version: ${{ steps.versions.versions.this_version }}
+      version_next_version: ${{ steps.versions.versions.next_version }}
       pull_request_create: ${{ steps.pull_request.outputs.create }}
       pull_request_branch_target: ${{ steps.pull_request.outputs.branch_target }}
       pull_request_branch_source: ${{ steps.pull_request.outputs.branch_source }}
