@@ -12,7 +12,7 @@ jobs:
       - name: Delete workflow runs
         uses: MajorScruffy/delete-old-workflow-runs@v0.3.0
         with:
-          repository: tomp736/pymp_infra
+          repository: tomp736/pymp
           older-than-seconds: 3600
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_WF_RW }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
