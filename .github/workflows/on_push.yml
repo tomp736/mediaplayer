@@ -103,7 +103,7 @@ jobs:
     needs:
       - prepare
 
-    uses: ./.github/workflows/calls/create_pr.yml
+    uses: ./.github/workflows/create_pr.yml
     with:
       source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
       target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
@@ -120,7 +120,7 @@ jobs:
       contents: read
       packages: write
 
-    uses: ./.github/workflows/calls/docker_build_push.yml
+    uses: ./.github/workflows/docker_build_push.yml
     with:
       build_registry: ghcr.io
       build_repo: ${{ github.repository }}
@@ -135,7 +135,7 @@ jobs:
       - prepare
       - docker_build_push
       
-    uses: ./.github/workflows/calls/create_tag.yml
+    uses: ./.github/workflows/create_tag.yml
     with:
       version: ${{ needs.prepare.outputs.version_next_version }}
     secrets: inherit
