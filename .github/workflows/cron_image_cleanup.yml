@@ -23,7 +23,7 @@ jobs:
           for tag in $TAGS; do
             if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "Tag valid: $user/$image:$tag"
-            elif [[ "$tag" = 'latest']]; then
+            elif [[ "$tag" = 'latest' ]]; then
               echo "Tag valid: $user/$image:$tag"
             else
               echo "Tag invalid: $user/$image:$tag"
