@@ -13,10 +13,10 @@ jobs:
     timeout-minutes: 5
 
     outputs:
-      version_create_tag: ${{ steps.versions.versions.create_tag }}
-      version_docker_build_push: ${{ steps.versions.versions.docker_build_push }}
-      version_current_version: ${{ steps.versions.versions.this_version }}
-      version_next_version: ${{ steps.versions.versions.next_version }}
+      version_create_tag: ${{ steps.versions.outputs.create_tag }}
+      version_docker_build_push: ${{ steps.versions.outputs.docker_build_push }}
+      version_current_version: ${{ steps.versions.outputs.this_version }}
+      version_next_version: ${{ steps.versions.outputs.next_version }}
       pull_request_create: ${{ steps.pull_request.outputs.create }}
       pull_request_branch_target: ${{ steps.pull_request.outputs.branch_target }}
       pull_request_branch_source: ${{ steps.pull_request.outputs.branch_source }}
@@ -54,6 +54,8 @@ jobs:
             create_tag=1
             patch=$((patch+1))
           else
+            docker_build_push=1
+            create_tag=1
             patch_count=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep $major.$minor.$patch | wc -l)
             patch_iter="-$patch_count"
           fi
