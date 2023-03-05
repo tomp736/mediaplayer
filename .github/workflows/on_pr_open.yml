@@ -1,0 +1,28 @@
+name: on pr open
+
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
+on:
+  pull_request:
+    types: 
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - dev
+      - main
+
+jobs:
+
+  # run the docker_build_push workflow
+  docker_build:
+
+    permissions:
+      contents: read
+      packages: write
+      
+    uses: ./.github/workflows/docker_build_push.yml
+    # with:
+    #   tag: ${{ github.event.pull_request.head.ref }}
+    #   version: ${{ github.event.pull_request.head.ref }}
+    #   ignore_push: true
+    secrets: inherit
