@@ -33,13 +33,13 @@ jobs:
               echo "Tag valid: $user/$image:$package_tag"
             else
               echo "Tag invalid: $user/$image:$package_tag"
-
+              url=$(echo $package_url | tr -d '"')
               curl -L \
                 -X DELETE \
                 -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
-                $package_url
+                $url
             fi
 
           done
-
+          

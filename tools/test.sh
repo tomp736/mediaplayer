@@ -4,25 +4,29 @@ user="tomp736"
 image="pymp/pymp_core"
 image_encoded="pymp%2Fpymp_core"
 
-CONTAINERS=$(curl -L \
+TAGS=$(curl -L \
     -H "Accept: application/vnd.github+json" \
-    -H "Authorization: Bearer $read_token" \
+    -H "Authorization: Bearer $token" \
     https://api.github.com/users/$user/packages/container/$image_encoded/versions \
-    jq -r '.[] | [.name, .metadata.container.tags[] // "" ] | @csv')
-    
+    | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
 
-echo "$CONTAINERS" | while IFS=',' read -r container_name container_tag; do
-    if [[ "$container_tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        echo "Tag valid: $user/$image:$tag"
-    elif [[ "$container_tag" = 'latest' ]]; then
-        echo "Tag valid: $user/$image:$tag"
+echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
+
+    echo "Checking $package_url : $package_tag"
+
+    if [[ "$package_tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
+        echo "Tag valid: $user/$image:$package_tag"
+    elif [[ "$package_tag" = 'latest' ]]; then
+        echo "Tag valid: $user/$image:$package_tag"
     else
-        echo "Tag invalid: $user/$image:$tag"
-
-        curl -L \
+        echo "Tag invalid: $user/$image:$package_tag"
+        url=$(echo $package_url | tr -d '"')
+        echo $url
+        curl \
             -X DELETE \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $write_token" \
-            https://api.github.com/users/$user/packages/container/$image_encoded/versions/$container_name
+            -H "Authorization: Bearer $token" \
+            $url
     fi
+
 done
