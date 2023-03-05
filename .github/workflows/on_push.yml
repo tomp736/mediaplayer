@@ -13,6 +13,10 @@ jobs:
     timeout-minutes: 5
 
     outputs:
+      version_create_tag: ${{ steps.pull_request.versions.create_tag }}
+      version_docker_build_push: ${{ steps.pull_request.versions.docker_build_push }}
+      version_current_version: ${{ steps.pull_request.versions.this_version }}
+      version_next_version: ${{ steps.pull_request.versions.next_version }}
       pull_request_create: ${{ steps.pull_request.outputs.pull_request_create }}
       pull_request_branch_target: ${{ steps.pull_request.outputs.pull_request_branch_target }}
       pull_request_branch_source: ${{ steps.pull_request.outputs.pull_request_branch_source }}
@@ -22,13 +26,18 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
-      # Adds variables related to version using output from git ls-remote
+      # Adds variables to github output
+      # used by docker_build_push and create_tag jobs
+      # create_tag: { 0 | 1 } indicates if a tag should be created
+      # docker_build_push: { 0 | 1 } indicates if a docker_build_push should be performed
       # this_version: { semantic version } latest version from git ls-remote
       # next_version: { semantic version } latest version incremented based on branch name
       - id: versions
         shell: bash
         run: |
           this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | tail -1)
+          create_tag=0
+          docker_build_push=0
 
           major=$(echo $this_version | awk -F'.' '{print $1}')
           minor=$(echo $this_version | awk -F'.' '{print $2}')
@@ -36,9 +45,13 @@ jobs:
           patch_iter=""
 
           if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
+            docker_build_push=1
+            create_tag=1
             minor=$((minor+1))
             patch=0
           elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
+            docker_build_push=1
+            create_tag=1
             patch=$((patch+1))
           else
             patch_count=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep $major.$minor.$patch | wc -l)
@@ -48,10 +61,39 @@ jobs:
           next_version="${major}.${minor}.${patch}${patch_iter}"
 
           echo "Updating $this_version to $next_version"
+          echo "create_tag=$create_tag" >> $GITHUB_OUTPUT
+          echo "docker_build_push=$docker_build_push" >> $GITHUB_OUTPUT
           echo "this_version=$this_version" >> $GITHUB_OUTPUT
           echo "next_version=$next_version" >> $GITHUB_OUTPUT
       
-      # Adds variables to github output for pull-request job
+      # Adds variables to github output for create_pull job
+      # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
+      # pull_request_branch: { branch-name } that the pull request will be made for
+      - id: pull_request
+        run: |
+          pull_request_create=0
+          pull_request_branch_source="${GITHUB_REF#refs/heads/}"
+          pull_request_branch_target=""
+
+          if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
+            pull_request_create=0
+          elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
+            pull_request_branch_target="main"
+            pull_request_create=1
+          else
+            pull_request_branch_target="dev"
+            pull_request_create=1
+          fi
+
+          echo $pull_request_create
+          echo $pull_request_branch_source
+          echo $pull_request_branch_target
+
+          echo "pull_request_create=$pull_request_create" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_source=$pull_request_branch_source" >> $GITHUB_OUTPUT
+          echo "pull_request_branch_target=$pull_request_branch_target" >> $GITHUB_OUTPUT
+      
+      # Adds variables to github output for create_pull job
       # pull_request_create: { 0 | 1 } indicating if pull request should be automatically created
       # pull_request_branch: { branch-name } that the pull request will be made for
       - id: pull_request
@@ -93,9 +135,9 @@ jobs:
     secrets: inherit
 
   # create pr if upstream configured
-  docker_build:
+  docker_build_push:
 
-    if: needs.prepare.outputs.pull_request_create == '0'
+    if: needs.prepare.outputs.version_docker_build_push == '1'
     needs:
       - prepare
     permissions:
@@ -106,18 +148,18 @@ jobs:
     with:
       build_registry: ghcr.io
       build_repo: ${{ github.repository }}
-      build_tag: ${{ needs.prepare.outputs.next_version }}
+      build_tag: ${{ needs.prepare.outputs.version_next_version }}
     secrets: inherit
 
   # create tag if build succeeds
-  create-tag:
+  create_tag:
 
-    if: needs.prepare.outputs.pull_request_create == '0'
+    if: needs.prepare.outputs.version_create_tag == '1'
     needs:
       - prepare
-      - docker_build
+      - docker_build_push
       
     uses: ./.github/workflows/create_tag.yml
     with:
-      version: ${{ needs.prepare.outputs.next_version }}
+      version: ${{ needs.prepare.outputs.version_next_version }}
     secrets: inherit
