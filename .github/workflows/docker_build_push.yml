@@ -1,6 +1,15 @@
 name: docker-build-push
 on: 
   workflow_call:
+    inputs:
+      build_repo:
+        type: string
+        description: 'version'
+        required: true
+      build_tag:
+        type: string
+        description: 'version'
+        required: true
 
 
 concurrency: 
@@ -11,9 +20,6 @@ jobs:
 
   docker-build:
     runs-on: ubuntu-latest
-    env:
-      build_repo: localhost:5000
-      build_tag: ${{ github.ref }}
     services:
       registry:
         image: registry:2
@@ -43,8 +49,8 @@ jobs:
             base-image-tag: latest
             test-target: 'tests'
           - image: pymp_server
-            base-image: ${{ env.build_repo }}/pymp_core
-            base-image-tag: ${{ env.build_tag }}
+            base-image: ${{ inputs.build_repo }}/pymp_core
+            base-image-tag: ${{ inputs.build_tag }}
             test-target: 'tests'
 
     steps:
@@ -88,11 +94,11 @@ jobs:
           target: test
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ env.build_tag }}
-            APP_REF_VERSION=${{ env.build_tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ env.build_repo }}/${{ matrix.image }}:${{ env.build_tag }}
+            ${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
       - 
         name: Build - targeting final and push
         uses: docker/build-push-action@v4
@@ -104,8 +110,8 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ env.build_tag }}
-            APP_REF_VERSION=${{ env.build_tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ env.build_repo }}/${{ matrix.image }}:${{ env.build_tag }}
+            ${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}

@@ -103,10 +103,9 @@ jobs:
       packages: write
 
     uses: ./.github/workflows/docker_build_push.yml
-    # with:
-    #   tag: ${{ needs.prepare.outputs.next_version }}
-    #   version: ${{ needs.prepare.outputs.next_version }}
-    #   ignore_push: false
+    with:
+      build_repo: ghcr.io/${{ github.repository }}
+      build_tag: ${{ needs.prepare.outputs.next_version }}
     secrets: inherit
 
   # create tag if build succeeds
