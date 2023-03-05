@@ -24,6 +24,8 @@ jobs:
               | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
 
           echo "$csv" | while IFS=',' read -r package_url package_tag; do
+
+            echo "Checking $package_url : $package_tag"
           
             if [[ "$package_tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
               echo "Tag valid: $user/$image:$package_tag"
