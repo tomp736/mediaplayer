@@ -21,10 +21,14 @@ jobs:
               "https://$registry_server/v2/$user/$image/tags/list?n=500" | jq -r '.tags[]')
 
           for tag in $TAGS; do
-            if ! [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-              echo "Deleting image: $user/$image:$tag"
-              # curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
-              #   "https://$registry_server/v2/$user/$image/manifests/$tag"
+            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Tag valid: $user/$image:$tag"
+            elif [[ "$tag" = 'latest']]; then
+              echo "Tag valid: $user/$image:$tag"
+            else
+              echo "Tag invalid: $user/$image:$tag"
+              curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
+                "https://$registry_server/v2/$user/$image/manifests/$tag"
             fi
           done
 
