@@ -19,7 +19,7 @@ jobs:
 
           TAGS=$(curl -L \
               -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}"" \
+              -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
               https://api.github.com/users/$user/packages/container/$image_encoded/versions)
 
           for tag in $TAGS; do
