@@ -78,7 +78,7 @@ jobs:
         timeout-minutes: 5
         if: matrix.base-image != ''
         run: |
-          until docker manifest inspect ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
             echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
