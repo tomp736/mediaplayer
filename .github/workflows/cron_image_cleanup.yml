@@ -16,7 +16,15 @@ jobs:
           user="tomp736"
           image="pymp/pymp_core"
 
-          tags=$(curl -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
+          TAGS=$(curl -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
               -H "Accept: application/json" \
               "https://$registry_server/v2/$user/$image/tags/list?n=500" | jq -r '.tags[]')
+
+          for tag in $TAGS; do
+            if ! [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Deleting image: $user/$image:$tag"
+              # curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
+              #   "https://$registry_server/v2/$user/$image/manifests/$tag"
+            fi
+          done
 
