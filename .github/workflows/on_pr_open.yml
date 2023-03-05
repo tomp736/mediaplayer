@@ -22,6 +22,6 @@ jobs:
       
     uses: ./.github/workflows/docker_build_push.yml
     with:
-      build_repo: localhost:5000
-      build_tag: ${{ github.event.pull_request.head.ref }}
+      build_repo: ghcr.io/${{ github.repository }}
+      build_tag: pr-${{ github.event.pull_request.number }}
     secrets: inherit
