@@ -2,6 +2,10 @@ name: docker-build-push
 on: 
   workflow_call:
     inputs:
+      build_registry:
+        type: string
+        description: 'version'
+        required: true
       build_repo:
         type: string
         description: 'version'
@@ -48,7 +52,7 @@ jobs:
             base-image-tag: latest
             test-target: 'tests'
           - image: pymp_server
-            base-image: ${{ inputs.build_repo }}/pymp_core
+            base-image: ${{ inputs.build_registry }}/${{ inputs.build_repo }}/pymp_core
             base-image-tag: ${{ inputs.build_tag }}
             test-target: 'tests'
 
@@ -61,6 +65,13 @@ jobs:
       - 
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.build_registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - 
         name: Check if image is available
         shell: bash
@@ -90,7 +101,7 @@ jobs:
             APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
+             ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
       - 
         name: Build - targeting final and push
         uses: docker/build-push-action@v4
@@ -106,4 +117,4 @@ jobs:
             APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
+            ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
