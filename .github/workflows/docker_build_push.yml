@@ -33,16 +33,20 @@ jobs:
           - pymp_frontend
           - pymp_server
         test-target:
-          - 'tests'
+          - ''
         base-image:
           - ''
         base-image-tag:
           - ''
         exclude:
-          - image: pymp_frontend
+          - image: pymp_core
             base-image: ''
             base-image-tag: ''
-            test-target: 'tests'
+            test-target: ''
+          - image: pymp_server
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
         include:
           - image: pymp_core
             base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
