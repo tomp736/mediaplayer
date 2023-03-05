@@ -54,6 +54,8 @@ jobs:
             create_tag=1
             patch=$((patch+1))
           else
+            docker_build_push=1
+            create_tag=1
             patch_count=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep $major.$minor.$patch | wc -l)
             patch_iter="-$patch_count"
           fi
