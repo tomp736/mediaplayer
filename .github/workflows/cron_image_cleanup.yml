@@ -23,7 +23,7 @@ jobs:
               https://api.github.com/users/$user/packages/container/$image_encoded/versions \
               | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
 
-          echo "$csv" | while IFS=',' read -r package_url package_tag; do
+          echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
 
             echo "Checking $package_url : $package_tag"
           
