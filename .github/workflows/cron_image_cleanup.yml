@@ -18,6 +18,5 @@ jobs:
 
           tags=$(curl -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
               -H "Accept: application/json" \
-              "https://$registry_server/v2/$user/$image/tags/list" | jq -r '.tags[]')
+              "https://$registry_server/v2/$user/$image/tags/list?n=500" | jq -r '.tags[]')
 
-          echo $tags
