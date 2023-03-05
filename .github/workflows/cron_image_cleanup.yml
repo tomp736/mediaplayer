@@ -27,8 +27,13 @@ jobs:
               echo "Tag valid: $user/$image:$tag"
             else
               echo "Tag invalid: $user/$image:$tag"
+
+              DIGEST=$(curl -s -I -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
+                "https://$registry_server/v2/$user/$image/manifests/$tag" | grep -i docker-content-digest | awk '{print $2}' | tr -d '\r')
+
+              echo "Deleting digest: $DIGEST"
               curl -s -X DELETE -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
-                "https://$registry_server/v2/$user/$image/manifests/$tag"
+                "https://$registry_server/v2/$user/$image/manifests/$DIGEST"
             fi
           done
 
