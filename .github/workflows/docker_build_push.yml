@@ -1,0 +1,120 @@
+name: docker-build-push
+on: 
+  workflow_call:
+    inputs:
+      build_registry:
+        type: string
+        description: 'version'
+        required: true
+      build_repo:
+        type: string
+        description: 'version'
+        required: true
+      build_tag:
+        type: string
+        description: 'version'
+        required: true
+
+
+concurrency: 
+  group:  docker_build_${{ inputs.build_tag }}
+  cancel-in-progress: false
+
+jobs:
+
+  docker-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix: 
+        image:
+          - pymp_core
+          - pymp_frontend
+          - pymp_server
+        test-target:
+          - ''
+        base-image:
+          - ''
+        base-image-tag:
+          - ''
+        exclude:
+          - image: pymp_core
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+          - image: pymp_server
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+        include:
+          - image: pymp_core
+            base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
+            base-image-tag: latest
+            test-target: 'tests'
+          - image: pymp_server
+            base-image: ${{ inputs.build_registry }}/${{ inputs.build_repo }}/pymp_core
+            base-image-tag: ${{ inputs.build_tag }}
+            test-target: 'tests'
+
+    steps:
+      - 
+        uses: actions/checkout@v3
+      - 
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - 
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - 
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.build_registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Check if image is available
+        shell: bash
+        timeout-minutes: 5
+        if: matrix.base-image != ''
+        run: |
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
+            echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            echo "Image is not available, sleeping for 10 seconds..."
+            sleep 10
+          done
+          echo "Image is available, continuing with the workflow."
+      - 
+        name: Build - targeting test
+        if: matrix.test-target != ''
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: test
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+             ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
+      - 
+        name: Build - targeting final and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
