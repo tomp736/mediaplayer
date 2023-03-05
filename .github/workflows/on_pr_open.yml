@@ -14,7 +14,7 @@ on:
 jobs:
 
   # run the docker_build_push workflow
-  docker_build:
+  docker_build_push:
 
     permissions:
       contents: read
@@ -24,5 +24,16 @@ jobs:
     with:
       build_registry: ghcr.io
       build_repo: ${{ github.repository }}
-      build_tag: pr-${{ github.event.pull_request.number }}
+      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+    secrets: inherit
+
+  # create tag if build succeeds
+  create_tag:
+
+    needs:
+      - docker_build_push
+      
+    uses: ./.github/workflows/create_tag.yml
+    with:
+      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
     secrets: inherit

@@ -17,7 +17,7 @@ on:
 
 
 concurrency: 
-  group:  docker_build_${{ github.ref }}
+  group:  docker_build_${{ inputs.build_tag }}
   cancel-in-progress: false
 
 jobs:
