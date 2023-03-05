@@ -2,18 +2,18 @@ name: docker-build-push
 on: 
   workflow_call:
 
-env:
-  build_repo: localhost:5000
-  build_tag: ${{ github.ref }}
 
 concurrency: 
-  group:  docker_build_${{ env.build_tag }}
+  group:  docker_build_${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
 
   docker-build:
     runs-on: ubuntu-latest
+    env:
+      build_repo: localhost:5000
+      build_tag: ${{ github.ref }}
     services:
       registry:
         image: registry:2
