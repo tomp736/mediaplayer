@@ -5,8 +5,8 @@ on:
     branches:
       - '**'
       - '!*-promotion'
-    paths:
-      - '!src/**'
+    paths-ignore:
+      - 'src/**'
 
 jobs:
 
