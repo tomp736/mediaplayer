@@ -6,16 +6,24 @@ on:
     - cron:  '*/10 * * * *'
 
 jobs:
-  delete-slow:
+  image-cleanup:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: 
+        image:
+          - pymp%2Fpymp_core
+          - pymp%2Fpymp_locust
+          - pymp%2Fpymp_frontend
+          - pymp%2Fpymp_server
     steps:
       - name: list image tags
         run: |
           # https://ghcr.io/tomp736/pymp/pymp_core/tags
           registry_server="ghcr.io"
           user="tomp736"
-          image="pymp/pymp_core"
-          image_encoded="pymp%2Fpymp_core"
+          image=${{ matrix.image }}
+          image_encoded=${{ matrix.image }}
 
           TAGS=$(curl -L \
               -H "Accept: application/vnd.github+json" \
@@ -24,13 +32,11 @@ jobs:
               | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
 
           echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
-
             tag=$(echo $package_tag | tr -d '"')
             url=$(echo $package_url | tr -d '"')
-
             echo "Checking $url : $tag"
           
-            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
+            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "Tag valid: $user/$image:$tag"
             elif [[ "$tag" = 'latest' ]]; then
               echo "Tag valid: $user/$image:$tag"
@@ -42,5 +48,4 @@ jobs:
                 -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
                 $url
             fi
-
           done
