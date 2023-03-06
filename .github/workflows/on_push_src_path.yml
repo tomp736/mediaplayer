@@ -1,10 +1,12 @@
-name: on branch push
+name: on branch push src/**
 on: 
   workflow_dispatch:    
   push:
     branches:
       - '**'
       - '!*-promotion'
+    paths:
+      - 'src/**'
 
 jobs:
 
@@ -23,8 +25,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.WORKFLOW_TOKEN }}
 
       # Adds variables to github output
       # used by docker_build_push and create_tag jobs
@@ -110,7 +110,7 @@ jobs:
       promotion_tag: 'promotion'
     secrets: inherit
 
-  # create pr if upstream configured
+  # docker_build_push
   docker_build_push:
 
     if: needs.prepare.outputs.version_docker_build_push == '1'
