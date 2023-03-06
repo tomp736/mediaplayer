@@ -8,39 +8,41 @@ on:
 jobs:
   delete-slow:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix: 
+        image:
+          - pymp%2Fpymp_core
+          - pymp%2Flocust
+          - pymp%2Ffrontend
+          - pymp%2Fserver
     steps:
-      - name: list image tags
+      - name: delete container images that dont conform to naming
         run: |
           # https://ghcr.io/tomp736/pymp/pymp_core/tags
           registry_server="ghcr.io"
           user="tomp736"
-          image="pymp/pymp_core"
-          image_encoded="pymp%2Fpymp_core"
 
-          TAGS=$(curl -L \
+          CONTAINERS=$(curl -L \
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.READ_IMAGES }}" \
-              https://api.github.com/users/$user/packages/container/$image_encoded/versions?per_page=100 \
-              | jq -r '.[] | [.url, .metadata.container.tags[] // "" ] | @csv')
+              https://api.github.com/users/$user/packages/container/${{ matrix.image }}/versions \
+              jq -r '.[] | [.name, .metadata.container.tags[] // "" ] | @csv')
+              
 
-          echo "$TAGS" | while IFS=',' read -r package_url package_tag; do
-
-            tag=$(echo $package_tag | tr -d '"')
-            url=$(echo $package_url | tr -d '"')
-
-            echo "Checking $url : $tag"
-          
-            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[09]+$ ]]; then
+          echo "$CONTAINERS" | while IFS=',' read -r container_name container_tag; do
+            if [[ "$tag" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
               echo "Tag valid: $user/$image:$tag"
             elif [[ "$tag" = 'latest' ]]; then
               echo "Tag valid: $user/$image:$tag"
             else
               echo "Tag invalid: $user/$image:$tag"
+
               curl -L \
                 -X DELETE \
                 -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer ${{ secrets.DELETE_IMAGES }}" \
-                $url
+                https://api.github.com/users/$user/packages/container/${{ matrix.image }}/versions/$tag
             fi
-
           done
+
