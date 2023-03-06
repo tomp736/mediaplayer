@@ -1,0 +1,65 @@
+name: on branch push !src/**
+on: 
+  workflow_dispatch:    
+  push:
+    branches:
+      - '**'
+      - '!*-promotion'
+    paths:
+      - '!src/**'
+
+jobs:
+
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    outputs:
+      pull_request_create: ${{ steps.pull_request.outputs.create }}
+      pull_request_branch_target: ${{ steps.pull_request.outputs.branch_target }}
+      pull_request_branch_source: ${{ steps.pull_request.outputs.branch_source }}
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      # Adds variables to github output for create_pull job
+      # create: { 0 | 1 } indicating if pull request should be automatically created
+      # branch_source: { branch-name } that the pull request will be made for
+      # branch_target: { branch-name } that the pull request will be made for
+      - id: pull_request
+        run: |
+          create=0
+          branch_source="${GITHUB_REF#refs/heads/}"
+          branch_target=""
+
+          if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
+            create=0
+          elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
+            branch_target="main"
+            create=1
+          else
+            branch_target="dev"
+            create=1
+          fi
+
+          echo $create
+          echo $branch_source
+          echo $branch_target
+
+          echo "create=$create" >> $GITHUB_OUTPUT
+          echo "branch_source=$branch_source" >> $GITHUB_OUTPUT
+          echo "branch_target=$branch_target" >> $GITHUB_OUTPUT
+
+  # create pr if upstream configured
+  create_pull:
+
+    if: needs.prepare.outputs.pull_request_create == '1'
+    needs:
+      - prepare
+
+    uses: ./.github/workflows/create_pr.yml
+    with:
+      source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
+      target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}
+      promotion_tag: 'promotion'
+    secrets: inherit
