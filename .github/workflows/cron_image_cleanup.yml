@@ -13,9 +13,9 @@ jobs:
       matrix: 
         image:
           - pymp%2Fpymp_core
-          - pymp%2Flocust
-          - pymp%2Ffrontend
-          - pymp%2Fserver
+          - pymp%2Fpymp_locust
+          - pymp%2Fpymp_frontend
+          - pymp%2Fpymp_server
     steps:
       - name: list image tags
         run: |
