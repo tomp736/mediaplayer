@@ -71,8 +71,8 @@ jobs:
       tag: ${{ needs.prepare.outputs.next_version }}
     secrets: inherit
 
-  # create tag if build succeeds
-  create_tag:
+  # issue repository dispatch
+  dispatch_deployment:
 
     needs:
       - docker_build_push
