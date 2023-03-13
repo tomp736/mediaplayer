@@ -1,4 +1,4 @@
-name: create pr
+name: 'on wfc create pr'
 
 on:
   workflow_call:

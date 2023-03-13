@@ -1,0 +1,16 @@
+name: 'on wfc todo'
+
+on: 
+  workflow_call:
+
+jobs:
+  todo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+        uses: actions/checkout@v3 
+      - 
+        name: ToDo
+        run: |
+          echo "A Thing ToDo"
