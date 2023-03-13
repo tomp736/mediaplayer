@@ -1,7 +1,8 @@
 from abc import abstractmethod
 from enum import IntFlag
 from typing import Dict
-
+import os
+import logging
 
 class PympServerRoles(IntFlag):
     NONE = 1
@@ -23,6 +24,10 @@ class IConfig():
     def load_config(self, config: Dict[str, str]):
         pass
 
+    @abstractmethod
+    def validate_config(self) -> bool: 
+        pass
+
 
 class FlaskConfig(IConfig):
 
@@ -42,6 +47,9 @@ class FlaskConfig(IConfig):
         self.host = config.get('host', self.host)
         self.port = int(config.get('port', self.port))
         self.cors_headers = config.get('cors_headers', self.cors_headers)
+
+    def validate_config(self) -> bool:
+        return True
 
 
 class ServerConfig(IConfig):
@@ -69,6 +77,8 @@ class ServerConfig(IConfig):
         self.host = config.get('host', self.host)
         self.port = int(config.get('port', self.port))
 
+    def validate_config(self) -> bool:
+        return True
 
 class ServiceConfig(IConfig):
 
@@ -95,14 +105,14 @@ class ServiceConfig(IConfig):
         self.host = config.get('host', self.host)
         self.port = int(config.get('port', self.port))
 
-    def is_valid(self):
+    def validate_config(self) -> bool:
         if self.proto in ["http", "https"]:
             return True
         else:
             return False
 
     def get_uri(self):
-        if self.proto in ["http", "https"]:
+        if self.validate_config():
             return f"{self.proto}://{self.host}:{self.port}"
         else:
             raise Exception(f"ServiceInfo Not Valid: {self.__dict__}")
@@ -124,6 +134,8 @@ class RedisConfig(IConfig):
         self.host = config.get('host', self.host)
         self.port = int(config.get('port', self.port))
 
+    def validate_config(self) -> bool:
+        return True
 
 class MediaConfig(IConfig):
 
@@ -136,17 +148,28 @@ class MediaConfig(IConfig):
         self.load(kwargs)
 
     def load(self, kwargs):
+        logging.info(kwargs)
         self.media_path = kwargs.get('media_path', self.media_path)
         self.index_path = kwargs.get('index_path', self.index_path)
-        self.media_chunk_size = kwargs.get(
-            'media_chunk_size', self.media_chunk_size)
-        self.thumb_chunk_size = kwargs.get(
-            'thumb_chunk_size', self.thumb_chunk_size)
+        self.media_chunk_size = int(kwargs.get(
+            'media_chunk_size', self.media_chunk_size))
+        self.thumb_chunk_size = int(kwargs.get(
+            'thumb_chunk_size', self.thumb_chunk_size))
 
     def load_config(self, config: Dict[str, str]):
+        logging.info(config)
         self.media_path = config.get('media_path', self.media_path)
         self.index_path = config.get('index_path', self.index_path)
         self.media_chunk_size = int(config.get(
             'media_chunk_size', self.media_chunk_size))
         self.thumb_chunk_size = int(config.get(
             'thumb_chunk_size', self.thumb_chunk_size))
+
+    def validate_config(self) -> bool:
+        logging.info(self.__dict__)
+        if not os.path.exists(self.media_path):
+            return False
+        if not os.path.exists(self.index_path):
+            return False
+        return True
+

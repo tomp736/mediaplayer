@@ -16,16 +16,16 @@ class ConfigBuilder:
             config_source_dict = config_source.get_values()
             config_dict: Dict[str, str] = {}
             if isinstance(config, ServerConfig):
-                config_dict = {key.lower().replace('server_', ''): value for key,
+                config_dict = {key.lower().replace('server_', '', 1): value for key,
                             value in config_source_dict.items() if key.startswith('SERVER_')}
             if isinstance(config, FlaskConfig):
-                config_dict = {key.lower().replace('flask_', ''): value for key,
+                config_dict = {key.lower().replace('flask_', '', 1): value for key,
                             value in config_source_dict.items() if key.startswith('FLASK_')}
             if isinstance(config, RedisConfig):
-                config_dict = {key.lower().replace('redis_', ''): value for key,
+                config_dict = {key.lower().replace('redis_', '', 1): value for key,
                             value in config_source_dict.items() if key.startswith('REDIS_')}
             if isinstance(config, MediaConfig):
-                config_dict = {key.lower().replace('media_', ''): value for key,
+                config_dict = {key.lower().replace('media_', '', 1): value for key,
                             value in config_source_dict.items() if key.startswith('MEDIA_')}
             config.load_config(config_dict)
         
