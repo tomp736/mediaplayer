@@ -33,7 +33,7 @@ jobs:
     with:
       build_registry: ghcr.io
       build_repo: ${{ github.repository }}
-      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.commits.totalCount }}
+      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.potentialMergeCommit.abbreviatedOid }}
     secrets: inherit
 
   # create tag if build succeeds
@@ -44,7 +44,7 @@ jobs:
       
     uses: ./.github/workflows/on_wfc_create_tag.yml
     with:
-      tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.commits.totalCount }}
+      tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.potentialMergeCommit.abbreviatedOid }}
     secrets: inherit
 
   # issue repository dispatch
