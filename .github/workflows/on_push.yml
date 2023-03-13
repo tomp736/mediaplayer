@@ -1,12 +1,11 @@
-name: on branch push !src/**
+name: 'on push'
 on: 
   workflow_dispatch:    
   push:
     branches:
       - '**'
       - '!*-promotion'
-    paths-ignore:
-      - 'src/**'
+      - '!*-autofix'
 
 jobs:
 
