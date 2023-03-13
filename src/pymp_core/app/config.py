@@ -92,6 +92,7 @@ class ServiceConfig(IConfig):
         self.load(kwargs)
 
     def load(self, kwargs):
+        logging.info(kwargs)
         self.id = kwargs.get('id', self.id)
         self.roles = kwargs.get('roles', self.roles)
         self.proto = kwargs.get('proto', self.proto)
@@ -99,6 +100,7 @@ class ServiceConfig(IConfig):
         self.port = kwargs.get('port', self.port)
 
     def load_config(self, config: Dict[str, str]):
+        logging.info(config)
         self.id = config.get('id', self.id)
         self.roles = PympServerRoles(int(config.get('roles', self.roles)))
         self.proto = config.get('proto', self.proto)
