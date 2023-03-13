@@ -1,4 +1,4 @@
-name: on pr open
+name: 'on pr open'
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
 on:
@@ -11,29 +11,8 @@ on:
       - dev
       - main
 
-jobs:
-
-  # run the docker_build_push workflow
-  docker_build_push:
-
-    permissions:
-      contents: read
-      packages: write
-      
-    uses: ./.github/workflows/docker_build_push.yml
-    with:
-      build_registry: ghcr.io
-      build_repo: ${{ github.repository }}
-      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
-    secrets: inherit
-
-  # create tag if build succeeds
-  create_tag:
-
-    needs:
-      - docker_build_push
-      
-    uses: ./.github/workflows/create_tag.yml
-    with:
-      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+jobs:  
+  # todo
+  todo:
+    uses: ./.github/workflows/on_wfc_todo.yml
     secrets: inherit
