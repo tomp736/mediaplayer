@@ -46,3 +46,16 @@ jobs:
     with:
       tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
     secrets: inherit
+
+  # issue repository dispatch
+  dispatch_deployment:
+
+    needs:
+      - docker_build_push
+      - create_tag
+      
+    uses: ./.github/workflows/on_wfc_dispatch_deployment.yml
+    with:
+      environment: ${{ github.event.pull_request.head.ref }}
+      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+    secrets: inherit
