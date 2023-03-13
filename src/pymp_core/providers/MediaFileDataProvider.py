@@ -18,10 +18,8 @@ class MediaFileDataProvider(MediaDataProvider):
     def __init__(self, media_config: MediaConfig):
         self.media_config = media_config
         self.status = True
-        if not os.path.exists(self.media_config.media_path):
-            os.mkdir(self.media_config.media_path)
-        if not os.path.exists(self.media_config.index_path):
-            os.mkdir(self.media_config.index_path)
+        os.makedirs(self.media_config.media_path, exist_ok=True)
+        os.makedirs(self.media_config.index_path, exist_ok=True)
 
     def __repr__(self) -> str:
         return f"MediaFileDataProvider({self.status})"
