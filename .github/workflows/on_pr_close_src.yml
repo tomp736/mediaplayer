@@ -66,7 +66,7 @@ jobs:
     needs:
       - docker_build_push
       
-    uses: ./.github/workflows/create_tag.yml
+    uses: ./.github/workflows/on_wfc_create_tag.yml
     with:
-      version: ${{ needs.prepare.outputs.next_version }}
+      tag: ${{ needs.prepare.outputs.next_version }}
     secrets: inherit
