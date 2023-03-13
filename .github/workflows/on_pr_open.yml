@@ -12,7 +12,7 @@ on:
       - main
 
 jobs:  
-  # run tests
-  tests:
+  # todo
+  todo:
     uses: ./.github/workflows/on_wfc_todo.yml
     secrets: inherit
