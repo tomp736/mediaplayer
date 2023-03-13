@@ -1,0 +1,48 @@
+name: 'on pr open src'
+
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
+on:
+  pull_request:
+    types: 
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - dev
+      - main
+    paths:
+      - "src/**"
+
+jobs:
+  
+  # run tests
+  tests:
+    uses: ./.github/workflows/on_wfc_tests.yml
+    secrets: inherit
+
+  # run the docker_build_push workflow
+  docker_build_push:
+    needs:
+      - tests
+
+    permissions:
+      contents: read
+      packages: write
+      
+    uses: ./.github/workflows/docker_build_push.yml
+    with:
+      build_registry: ghcr.io
+      build_repo: ${{ github.repository }}
+      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+    secrets: inherit
+
+  # create tag if build succeeds
+  create_tag:
+
+    needs:
+      - docker_build_push
+      
+    uses: ./.github/workflows/create_tag.yml
+    with:
+      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+    secrets: inherit
