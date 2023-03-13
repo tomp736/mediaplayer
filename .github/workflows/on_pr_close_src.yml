@@ -79,4 +79,7 @@ jobs:
       - create_tag
       
     uses: ./.github/workflows/on_wfc_dispatch_deployment.yml
+    with:
+      environment: ${{ github.event.pull_request.base.ref }}
+      version: ${{ needs.prepare.outputs.next_version }}
     secrets: inherit

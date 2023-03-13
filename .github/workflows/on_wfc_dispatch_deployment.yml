@@ -2,6 +2,15 @@ name: 'on wfc dispatch deployment'
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        type: string
+        description: 'environment to deploy'
+        required: true
+      version:
+        type: string
+        description: 'app version to deploy'
+        required: false
 
 jobs:
   create_pr:
@@ -9,11 +18,25 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Trigger Repository Dispatch
+      - 
+        name: Save payload to file
+        run: |
+          cat <<EOF > payload.json
+          {
+            "event_type": "patch_pymp",
+            "client_payload": {
+              "environment": "${{ inputs.environment }}",
+              "version": "${{ inputs.version }}",
+              "message": "Update pymp deployment."
+            }
+          }
+          EOF
+      - 
+        name: Trigger Repository Dispatch
         run: |
           curl -X POST \
               -H "Authorization: Bearer ${{ secrets.WF_DISPATCH_PYMP_INFRA_FLUX }}" \
               -H "Accept: application/vnd.github.everest-preview+json" \
               -H "Content-Type: application/json" \
-              https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches \
-              --data '{"event_type": "update-pymp-patch", "client_payload": {"message": "Trigger update PyMP patch workflow."}}'
+              --data @payload.json \
+              https://api.github.com/repos/tomp736/pymp_infra_flux/dispatches
