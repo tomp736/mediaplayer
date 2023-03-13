@@ -1,4 +1,4 @@
-name: create dispatch
+name: 'on wfc dispatch deployment'
 
 on:
   workflow_call:
