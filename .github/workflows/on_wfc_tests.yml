@@ -1,0 +1,16 @@
+name: 'on wfc tests'
+
+on: 
+  workflow_call:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - 
+        uses: actions/checkout@v3 
+      - 
+        name: Run Tests
+        run: |
+          echo "Ran some tests"
