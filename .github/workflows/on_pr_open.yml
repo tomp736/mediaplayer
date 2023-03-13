@@ -24,7 +24,7 @@ jobs:
     with:
       build_registry: ghcr.io
       build_repo: ${{ github.repository }}
-      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+      build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.additions }}
     secrets: inherit
 
   # create tag if build succeeds
@@ -35,5 +35,5 @@ jobs:
       
     uses: ./.github/workflows/create_tag.yml
     with:
-      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}
+      version: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}.${{ github.event.pull_request.additions }}
     secrets: inherit
