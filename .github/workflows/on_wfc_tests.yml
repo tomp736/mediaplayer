@@ -6,6 +6,12 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix: 
+        image:
+          - pymp_core
+          - pymp_server
 
     steps:
       - 
@@ -17,9 +23,9 @@ jobs:
           cache: 'pip' # caching pip dependencies
       -
         run: |
-          pip install -r ./src/pymp_core/requirements.txt
-          pip install ./src/pymp_core
-          pip install -r ./src/pymp_core_tests/requirements.txt
+          pip install -r ./src/${{ matrix.image }}/requirements.txt
+          pip install ./src/${{ matrix.image }}
+          pip install -r ./src/${{ matrix.image }}_tests/requirements.txt
       -
         run: |
-          pytest ./src/pymp_core_tests
+          pytest ./src/p${{ matrix.image }}_tests
