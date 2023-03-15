@@ -12,6 +12,9 @@ jobs:
         image:
           - pymp_core
           - pymp_server
+        include:
+          - image: pymp_server
+            local-deps: 'pymp_core'
 
     steps:
       - 
@@ -21,6 +24,14 @@ jobs:
         with:
           python-version: '3.10' 
           cache: 'pip' # caching pip dependencies
+      - 
+        name: Check and install local deps.
+        shell: bash
+        timeout-minutes: 5
+        if: matrix.local-deps != ''
+        run: |
+          pip install -r ./src/${{ matrix.local-deps }}/requirements.txt
+          pip install ./src/${{ matrix.local-deps }}
       -
         run: |
           pip install -r ./src/${{ matrix.image }}/requirements.txt
@@ -28,4 +39,4 @@ jobs:
           pip install -r ./src/${{ matrix.image }}_tests/requirements.txt
       -
         run: |
-          pytest ./src/p${{ matrix.image }}_tests
+          pytest ./src/${{ matrix.image }}_tests
