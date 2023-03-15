@@ -10,10 +10,12 @@ from pymp_core.app.config_factory import CONFIG_FACTORY
 from pymp_core.dto.media_info import MediaInfo
 from pymp_core.dto.service_info import ServiceInfo
 
+import logging
 
 class RedisDataAccess(ABC):
     def __init__(self, decode_responses):
         self.config = CONFIG_FACTORY.get_redis_config()
+        logging.info(self.config)
         self.redis = redis.Redis(host=self.config.host, port=self.config.port, db=0, decode_responses=decode_responses)
 
     def is_redis_readonly_replica(self) -> bool:

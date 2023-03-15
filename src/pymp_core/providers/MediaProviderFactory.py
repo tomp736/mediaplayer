@@ -27,7 +27,7 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
     service_configs = CONFIG_FACTORY.get_service_configs()  
     for service_config in service_configs:
         if service_config.roles & PympServerRoles.MEDIA_SVC:    
-            if service_config.is_valid() and service_config.id == service_id:
+            if service_config.id == service_id:
                 media_http_data_provider = MediaHttpDataProvider(service_config)
                 if media_http_data_provider.check_data_provider(wants_write_access):
                     media_providers.append(media_http_data_provider)
@@ -38,7 +38,7 @@ def get_data_providers(service_id: str, wants_write_access: bool = False) -> Lis
         if media_registry_provider:
             service_info = media_registry_provider.get_service_info(service_id)
             service_config = ServiceConfig(**service_info.__dict__)
-            if service_info and service_config and service_config.is_valid():
+            if service_info and service_config:
                 media_provider = MediaHttpDataProvider(service_config)
                 if media_provider.check_data_provider(wants_write_access):
                     media_providers.append(media_provider)
