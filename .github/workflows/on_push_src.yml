@@ -1,0 +1,17 @@
+name: 'on push src'
+on: 
+  workflow_dispatch:    
+  push:
+    branches:
+      - '**'
+      - '!*-promotion'
+      - '!*-autofix'
+    paths:
+      - 'src/**'
+
+jobs:
+  
+  # run tests
+  tests:
+    uses: ./.github/workflows/on_wfc_tests.yml
+    secrets: inherit

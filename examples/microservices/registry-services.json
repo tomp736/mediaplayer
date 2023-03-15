@@ -1,0 +1,9 @@
+[
+    {
+        "id": "media_registry",
+        "roles": 64,
+        "proto": "http",
+        "host": "pymp-server-media-registry",
+        "port": 80
+    }
+  ]

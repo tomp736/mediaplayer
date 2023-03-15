@@ -1,12 +1,11 @@
-name: on branch push !src/**
+name: 'on push'
 on: 
   workflow_dispatch:    
   push:
     branches:
       - '**'
       - '!*-promotion'
-    paths-ignore:
-      - 'src/**'
+      - '!*-autofix'
 
 jobs:
 
@@ -57,7 +56,7 @@ jobs:
     needs:
       - prepare
 
-    uses: ./.github/workflows/create_pr.yml
+    uses: ./.github/workflows/on_wfc_create_pr.yml
     with:
       source_branch: ${{ needs.prepare.outputs.pull_request_branch_source }}
       target_branch: ${{ needs.prepare.outputs.pull_request_branch_target }}

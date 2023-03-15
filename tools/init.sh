@@ -12,10 +12,10 @@ sudo mkdir -p /srv/pymp/media1/index
 sudo chown -R $USER:root /srv/media1
 
 sudo mkdir -p /srv/pymp/redis
-sudo chown -R $USER:root /srv/redis
+sudo chown -R $USER:root /srv/pymp/redis
 
 sudo mkdir -p /srv/pymp/grafana
-sudo chown -R $USER:root /srv/grafana
+sudo chown -R $USER:root /srv/pymp/grafana
 
 # NOBODY:NOGROUP
 sudo mkdir -p /srv/pymp/prometheus
