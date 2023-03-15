@@ -3,14 +3,14 @@ version: "3.3"
 services:
 
   # PYMP Services
-  frontend:
-    image: ghcr.io/tomp736/pymp/pymp_frontend:latest-dev
+  pymp-frontend:
+    image: pymp_frontend
     ports:
       - "8080:80"
     environment:
-      MEDIA_URL: "http://${PYMP_HOSTNAME}:8081"
-      THUMB_URL: "http://${PYMP_HOSTNAME}:8082"
-      META_URL: "http://${PYMP_HOSTNAME}:8083"
+      MEDIA_URL: "http://localhost:8081/api"
+      THUMB_URL: "http://localhost:8081/api"
+      META_URL: "http://localhost:8081/api"
     deploy:
       resources:
         limits:
@@ -21,17 +21,27 @@ services:
           memory: 25M
     restart: unless-stopped
 
-  media_api:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
+  pymp-server:
+    image: pymp_server
     ports:
       - "8081:80"
-    env_file:
-      - 'server_api.env'
     environment:
-      - SERVICE_TYPE=1
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-      - MEDIAREGISTRY_SVC_PORT=80
+      PYTHONHASHSEED: "383747829"
+      FLASK_HOST: "0.0.0.0"
+      FLASK_PORT: "80"
+      FLASK_CORS_HEADERS: "*"
+      REDIS_HOST: "pymp-redis-readonly"
+      REDIS_PORT: "6379"
+      MEDIA_MEDIA_CHUNK_SIZE: "4194304"
+      MEDIA_THUMB_CHUNK_SIZE: "32768"
+      MEDIA_MEDIA_PATH: "/data/media"
+      MEDIA_INDEX_PATH: "/data/index"
+      SERVER_PROTO: "http"
+      SERVER_HOST: "pymp-server"
+      SERVER_PORT: "80"
+      SERVER_ROLES: "30"
+    volumes: 
+      - ./registry-services.json:/app/registry-services.json
     networks:
       - media_net
       - redis_fe
@@ -46,117 +56,22 @@ services:
           cpus: '0.5'
           memory: 25M
     restart: unless-stopped
-
-  thumb_api:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    ports:
-      - "8082:80"
-    env_file:
-      - 'server_api.env'
-    environment:
-      - SERVICE_TYPE=4
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-      - MEDIAREGISTRY_SVC_PORT=80
-    networks:
-      - redis_fe
-      - locust_net
-      - prom_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 25M
-    restart: unless-stopped
-
-  meta_api:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    ports:
-      - "8083:80"
-    env_file:
-      - 'server_api.env'
-    environment:
-      - SERVICE_TYPE=2
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-      - MEDIAREGISTRY_SVC_PORT=80
-    networks:
-      - redis_fe
-      - locust_net
-      - prom_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 25M
-    restart: unless-stopped
-
-  media_svc_internal:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    environment:
-      - SERVICE_TYPE=8
-      - SERVICE_ID=internal
-      - SERVICE_PROTO=http
-      - SERVICE_HOST=media_svc_internal
-      - SERVICE_PORT=80
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-      - MEDIAREGISTRY_SVC_PORT=80
-    volumes:
-      - /srv/pymp/media1/videos:/app/media:rw
-      - /srv/pymp/media1/index:/app/index:rw
-    networks:
-      - media_net
-      - prom_net
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 500M
-        reservations:
-          cpus: '0.5'
-          memory: 250M
-    restart: always
-
-  media_svc_external:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    environment:
-      - SERVICE_TYPE=8
-      - SERVICE_ID=external
-      - SERVICE_PROTO=http
-      - SERVICE_HOST="${PYMP_HOSTNAME}"
-      - SERVICE_PORT=12001
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST="${PYMP_HOSTNAME}"
-      - MEDIAREGISTRY_SVC_PORT=8085
-    volumes:
-      - /srv/pymp/media2/videos:/app/media:rw
-      - /srv/pymp/media2/index:/app/index:rw
-    ports:
-      - "12001:80"
-      - "12002:8000"
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 500M
-        reservations:
-          cpus: '0.5'
-          memory: 250M
-    restart: always
   
-  mediaregistry_svc:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    env_file:
-      - 'server_svc.env'
+  pymp-server-media-registry:
+    image: pymp_server
     environment:
-      - SERVICE_TYPE=32
+      PYTHONHASHSEED: "383747829"
+      FLASK_HOST: "0.0.0.0"
+      FLASK_PORT: "80"
+      FLASK_CORS_HEADERS: "*"
+      REDIS_HOST: "pymp-redis"
+      REDIS_PORT: "6379"
+      SERVER_PROTO: "http"
+      SERVER_HOST: "pymp-server-media-registry"
+      SERVER_PORT: "80"
+      SERVER_ROLES: "64"
+    volumes: 
+      - ./registry-services.json:/app/registry-services.json
     networks:
       - media_net
       - redis_be
@@ -173,16 +88,23 @@ services:
           memory: 50M
     restart: always
 
-  ffmpeg_svc:
-    image: ghcr.io/tomp736/pymp/pymp_server:latest-dev
-    env_file:
-      - 'server_svc.env'
+  pymp-server-ffmpeg:
+    image: pymp_server
     environment:
-      - SERVICE_TYPE=16
-      - MEDIA_SVC_HOST=media_svc_internal
-      - MEDIAREGISTRY_SVC_PROTO=http
-      - MEDIAREGISTRY_SVC_HOST=mediaregistry_svc
-      - MEDIAREGISTRY_SVC_PORT=80
+      PYTHONHASHSEED: "383747829"
+      FLASK_HOST: "0.0.0.0"
+      FLASK_PORT: "80"
+      FLASK_CORS_HEADERS: "*"
+      REDIS_HOST: "pymp-redis"
+      REDIS_PORT: "6379"
+      MEDIA_MEDIA_CHUNK_SIZE: "4194304"
+      MEDIA_THUMB_CHUNK_SIZE: "32768"
+      SERVER_PROTO: "http"
+      SERVER_HOST: "pymp-server-ffmpeg"
+      SERVER_PORT: "80"
+      SERVER_ROLES: "32"
+    volumes: 
+      - ./registry-services.json:/app/registry-services.json
     networks:
       - media_net
       - redis_be
@@ -197,24 +119,8 @@ services:
           memory: 50M
     restart: always
 
- # Redis Services
-  redis-slave:
-    image: redis:latest
-    command: redis-server --slaveof redis-master 6379
-    networks:
-      - redis_fe
-      - redis_be
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 25M
-    restart: always
-   
-  redis-master:
+ # Redis Services   
+  pymp-redis:
     image: redis:latest
     command: redis-server --port 6379   
     networks:
@@ -231,16 +137,12 @@ services:
           memory: 25M
     restart: always
 
-  # Monitoring and Load Testing Services
-  prometheus:
-    image: prom/prometheus
+  pymp-redis-readonly:
+    image: redis:latest
+    command: redis-server --slaveof pymp-redis 6379
     networks:
-      - prom_net
-    ports:
-      - 9090:9090
-    volumes: 
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      - /srv/pymp/prometheus:/prometheus:rw
+      - redis_fe
+      - redis_be
     deploy:
       resources:
         limits:
@@ -248,39 +150,59 @@ services:
           memory: 100M
         reservations:
           cpus: '0.5'
-          memory: 100M
-    restart: always
-    
-  grafana:
-    image: grafana/grafana:latest
-    networks:
-      - prom_net
-    ports:
-      - 9091:3000
-    volumes: 
-      - ./grafana/dashboards:/etc/dashboards
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - /srv/pymp/grafana:/var/lib/grafana:rw
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-          memory: 100M
-        reservations:
-          cpus: '0.5'
-          memory: 100M
+          memory: 25M
     restart: always
 
-  pymp_locust:
-    image: ghcr.io/tomp736/pymp/pymp_locust:latest-dev
-    networks:
-      - locust_net
-    ports:
-      - "8089:8089"
-    env_file:
-      - 'locust.env'
-    command: -f /mnt/locust/locustfiles  
+  # # Monitoring and Load Testing Services
+  # prometheus:
+  #   image: prom/prometheus
+  #   networks:
+  #     - prom_net
+  #   ports:
+  #     - 9090:9090
+  #   volumes: 
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - /srv/pymp/prometheus:/prometheus:rw
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.5'
+  #         memory: 100M
+  #       reservations:
+  #         cpus: '0.5'
+  #         memory: 100M
+  #   restart: always
+    
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   networks:
+  #     - prom_net
+  #   ports:
+  #     - 9091:3000
+  #   volumes: 
+  #     - ./grafana/dashboards:/etc/dashboards
+  #     - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+  #     - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+  #     - /srv/pymp/grafana:/var/lib/grafana:rw
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '0.5'
+  #         memory: 100M
+  #       reservations:
+  #         cpus: '0.5'
+  #         memory: 100M
+  #   restart: always
+
+  # pymp-locust:
+  #   image: ghcr.io/tomp736/pymp/pymp_locust:latest-dev
+  #   networks:
+  #     - locust_net
+  #   ports:
+  #     - "8089:8089"
+  #   env_file:
+  #     - 'locust.env'
+  #   command: -f /mnt/locust/locustfiles  
 
 networks:
   prom_net: 
