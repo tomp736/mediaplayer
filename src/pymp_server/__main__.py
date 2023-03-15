@@ -16,11 +16,14 @@ from pymp_server.routes.frontend_thumb import app_frontend_thumb
 from pymp_server.routes.frontend_meta import app_frontend_meta
 
 app = Flask(__name__)
+    
+server_config = CONFIG_FACTORY.get_server_config()
+flask_config = CONFIG_FACTORY.get_flask_config()
 
 @app.after_request
 def after_request_func(response):
     logging.info('set_cors_headers')
-    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Origin', flask_config.cors_headers)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
     response.headers.add('Accept-Ranges', 'bytes')
@@ -29,9 +32,6 @@ def after_request_func(response):
 def main():
     logging.getLogger().setLevel(logging.INFO)
     # start_http_server(8000)
-    
-    server_config = CONFIG_FACTORY.get_server_config()
-    flask_config = CONFIG_FACTORY.get_flask_config()
     
     logging.info(server_config.__dict__)
     logging.info(flask_config.__dict__)
