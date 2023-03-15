@@ -48,6 +48,8 @@ jobs:
 
   # run the docker_build_push workflow
   docker_build_push:
+    needs:
+      - prepare
 
     permissions:
       contents: read
@@ -64,6 +66,7 @@ jobs:
   create_tag:
 
     needs:
+      - prepare
       - docker_build_push
       
     uses: ./.github/workflows/on_wfc_create_tag.yml
@@ -75,6 +78,7 @@ jobs:
   dispatch_deployment:
 
     needs:
+      - prepare
       - docker_build_push
       - create_tag
       
