@@ -33,11 +33,8 @@ jobs:
 
           if [[ "${{ github.ref }}" = "refs/heads/main" ]]; then
             create=0
-          elif [[ "${{ github.ref }}" = "refs/heads/dev" ]]; then
-            branch_target="main"
-            create=1
           else
-            branch_target="dev"
+            branch_target="main"
             create=1
           fi
 

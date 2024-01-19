@@ -15,4 +15,4 @@ jobs:
           repository: tomp736/pymp
           older-than-seconds: 3600
         env:
-          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
