@@ -3,7 +3,7 @@ name: 'cron cleanup workflows'
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '*/10 * * * *'
+    - cron:  '0 0 * * *'
 
 jobs:
   delete-slow:
@@ -15,4 +15,4 @@ jobs:
           repository: tomp736/pymp
           older-than-seconds: 3600
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PYMP_PAT_WF_RW }}
