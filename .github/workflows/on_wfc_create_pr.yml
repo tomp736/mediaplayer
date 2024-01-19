@@ -36,13 +36,13 @@ jobs:
         id: create_pull_request
         uses: peter-evans/create-pull-request@v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PYMP_PAT_WF_RW }}
           branch: ${{ inputs.target_branch }}-${{ inputs.promotion_tag }}
 
       # - name: enable auto-merge
       #   if: steps.create_pull_request.outputs.pull-request-operation == 'created'
       #   uses: peter-evans/enable-pull-request-automerge@v2
       #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      #     token: ${{ secrets.PYMP_PAT_WF_RW }}
       #     pull-request-number: ${{ steps.create_pull_request.outputs.pull-request-number }}
       #     merge-method: squash
