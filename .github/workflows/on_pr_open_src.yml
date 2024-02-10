@@ -6,8 +6,8 @@ on:
     types: [opened, reopened, synchronize]
     branches:
       - main
-    paths:
-      - "src/**"
+    # paths:
+    #   - "src/**"
 
 jobs:
   # Job to run tests
