@@ -6,64 +6,30 @@ inputs:
     type: string
     description: 'Docker registry URL'
     required: true
+
   registry_user:
     type: string
     description: 'Docker registry USER'
     required: true
+
   registry_token:
     type: string
     description: 'Docker registry TOKEN'
     required: true
+
   repository:
     type: string
     description: 'Docker repository name'
     required: true
+    
   build_tag:
     type: string
     description: 'Build tag/version'
     required: true
 
-concurrency: 
-  group: docker_build_${{ inputs.build_tag }}
-  cancel-in-progress: false
-
-jobs:
-  docker-build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        image:
-          - pymp_core
-          - pymp_frontend
-          - pymp_server
-        test-target:
-          - ''
-        base-image:
-          - ''
-        base-image-tag:
-          - ''
-        exclude:
-          - image: pymp_core
-            base-image: ''
-            base-image-tag: ''
-            test-target: ''
-          - image: pymp_server
-            base-image: ''
-            base-image-tag: ''
-            test-target: ''
-        include:
-          - image: pymp_core
-            base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
-            base-image-tag: latest
-            test-target: 'tests'
-          - image: pymp_server
-            base-image: ${{ inputs.registry }}/${{ inputs.repository }}/pymp_core
-            base-image-tag: ${{ inputs.build_tag }}
-            test-target: 'tests'
-
-    steps:
+runs:
+  using: "composite"
+  steps:
       - name: Checkout code
         uses: actions/checkout@v3
       
