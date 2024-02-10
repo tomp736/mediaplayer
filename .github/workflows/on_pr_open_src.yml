@@ -31,8 +31,8 @@ jobs:
       
     uses: ./.github/workflows/docker_build_push.yml
     with:
-      build_registry: ghcr.io
-      build_repo: ${{ github.repository }}
+      registry: ghcr.io
+      repository: ${{ github.repository }}
       build_tag: ${{ github.event.pull_request.head.ref }}-${{ github.event.pull_request.number }}-${{ github.event.pull_request.commits }}
     secrets: inherit
 
