@@ -1,15 +1,11 @@
-name: 'on pr close src'
+name: Pull Request Close
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
 on:
   pull_request:
-    types: 
-    - closed
+    types: [closed]
     branches:
-    - dev
     - main
-    paths:
-      - "src/**"
 
 jobs:
   prepare:
