@@ -1,32 +1,32 @@
 name: docker-build-push
-on: 
+
+on:
   workflow_call:
     inputs:
-      build_registry:
+      registry:
         type: string
-        description: 'version'
+        description: 'Docker registry URL'
         required: true
-      build_repo:
+      repository:
         type: string
-        description: 'version'
+        description: 'Docker repository name'
         required: true
       build_tag:
         type: string
-        description: 'version'
+        description: 'Build tag/version'
         required: true
 
-
 concurrency: 
-  group:  docker_build_${{ inputs.build_tag }}
+  group: docker_build_${{ inputs.build_tag }}
   cancel-in-progress: false
 
 jobs:
-
   docker-build:
     runs-on: ubuntu-latest
+
     strategy:
       fail-fast: true
-      matrix: 
+      matrix:
         image:
           - pymp_core
           - pymp_frontend
@@ -52,40 +52,44 @@ jobs:
             base-image-tag: latest
             test-target: 'tests'
           - image: pymp_server
-            base-image: ${{ inputs.build_registry }}/${{ inputs.build_repo }}/pymp_core
+            base-image: ${{ inputs.registry }}/${{ inputs.repository }}/pymp_core
             base-image-tag: ${{ inputs.build_tag }}
             test-target: 'tests'
 
     steps:
-      - 
+      - name: Checkout code
         uses: actions/checkout@v3
-      - 
-        name: Set up QEMU
+      
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      - 
-        name: Set up Docker Buildx
+      
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - 
-        name: Login to GitHub Container Registry
+      
+      - name: Login to Docker registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ inputs.build_registry }}
+          registry: ${{ inputs.registry }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - 
-        name: Check if image is available
-        shell: bash
-        timeout-minutes: 5
+          password: ${{ secrets.GITHUB_TOKEN }}  # Replace with your Docker password secret
+      
+      - name: Check if base image is available
         if: matrix.base-image != ''
         run: |
-          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }}; do
-            echo ${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+          retries=5
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }} || [ $retries -eq 0 ]; do
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
+            ((retries--))
           done
-          echo "Image is available, continuing with the workflow."
-      - 
-        name: Build - targeting test
+          if [ $retries -eq 0 ]; then
+            echo "Base image not available after multiple attempts. Exiting..."
+            exit 1
+          else
+            echo "Base image is available, continuing with the workflow."
+          fi
+      
+      - name: Build - targeting test
         if: matrix.test-target != ''
         uses: docker/build-push-action@v4
         with:
@@ -101,9 +105,9 @@ jobs:
             APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-             ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
-      - 
-        name: Build - targeting final and push
+            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}
+      
+      - name: Build - targeting final and push
         uses: docker/build-push-action@v4
         with:
           context: ./src
@@ -117,4 +121,4 @@ jobs:
             APP_REF_VERSION=${{ inputs.build_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ inputs.build_registry }}/${{ inputs.build_repo }}/${{ matrix.image }}:${{ inputs.build_tag }}
+            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}
