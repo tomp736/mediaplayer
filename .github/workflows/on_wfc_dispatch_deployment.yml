@@ -1,25 +1,28 @@
-name: 'on wfc dispatch deployment'
+name: Dispatch_Deployment_Workflow
 
 on:
   workflow_call:
     inputs:
       environment:
         type: string
-        description: 'environment to deploy'
+        description: 'Environment to deploy'
         required: true
       version:
         type: string
-        description: 'app version to deploy'
-        required: false
+        description: 'App version to deploy'
+        required: true
+      dispatch_token:
+        type: string
+        description: 'GitHub token to trigger dispatch'
+        required: true
 
 jobs:
-  create_pr:
+  dispatch-deployment-job:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - 
-        name: Save payload to file
+      - name: Prepare Dispatch Payload
         run: |
           cat <<EOF > payload.json
           {
@@ -31,11 +34,11 @@ jobs:
             }
           }
           EOF
-      - 
-        name: Trigger Repository Dispatch
+
+      - name: Trigger Repository Dispatch
         run: |
           curl -X POST \
-              -H "Authorization: Bearer ${{ secrets.WF_DISPATCH_PYMP_INFRA_FLUX }}" \
+              -H "Authorization: Bearer ${{ inputs.dispatch_token }}" \
               -H "Accept: application/vnd.github.everest-preview+json" \
               -H "Content-Type: application/json" \
               --data @payload.json \
