@@ -1,0 +1,131 @@
+name: docker-build-push
+description: builds and pushes an image
+
+inputs:
+  registry:
+    type: string
+    description: 'Docker registry URL'
+    required: true
+  registry_user:
+    type: string
+    description: 'Docker registry USER'
+    required: true
+  registry_token:
+    type: string
+    description: 'Docker registry TOKEN'
+    required: true
+  repository:
+    type: string
+    description: 'Docker repository name'
+    required: true
+  build_tag:
+    type: string
+    description: 'Build tag/version'
+    required: true
+
+concurrency: 
+  group: docker_build_${{ inputs.build_tag }}
+  cancel-in-progress: false
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        image:
+          - pymp_core
+          - pymp_frontend
+          - pymp_server
+        test-target:
+          - ''
+        base-image:
+          - ''
+        base-image-tag:
+          - ''
+        exclude:
+          - image: pymp_core
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+          - image: pymp_server
+            base-image: ''
+            base-image-tag: ''
+            test-target: ''
+        include:
+          - image: pymp_core
+            base-image: ghcr.io/labrats-work/ops-images/python-ffmpeg
+            base-image-tag: latest
+            test-target: 'tests'
+          - image: pymp_server
+            base-image: ${{ inputs.registry }}/${{ inputs.repository }}/pymp_core
+            base-image-tag: ${{ inputs.build_tag }}
+            test-target: 'tests'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.registry }}
+          username: ${{ inputs.registry_user }}
+          password: ${{ inputs.registry_token }}  # Replace with your Docker password secret
+      
+      - name: Check if base image is available
+        if: matrix.base-image != ''
+        run: |
+          retries=5
+          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }} || [ $retries -eq 0 ]; do
+            echo "Image is not available, sleeping for 10 seconds..."
+            sleep 10
+            ((retries--))
+          done
+          if [ $retries -eq 0 ]; then
+            echo "Base image not available after multiple attempts. Exiting..."
+            exit 1
+          else
+            echo "Base image is available, continuing with the workflow."
+          fi
+      
+      - name: Build - targeting test
+        if: matrix.test-target != ''
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          target: test
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}
+      
+      - name: Build - targeting final and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ./src/${{ matrix.image }}/dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
+            APP_BUILD_VERSION=${{ inputs.build_tag }}
+            APP_REF_VERSION=${{ inputs.build_tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}

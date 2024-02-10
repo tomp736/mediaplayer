@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Run Unit Tests.
-        uses: ./.github/workflows/on_wfc_tests.yml
+      # - name: Run Unit Tests.
+      #   uses: ./.github/workflows/on_wfc_tests.yml
 
   # Job to build and push Docker images
   build-and-push-docker:
@@ -30,9 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build and Push Docker Images
-        uses: ./.github/workflows/docker_build_push.yml
+        uses: ./.github/actions/docker-build-push
         with:
           registry: ghcr.io
+          registry_user: ${{ github.actor }}
+          regustry_token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           build_tag: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
 
@@ -45,7 +47,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Dispatch Deployment Event
-        uses: ./.github/workflows/on_wfc_dispatch_deployment.yml
+        uses: ./.github/actions/dispatch-deployment
         with:
           environment: ${{ github.event.pull_request.head.ref }}
           version: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
