@@ -87,7 +87,7 @@ runs:
         uses: docker/build-push-action@v4
         with:
           context: ${{ inputs.docker_path }}
-          file: dockerfile
+          file: ${{ inputs.docker_path }}/dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
