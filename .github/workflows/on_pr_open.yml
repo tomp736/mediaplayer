@@ -29,14 +29,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        # Read the current version number from git ls-remote
+      - id: this_version
+        shell: bash
+        run: |
+          echo "this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | tail -1)" >> $GITHUB_OUTPUT
+
       - name: Build and Push Docker Images
         uses: ./.github/actions/docker-build-push
         with:
-          registry: ghcr.io
+          registry_url: ghcr.io
           registry_user: ${{ github.actor }}
           regustry_token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          build_tag: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          registry_repository: ${{ github.repository }}
+
+          docker_path: ./src/pymp_core
+          docker_baseimage_name: ''
+          docker_baseimage_tag: ''
+          docker_image_name: pymp_core
+          docker_image_tag: ${{ steps.this_version.outputs.this_version }}-pr-${{ github.event.pull_request.number }}
 
   # Job to dispatch deployment event
   dispatch-deployment:

@@ -2,7 +2,7 @@ name: docker-build-push
 description: builds and pushes an image
 
 inputs:
-  registry:
+  registry_url:
     type: string
     description: 'Docker registry URL'
     required: true
@@ -17,14 +17,34 @@ inputs:
     description: 'Docker registry TOKEN'
     required: true
 
-  repository:
+  registry_repository:
     type: string
-    description: 'Docker repository name'
+    description: 'Docker registry REPOSITORY'
     required: true
-    
-  build_tag:
+
+  docker_baseimage_name:
     type: string
-    description: 'Build tag/version'
+    description: 'Docker base image name'
+    required: true
+
+  docker_baseimage_tag:
+    type: string
+    description: 'Docker base image tag'
+    required: true
+
+  docker_path:
+    type: string
+    description: 'Docker image name'
+    required: true
+
+  docker_image_name:
+    type: string
+    description: 'Docker image name'
+    required: true
+
+  docker_image_tag:
+    type: string
+    description: 'Docker image name'
     required: true
 
 runs:
@@ -42,15 +62,16 @@ runs:
       - name: Login to Docker registry
         uses: docker/login-action@v2
         with:
-          registry: ${{ inputs.registry }}
+          registry: ${{ inputs.registry_url }}
           username: ${{ inputs.registry_user }}
           password: ${{ inputs.registry_token }}  # Replace with your Docker password secret
       
       - name: Check if base image is available
-        if: matrix.base-image != ''
+        if: inputs.docker_baseimage_name != ''
+        shell: bash
         run: |
           retries=5
-          until docker pull ${{ matrix.base-image }}:${{ matrix.base-image-tag }} || [ $retries -eq 0 ]; do
+          until docker pull ${{ inputs.docker_baseimage_name }}:${{ inputs.docker_baseimage_tag }} || [ $retries -eq 0 ]; do
             echo "Image is not available, sleeping for 10 seconds..."
             sleep 10
             ((retries--))
@@ -61,37 +82,19 @@ runs:
           else
             echo "Base image is available, continuing with the workflow."
           fi
-      
-      - name: Build - targeting test
-        if: matrix.test-target != ''
-        uses: docker/build-push-action@v4
-        with:
-          context: ./src
-          file: ./src/${{ matrix.image }}/dockerfile
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          target: test
-          build-args: |
-            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ inputs.build_tag }}
-            APP_REF_VERSION=${{ inputs.build_tag }}
-            BUILDKIT_PROGRESS=plain
-          tags: |
-            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}
-      
+
       - name: Build - targeting final and push
         uses: docker/build-push-action@v4
         with:
           context: ./src
-          file: ./src/${{ matrix.image }}/dockerfile
+          file: ./src/${{ inputs.docker_path }}/dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            BASE_IMAGE=${{ matrix.base-image }}:${{ matrix.base-image-tag }}
-            APP_BUILD_VERSION=${{ inputs.build_tag }}
-            APP_REF_VERSION=${{ inputs.build_tag }}
+            BASE_IMAGE=${{ inputs.docker_baseimage_name }}:${{ inputs.docker_baseimage_tag }}
+            APP_BUILD_VERSION=${{ inputs.docker_image_tag }}
+            APP_REF_VERSION=${{ inputs.docker_image_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ inputs.registry }}/${{ inputs.repository }}/${{ matrix.image }}:${{ inputs.build_tag }}
+            ${{ inputs.registry_url }}/${{ inputs.registry_repository }}/${{ inputs.docker_image_tag }}:${{ inputs.build_tag }}
