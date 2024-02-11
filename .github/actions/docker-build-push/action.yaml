@@ -22,11 +22,6 @@ inputs:
     description: 'Docker registry REPOSITORY'
     required: true
 
-  docker_image_base:
-    type: string
-    description: 'Docker image base'
-    required: true
-
   docker_path:
     type: string
     description: 'Docker image name'
@@ -59,24 +54,7 @@ runs:
         with:
           registry: ${{ inputs.registry_url }}
           username: ${{ inputs.registry_user }}
-          password: ${{ inputs.registry_token }}  # Replace with your Docker password secret
-      
-      - name: Check if base image is available
-        if: inputs.docker_image_base != ''
-        shell: bash
-        run: |
-          retries=5
-          until docker pull ${{ inputs.docker_image_base }} || [ $retries -eq 0 ]; do
-            echo "Image is not available, sleeping for 10 seconds..."
-            sleep 10
-            ((retries--))
-          done
-          if [ $retries -eq 0 ]; then
-            echo "Base image not available after multiple attempts. Exiting..."
-            exit 1
-          else
-            echo "Base image is available, continuing with the workflow."
-          fi
+          password: ${{ inputs.registry_token }}
 
       - name: Build - targeting final and push
         uses: docker/build-push-action@v4
@@ -87,7 +65,6 @@ runs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            BASE_IMAGE=${{ inputs.docker_image_base }}
             APP_BUILD_VERSION=${{ inputs.docker_image_tag }}
             APP_REF_VERSION=${{ inputs.docker_image_tag }}
             BUILDKIT_PROGRESS=plain
