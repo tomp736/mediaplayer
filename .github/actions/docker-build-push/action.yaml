@@ -1,0 +1,72 @@
+name: docker-build-push
+description: builds and pushes an image
+
+inputs:
+  registry_url:
+    type: string
+    description: 'Docker registry URL'
+    required: true
+
+  registry_user:
+    type: string
+    description: 'Docker registry USER'
+    required: true
+
+  registry_token:
+    type: string
+    description: 'Docker registry TOKEN'
+    required: true
+
+  registry_repository:
+    type: string
+    description: 'Docker registry REPOSITORY'
+    required: true
+
+  docker_path:
+    type: string
+    description: 'Docker image name'
+    required: true
+
+  docker_image_name:
+    type: string
+    description: 'Docker image name'
+    required: true
+
+  docker_image_tag:
+    type: string
+    description: 'Docker image name'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: Login to Docker registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ inputs.registry_url }}
+          username: ${{ inputs.registry_user }}
+          password: ${{ inputs.registry_token }}
+
+      - name: Build - targeting final and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ${{ inputs.docker_path }}/dockerfile
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP_BUILD_VERSION=${{ inputs.docker_image_tag }}
+            APP_REF_VERSION=${{ inputs.docker_image_tag }}
+            BUILDKIT_PROGRESS=plain
+          tags: |
+            ${{ inputs.registry_url }}/${{ inputs.registry_repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}

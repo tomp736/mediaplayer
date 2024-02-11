@@ -1,18 +1,63 @@
-name: 'on pr open'
+name: Pull Request Open
 
-# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
+# Trigger on pull request events targeting the main branch and for specified paths
 on:
   pull_request:
-    types: 
-      - opened
-      - reopened
-      - synchronize
+    types: [opened, reopened, synchronize]
     branches:
-      - dev
-      - main
+    - main
 
-jobs:  
-  # todo
-  todo:
-    uses: ./.github/workflows/on_wfc_todo.yml
-    secrets: inherit
+jobs:
+  # Job to run tests
+  run-tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # - name: Run Unit Tests.
+      #   uses: ./.github/workflows/on_wfc_tests.yml
+
+  # Job to build and push Docker images
+  build-and-push-docker:
+    name: Build and Push Docker Images
+    needs: run-tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        # Read the current version number from git ls-remote
+      - id: this_version
+        shell: bash
+        run: |
+          echo "this_version=$(git ls-remote --tag origin | cut -d '/' -f 3 | sort -V | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | tail -1)" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Images
+        uses: ./.github/actions/docker-build-push
+        with:
+          registry_url: ghcr.io
+          registry_user: ${{ github.actor }}
+          registry_token: ${{ secrets.GITHUB_TOKEN }}
+          registry_repository: ${{ github.repository }}
+
+          docker_path: ./src/pymp_core
+          docker_image_name: pymp_core
+          docker_image_tag: ${{ steps.this_version.outputs.this_version }}-pr-${{ github.event.pull_request.number }}
+
+  # Job to dispatch deployment event
+  dispatch-deployment:
+    name: Dispatch Deployment Event
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Dispatch Deployment Event
+        uses: ./.github/actions/dispatch-deployment
+        with:
+          environment: ${{ github.event.pull_request.head.ref }}
+          version: pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          dispatch_token: ${{ secrets.WF_DISPATCH_PYMP_INFRA_FLUX }}
