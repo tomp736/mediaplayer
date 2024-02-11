@@ -44,8 +44,7 @@ jobs:
           registry_repository: ${{ github.repository }}
 
           docker_path: ./src/pymp_core
-          docker_baseimage_name: ''
-          docker_baseimage_tag: ''
+          docker_image_base: ''
           docker_image_name: pymp_core
           docker_image_tag: ${{ steps.this_version.outputs.this_version }}-pr-${{ github.event.pull_request.number }}
 
