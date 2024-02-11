@@ -59,7 +59,7 @@ runs:
       - name: Build - targeting final and push
         uses: docker/build-push-action@v4
         with:
-          context: ${{ inputs.docker_path }}
+          context: ./src
           file: ${{ inputs.docker_path }}/dockerfile
           push: true
           cache-from: type=gha
