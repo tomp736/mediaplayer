@@ -97,4 +97,4 @@ runs:
             APP_REF_VERSION=${{ inputs.docker_image_tag }}
             BUILDKIT_PROGRESS=plain
           tags: |
-            ${{ inputs.registry_url }}/${{ inputs.registry_repository }}/${{ inputs.docker_image_tag }}:${{ inputs.build_tag }}
+            ${{ inputs.registry_url }}/${{ inputs.registry_repository }}/${{ inputs.docker_image_name }}:${{ inputs.docker_image_tag }}
